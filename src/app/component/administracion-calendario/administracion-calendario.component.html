@@ -1,0 +1,79 @@
+<nb-card [nbSpinner]="loading" nbSpinnerStatus="success" nbSpinnerSize="large"
+nbSpinnerMessage="{{ 'GLOBAL.cargando' | translate }}">
+    <nb-card-header>
+        <div class="row" align="center">
+            <div class="col">
+                {{ 'calendario.administración_calendario_proyecto' | translate }}
+            </div>
+        </div>
+    </nb-card-header>
+    <nb-card-body>
+        <fieldset [ngClass]="{'fieldseter':true} ">
+            <legend>
+                {{ 'calendario.informacion_general' | translate}}
+            </legend>
+            <div class="row" *ngIf="IsAdmin">
+                <div class="col-3">
+                    <mat-form-field style="width: 100%;">
+                        <mat-label> {{ 'proyecto.nivel_proyecto' | translate }} </mat-label>
+                        <mat-select [(ngModel)]="nivelesSelected" (selectionChange)="onSelectLevel()">
+                            <mat-option *ngFor="let nivel of niveles" [value]="nivel">{{ nivel.Nombre }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <mat-form-field style="width: 100%;">
+                        <mat-label> {{ 'calendario.proyecto_curricular' | translate }} </mat-label>
+                        <mat-select [(ngModel)]="proyectoSelected" (selectionChange)="onSelectPrograma()">
+                            <mat-option *ngFor="let proyecto of Proyectos" [value]="proyecto">
+                                {{proyecto.Nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <mat-form-field style="width: 100%;">
+                        <mat-label> {{ 'calendario.calendario_academico' | translate }} </mat-label>
+                        <input matInput type="text" placeholder="{{ 'calendario.calendario_academico' | translate }}" value="{{Calendario_academico}}" readonly />
+                    </mat-form-field>
+                </div>
+                <div class="col-2">
+                    <button  title="{{ 'calendario.tooltip_detalle' | translate}}" mat-button (click)='verCalendario()'><i class="nb-search" style="font-size: 35px;"></i></button>
+                </div>
+            </div>
+        </fieldset>
+        <br><br>
+        <fieldset [ngClass]="{'fieldseter':true}">
+            <legend>
+                {{ 'calendario.procesos_actividades' | translate }}
+            </legend>
+
+            <div class="calendar-content">
+                <mat-tab-group>
+                    <mat-tab label="{{ 'calendario.procesos' | translate }}">
+                        <!-- <ng2-smart-table [settings]="processSettings" [source]="processTable" (custom)="onAction($event, null)"></ng2-smart-table> -->
+                    </mat-tab>
+                    <mat-tab label="{{ 'calendario.actividades' | translate }}">
+                        <mat-accordion>
+                            <mat-expansion-panel *ngFor="let process of processes">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ process.Nombre }}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <!-- <ng2-smart-table [settings]="activitiesSettings" [source]="process.actividades" (custom)="onAction($event, process)" ></ng2-smart-table> -->
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </fieldset>
+    </nb-card-body>
+    <nb-card-footer>
+
+    </nb-card-footer>
+</nb-card>

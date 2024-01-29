@@ -1,0 +1,219 @@
+<!--<ng-container *ngIf="select_proyectos_act">
+    <nb-card style="padding: 0;">
+        <nb-card-body>
+            <fieldset [ngClass]="{'fieldseter':true} ">
+                <legend>{{ 'calendario.select_proyectos_actividades' | translate }}</legend>
+                <form novalidate [formGroup]="SelectorDeps">
+                <div class="message-alert">
+                    {{ 'calendario.seleccion_proyectos_info' | translate }}
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label>{{ 'calendario.seleccione_proyecto' | translate }} </mat-label>
+                            <mat-select formControlName="Dependencias" multiple>
+                                <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }} </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="float-right" mat-button (click)='guardar()'>{{ 'GLOBAL.guardar' | translate }}</button>
+                    </div>
+                </div>
+                </form>
+            </fieldset>
+        </nb-card-body>
+    </nb-card>
+</ng-container>
+
+<ng-container *ngIf="actividad_detalle_proyectos">
+    <nb-card style="padding: 0;">
+        <nb-card-header>
+            <div class="row" align="center">
+                <div class="col">
+                    {{ 'calendario.actividad' | translate }}: {{actividad}}
+                </div>
+            </div>
+        </nb-card-header>
+        <nb-card-body>
+            <fieldset [ngClass]="{'fieldseter':true} ">
+                <legend>{{ 'calendario.descripcion_actividad' | translate }}</legend>
+                <label>{{descripcion_actividad}}</label>
+            </fieldset>
+            <br>
+            <ng2-smart-table [settings]="settings" [source]="dataSource">
+            </ng2-smart-table>
+        </nb-card-body>
+        <nb-card-footer>
+            <div class="row" align="center">
+                <div class="col">
+                    <button class="float-center" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                </div>
+            </div>
+        </nb-card-footer>
+    </nb-card>
+</ng-container>
+
+<ng-container *ngIf="proceso_detalle">
+    <nb-card>
+        <nb-card-body>
+            <fieldset [ngClass]="{'fieldseter':true} ">
+                <legend>
+                    {{ 'calendario.proceso' | translate }}
+                </legend>
+                <div class="row">
+                    <div class="col-12">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.nombre' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.proceso' | translate }}" value="{{nombre_proceso}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.descripcion' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.descripcion_proceso' | translate }}" value="{{descripcion_proceso}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.periodicidad_2' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.periodicidad_2' | translate }}" value="{{periodicidad_proceso}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="float-right" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                    </div>
+                </div>
+            </fieldset>
+        </nb-card-body>
+    </nb-card>
+</ng-container>
+
+<ng-container *ngIf="editar_actividad">
+    <nb-card>
+        <nb-card-header>
+            <div class="row" align="center">
+                <div class="col">
+                    {{ 'calendario.edicion_actividades' | translate }}
+                </div>
+            </div>
+        </nb-card-header>
+        <nb-card-body>
+            <form novalidate [formGroup]="ActivityEditor">
+            <fieldset [ngClass]="{'fieldseter':true} ">
+                <legend>
+                    {{ 'calendario.actividad' | translate }}
+                </legend>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.proceso' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.proceso' | translate }}" value="{{nombre_proceso}}" readonly />
+                        </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.periodo' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.periodo' | translate }}" value="{{periodo}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.actividad' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.actividad' | translate }}" value="{{actividad}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <mat-form-field style="width: 100%;">
+                            <mat-label> {{ 'calendario.descripcion' | translate }} </mat-label>
+                            <input matInput type="text" placeholder="{{ 'calendario.descripcion' | translate }}" value="{{descripcion_actividad}}" readonly />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <fieldset [ngClass]="{'fieldseter':true} ">
+                    <fieldset [ngClass]="{'fieldseter':true} ">
+                        <legend>
+                            {{ 'calendario.fechas_globales' | translate }}
+                        </legend>
+                        <div class="row">
+                            <div class="col-6">
+                                <mat-form-field style="width: 100%;">
+                                    <mat-label>{{ 'calendario.fecha_inicio' | translate }}:</mat-label>
+                                    <input matInput [matDatepicker]="f_ini" formControlName="fecha_inicio_org" readonly disabled>
+                                    <mat-datepicker-toggle matSuffix [for]="f_ini"></mat-datepicker-toggle>
+                                    <mat-datepicker #f_ini></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6">
+                                <mat-form-field style="width: 100%;">
+                                    <mat-label>{{ 'calendario.fecha_fin' | translate }}:</mat-label>
+                                    <input matInput [matDatepicker]="f_fin" formControlName="fecha_fin_org" readonly disabled>
+                                    <mat-datepicker-toggle matSuffix [for]="f_fin"></mat-datepicker-toggle>
+                                    <mat-datepicker #f_fin></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <div *ngIf="ActividadEditable">
+                    <div class="message-alert" style="font-size: 13px;">
+                        {{ 'calendario.modificacion_fechas_info' | translate }}
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <mat-form-field style="width: 100%;">
+                                <mat-label>{{ 'calendario.fecha_inicio' | translate }}:</mat-label>
+                                <input matInput [matDatepicker]="f_ini_n" [min]="f_ini._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_inicio_new">
+                                <mat-datepicker-toggle matSuffix [for]="f_ini_n"></mat-datepicker-toggle>
+                                <mat-datepicker #f_ini_n></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                            <mat-form-field style="width: 100%;">
+                                <mat-label>{{ 'calendario.fecha_fin' | translate }}:</mat-label>
+                                <input matInput [matDatepicker]="f_fin_n" [min]="f_ini_n._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_fin_new">
+                                <mat-datepicker-toggle matSuffix [for]="f_fin_n"></mat-datepicker-toggle>
+                                <mat-datepicker #f_fin_n></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    </div>
+                </fieldset>
+            </fieldset>
+            <br>
+            <fieldset [ngClass]="{'fieldseter':true} ">
+                <legend>
+                    {{ 'calendario.dirigido' | translate }}
+                </legend>
+                <ng2-smart-table [settings]="settings2" [source]="dataSource2">
+                </ng2-smart-table>
+            </fieldset>
+            <br>
+            <div class="row" align="center">
+                <div class="col">
+                    <div *ngIf="ActividadEditable">
+                        <button class="float-center" mat-button (click)='guardar()' [disabled]="ActivityEditor.invalid">{{ 'GLOBAL.guardar' | translate }}</button>
+                    </div>
+                    <div *ngIf="!ActividadEditable">
+                        <button class="float-center" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </nb-card-body>
+    </nb-card>
+</ng-container>-->
