@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NbCardModule, NbThemeModule, NbSpinnerModule, NbToastrModule,   } from '@nebular/theme';
+
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -21,8 +21,17 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import { LocalDataSource } from 'ng2-smart-table';
 import { PopUpManager } from './managers/popUpManager';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
+import { EdicionActividadesProgramasComponent } from './component/edicion-actividades-programas/edicion-actividades-programas.component';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import {MatCardModule} from '@angular/material/card';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatIconModule} from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import {MatNativeDateModule} from '@angular/material/core';
 
 
 
@@ -31,21 +40,27 @@ import { FormsModule } from '@angular/forms';
   declarations: [
     AppComponent,
     AdministracionCalendarioComponent,
+    EdicionActividadesProgramasComponent
   ],
   imports: [
+    ReactiveFormsModule,
     FormsModule,
     BrowserModule,
     AppRoutingModule,
+    MatNativeDateModule,
     MatDialogModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatTableModule,
+    MatDatepickerModule,
     MatTabsModule,
+    MatPaginatorModule,
     BrowserAnimationsModule,
     MatExpansionModule,
-    NbCardModule,
-    NbSpinnerModule,
-    NbToastrModule.forRoot(),
-    NbThemeModule.forRoot(),
+    MatIconModule,
     HttpClientModule,
     TranslateModule.forRoot({
       loader:{

@@ -1,79 +1,186 @@
-<nb-card [nbSpinner]="loading" nbSpinnerStatus="success" nbSpinnerSize="large"
-nbSpinnerMessage="{{ 'GLOBAL.cargando' | translate }}">
-    <nb-card-header>
-        <div class="row" align="center">
-            <div class="col">
-                {{ 'calendario.administración_calendario_proyecto' | translate }}
-            </div>
+
+<mat-card>
+  <mat-spinner *ngIf="loading"  diameter="100" color="primary"></mat-spinner>
+  <mat-card-header >
+    <div class="row" align="center" >
+      <div class="col">
+        {{ 'calendario.administración_calendario_proyecto' | translate }}
+      </div>
+    </div>
+  </mat-card-header  >
+  <mat-card-content >
+    <fieldset [ngClass]="{'fieldseter':true}">
+      <legend>
+        {{ 'calendario.informacion_general' | translate}}
+      </legend>
+      <div class="row" *ngIf="IsAdmin">
+        <div class="col-3">
+          <mat-form-field style="width: 100%;">
+            <mat-label> {{ 'proyecto.nivel_proyecto' | translate }} </mat-label>
+            <mat-select [(ngModel)]="nivelesSelected" (selectionChange)="onSelectLevel()">
+              <mat-option *ngFor="let nivel of niveles" [value]="nivel">
+                {{ nivel.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
-    </nb-card-header>
-    <nb-card-body>
-        <fieldset [ngClass]="{'fieldseter':true} ">
-            <legend>
-                {{ 'calendario.informacion_general' | translate}}
-            </legend>
-            <div class="row" *ngIf="IsAdmin">
-                <div class="col-3">
-                    <mat-form-field style="width: 100%;">
-                        <mat-label> {{ 'proyecto.nivel_proyecto' | translate }} </mat-label>
-                        <mat-select [(ngModel)]="nivelesSelected" (selectionChange)="onSelectLevel()">
-                            <mat-option *ngFor="let nivel of niveles" [value]="nivel">{{ nivel.Nombre }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <mat-form-field style="width: 100%;">
+            <mat-label> {{ 'calendario.proyecto_curricular' | translate }} </mat-label>
+            <mat-select [(ngModel)]="proyectoSelected" (selectionChange)="onSelectPrograma()">
+              <mat-option *ngFor="let proyecto of Proyectos" [value]="proyecto">
+                {{proyecto.Nombre}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <mat-form-field style="width: 100%;">
+            <mat-label> {{ 'calendario.calendario_academico' | translate }} </mat-label>
+            <input matInput type="text" placeholder="{{ 'calendario.calendario_academico' | translate }}" [value]="Calendario_academico" readonly />
+          </mat-form-field>
+        </div>
+        <div class="col-2">
+          <button mat-icon-button title="{{ 'calendario.tooltip_detalle' | translate }}" (click)="verCalendario()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </div>
+      </div>
+    </fieldset>
+    <br><br>
+    <fieldset [ngClass]="{'fieldseter':true}">
+      <legend>
+        {{ 'calendario.procesos_actividades' | translate }}
+      </legend>
+      <div class="calendar-content">
+        <mat-tab-group>
+          <mat-tab label="{{ 'calendario.procesos' | translate }}">
+            <!-- Aquí va el contenido de procesos -->
+            <mat-form-field>
+              <mat-label>{{'GLOBAL.buscar' | translate}}</mat-label>
+              <input matInput (keyup)="applyFilterProces($event)" placeholder="{{'GLOBAL.buscar'| translate}}" #input>
+            </mat-form-field>
+            
+            <div class="mat-elevation-z8"   (custom)="onAction($event, null)">
+              <table mat-table [dataSource]="dataSource" matSort>
+            
+                <!-- ID Column -->
+                <ng-container matColumnDef="Nombre" >
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.nombre' | translate}} </th>
+                  <td mat-cell *matCellDef="let row"> {{row.Nombre}} </td>
+                </ng-container>
+                <!-- Progress Column -->
+                <ng-container matColumnDef="Descripcion">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 80%;"> {{'GLOBAL.descripcion' | translate}} </th>
+                 
+                  <td mat-cell *matCellDef="let row"> {{row.Descripcion}} </td>
+                </ng-container>
+                
+                <ng-container matColumnDef="Acciones">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header > {{'GLOBAL.acciones' | translate}} </th>
+                  <td mat-cell *matCellDef="let row" > 
+                    <button class="buttondetprocess" (click)="onAction({action: 'view', data:row}, null)">                        
+                      <mat-icon  aria-hidden="false" title="{{'calendario.tooltip_detalle_proceso' | translate}}" fontIcon="search">
+                    </mat-icon>
+                  </button>
+                </ng-container>
+    
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell" colspan="4">{{'calendario.sin_procesos' | translate}}</td>
+                </tr>
+              </table>
+            
+            
             </div>
-            <div class="row">
-                <div class="col-6">
-                    <mat-form-field style="width: 100%;">
-                        <mat-label> {{ 'calendario.proyecto_curricular' | translate }} </mat-label>
-                        <mat-select [(ngModel)]="proyectoSelected" (selectionChange)="onSelectPrograma()">
-                            <mat-option *ngFor="let proyecto of Proyectos" [value]="proyecto">
-                                {{proyecto.Nombre}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <mat-form-field style="width: 100%;">
-                        <mat-label> {{ 'calendario.calendario_academico' | translate }} </mat-label>
-                        <input matInput type="text" placeholder="{{ 'calendario.calendario_academico' | translate }}" value="{{Calendario_academico}}" readonly />
-                    </mat-form-field>
-                </div>
-                <div class="col-2">
-                    <button  title="{{ 'calendario.tooltip_detalle' | translate}}" mat-button (click)='verCalendario()'><i class="nb-search" style="font-size: 35px;"></i></button>
-                </div>
-            </div>
-        </fieldset>
-        <br><br>
-        <fieldset [ngClass]="{'fieldseter':true}">
-            <legend>
-                {{ 'calendario.procesos_actividades' | translate }}
-            </legend>
+          </mat-tab>
+          <mat-tab label="{{ 'calendario.actividades' | translate }}">
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let process of processes ;  index as i ">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ process.Nombre }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                
+                <!-- Aquí va el contenido de actividades -->    
+                <mat-form-field>
+                  <mat-label>{{'GLOBAL.buscar' | translate}}</mat-label>
+                  <input matInput (keyup)="applyFilterActividades($event, process.actividades, i)" placeholder="{{'GLOBAL.buscar'| translate}}" #inputActividades>
+                </mat-form-field>
+                   
+                <div class="mat-elevation-z8" >
+                  <table mat-table  [dataSource]="process.actividades  " matSort>
+                
+                    <!-- ID Column -->
+                    <ng-container matColumnDef="Nombre">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{"calendario.nombre" | translate}} </th>
+                      <td mat-cell *matCellDef="let row"> {{row.Nombre}} </td>
+                    </ng-container>
+                
+                    <!-- Progress Column -->
+                    <ng-container matColumnDef="Descripcion">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'GLOBAL.descripcion' | translate}} </th>
+                      
+                      <td mat-cell *matCellDef="let row"> {{row.Descripcion}} </td>
+                    </ng-container>
 
-            <div class="calendar-content">
-                <mat-tab-group>
-                    <mat-tab label="{{ 'calendario.procesos' | translate }}">
-                        <!-- <ng2-smart-table [settings]="processSettings" [source]="processTable" (custom)="onAction($event, null)"></ng2-smart-table> -->
-                    </mat-tab>
-                    <mat-tab label="{{ 'calendario.actividades' | translate }}">
-                        <mat-accordion>
-                            <mat-expansion-panel *ngFor="let process of processes">
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        {{ process.Nombre }}
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
-                                <!-- <ng2-smart-table [settings]="activitiesSettings" [source]="process.actividades" (custom)="onAction($event, process)" ></ng2-smart-table> -->
-                            </mat-expansion-panel>
-                        </mat-accordion>
-                    </mat-tab>
-                </mat-tab-group>
-            </div>
-        </fieldset>
-    </nb-card-body>
-    <nb-card-footer>
+                    <ng-container matColumnDef="FechaInicio">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.fecha_inicio' | translate}}  </th>
+                      <td mat-cell *matCellDef="let row"> {{row.FechaInicio}} </td>
+                    </ng-container>
 
-    </nb-card-footer>
-</nb-card>
+                    <ng-container matColumnDef="FechaFin">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.fecha_fin' | translate}}  </th>
+                      <td mat-cell *matCellDef="let row"> {{row.FechaFin}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="Activo">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.estado' | translate}}  </th>
+                      <td mat-cell *matCellDef="let row"> {{row.Activo}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="Acciones">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'GLOBAL.acciones' | translate}}  </th>
+                      <td mat-cell *matCellDef="let row" > 
+                      <button   (click)="onAction({action: 'edit', data:row}, process.actividades)" style="width: 50%;">                        
+                        <mat-icon  aria-hidden="false" title="{{'calendario.tooltip_editar_actividad' | translate}}" fontIcon="edit_outline">
+                      </mat-icon>
+                    </button>
+                    <button   style="width: 50%;" (click)="onAction( {action: 'disable', }, process ) ">                        
+                      <mat-icon  aria-hidden="false" title="{{'calendario.tooltip_estado_actividad' | translate}}" fontIcon="lock">
+                    </mat-icon>
+                  </button>
+                      </td>
+                    </ng-container>
+        
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsActividades"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsActividades;"></tr>
+                
+                    <!-- Row shown when there is no matching data. -->
+                    <tr class="mat-row" *matNoDataRow>
+                      <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+                    </tr>
+                  </table>
+                
+                </div>
+                
+
+              </mat-expansion-panel>
+            </mat-accordion>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </fieldset>
+  </mat-card-content>
+  <mat-card-actions>
+    <!-- Aquí van las acciones del footer -->
+  </mat-card-actions>
+</mat-card>

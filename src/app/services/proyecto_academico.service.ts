@@ -11,7 +11,7 @@ export class ProyectoAcademicoService {
     this.requestManager.setPath('PROYECTO_ACADEMICO_SERVICE');
   }
 
-  get(endpoint: any) {
+  get(endpoint: string) {
     this.requestManager.setPath('PROYECTO_ACADEMICO_SERVICE');
     return this.requestManager.get(endpoint);
   }

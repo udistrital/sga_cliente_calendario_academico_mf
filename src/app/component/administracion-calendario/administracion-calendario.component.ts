@@ -2,34 +2,30 @@
 import { Actividad } from '../../models/calendario-academico/actividad';
 import { Proceso } from '../../models/calendario-academico/proceso';
 import { ProyectoAcademicoInstitucion } from '../../models/proyecto_academico/proyecto_academico_institucion';
-import { Vinculacion } from '../../models/terceros/vinculacion';
 import { NivelFormacion } from '../../models/proyecto_academico/nivel_formacion';
 //managers
 import { PopUpManager } from '../../managers/popUpManager';
-
 //servicios
 import { EventoService } from '../../services/evento.service';
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
 import { SgaMidService } from '../../services/sga_mid.service';
-import { TercerosService } from '../../services/terceros.service';
+
 import { UserService } from '../../services/users.service';
 import { ParametrosService } from '../../services/parametros.service';
 import { ImplicitAutenticationService } from '../../services/implicit_autentication.service';
 //Material
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { MatFormFieldControl } from '@angular/material/form-field';
-
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, ViewChild } from '@angular/core';
 //Traductor
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { LocalDataSource } from 'ng2-smart-table';
 //componente etc
 import { EdicionActividadesProgramasComponent } from '../edicion-actividades-programas/edicion-actividades-programas.component';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup } from '@angular/forms';
-import { HttpEventType } from '@angular/common/http';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { filter } from 'rxjs';
 
 
 
@@ -40,10 +36,13 @@ import { HttpEventType } from '@angular/common/http';
 })
 export class AdministracionCalendarioComponent implements OnInit {
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
 loading: boolean = false;
 processSettings: any;
 activitiesSettings: any;
-processTable: LocalDataSource;
+
 processes: Proceso[] = [];
 
 userId: number = 0;
@@ -62,12 +61,18 @@ periodicidad!: any;
 periodo_calendario: string = "";
 idCalendario: number = 0;
 
+displayedColumns: string[] = ['Nombre', 'Descripcion', "Acciones" ];
+displayedColumnsActividades : string [] =["Nombre","Descripcion","FechaInicio","FechaFin","Activo","Acciones"]
+dataSource!: MatTableDataSource<Proceso>;
+datasourceActivity!: MatTableDataSource<Actividad>
+
+
   constructor(
     private translate: TranslateService,
     private dialog: MatDialog,
     private popUpManager: PopUpManager,
     private userService: UserService,
-    private terceroService: TercerosService,
+  
     private projectService: ProyectoAcademicoService,
     private sgaMidService: SgaMidService,
     private eventoService: EventoService,
@@ -76,7 +81,6 @@ idCalendario: number = 0;
     private route: ActivatedRoute,
     private autenticationService: ImplicitAutenticationService,
     ) {
-      this.processTable = new LocalDataSource();
       this.createProcessTable();
       this.createActivitiesTable();
       this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
@@ -85,12 +89,16 @@ idCalendario: number = 0;
       });
     }
 
+
   ngOnInit() {
+    this.dataSource  = new MatTableDataSource<Proceso>();
+   
     
+
     this.autenticationService.getRole().then(
       //1.fix (rol: Array <String>) => {
       (rol: any) => {
-        console.log(rol)
+
           let r = rol.find((role: string) => (role == "ADMIN_SGA" || role == "VICERRECTOR" || role == "ASESOR_VICE")); // rol admin o vice
           if (r) {
             this.IsAdmin = true;
@@ -101,7 +109,7 @@ idCalendario: number = 0;
            //2. fix this.getProgramaIdByUser().then((id: number) => {
               this.getProgramaIdByUser().then((id: any) => {
               this.DependenciaID = id;
-              //this.getInfoPrograma(this.DependenciaID);
+              this.getInfoPrograma(this.DependenciaID);
             },(err: any) => {
               if (err) {
                 console.log('error en el contructor X(')
@@ -209,12 +217,28 @@ idCalendario: number = 0;
     };
   }
 
+  
+applyFilterProces(event: Event) {
+  const filterValue = (event.target as HTMLInputElement).value;
+  console.log(filterValue)
+  this.dataSource.filter = filterValue.trim().toLowerCase();
+
+  if (this.dataSource.paginator) {
+    this.dataSource.paginator.firstPage();
+  }
+}
+applyFilterActividades(event: Event, data:any, i : number) {
+  const filterValue = (event.target as HTMLInputElement).value;
+  this.processes[i].actividades.filter  = filterValue.trim().toLowerCase();
+   this.datasourceActivity = data
+   
+}
+
   verCalendario(){
     this.router.navigate(['../detalle-calendario', { Id: this.idCalendario }], { relativeTo: this.route });
   }
-
   
-  onAction(event:any, process:any) {
+  onAction(event:any,  process:any) {
     switch (event.action) {
       case 'view':
         this.viewProcess(event, process)
@@ -229,6 +253,7 @@ idCalendario: number = 0;
   }
 
   viewProcess(event:any, process:any){
+    console.log(event)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
     activityConfig.height = '370px';
@@ -240,10 +265,12 @@ idCalendario: number = 0;
   }
 
   editActivity(event:any, process:any){
+    console.log(event)
+    console.log(process)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '600px';
-    activityConfig.data = { process: process, activity: event.data, periodo: this.periodo_calendario, dependencia: this.DependenciaID, vista: "edit_act" };
+    activityConfig.data = { activity: event.data, process: process, periodo: this.periodo_calendario, dependencia: this.DependenciaID, vista: "edit_act" };
     const newActivity = this.dialog.open(EdicionActividadesProgramasComponent, activityConfig);
     newActivity.afterClosed().subscribe((activity: any) => {
       if (activity != undefined) {
@@ -253,7 +280,7 @@ idCalendario: number = 0;
             this.eventoService.put('calendario_evento', respGet).subscribe(
               respPut => {
                 this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
-               // this.getInfoPrograma(this.DependenciaID);
+                this.getInfoPrograma(this.DependenciaID);
               }, error => {
                 this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
               }
@@ -283,7 +310,7 @@ idCalendario: number = 0;
               respGet.DependenciaId = JSON.stringify(dep);
               this.eventoService.put('calendario_evento', respGet).subscribe(
                 respPut => {
-                 // this.getInfoPrograma(this.DependenciaID);
+                  this.getInfoPrograma(this.DependenciaID);
                   this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
                 }, error => {
                   this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
@@ -305,6 +332,9 @@ idCalendario: number = 0;
       //(response: NivelFormacion[]) => {
         (response: any) => {
         this.niveles = response;
+     
+        
+       
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
@@ -318,6 +348,7 @@ idCalendario: number = 0;
         //(response: ProyectoAcademicoInstitucion[]) => {
           (response: any) => {
           this.ProyectosFull = response;
+          console.log(this.ProyectosFull)
         },
         (error) => {
           this.ProyectosFull = [];
@@ -330,7 +361,6 @@ idCalendario: number = 0;
     this.proyectoSelected = undefined;
     this.Calendario_academico = undefined;
     this.processes = [];
-    this.processTable.load(this.processes);
     this.Proyectos = this.ProyectosFull.filter((proyecto) => this.filtrarProyecto(proyecto));
   }
 
@@ -351,9 +381,12 @@ idCalendario: number = 0;
   onSelectPrograma() {
     this.Calendario_academico = undefined;
     this.processes = [];
-    this.processTable.load(this.processes);
     this.DependenciaID = this.proyectoSelected.Id;
-   // this.getInfoPrograma(this.DependenciaID);
+    this.getInfoPrograma(this.DependenciaID);
+
+
+
+ 
   }
 
   getProgramaIdByUser() {
@@ -375,12 +408,12 @@ idCalendario: number = 0;
         );
     });  
   }
-/*
+
   getInfoPrograma(DependenciaId: number) {
     this.loading = true;
     this.processes = [];
     this.projectService.get('proyecto_academico_institucion/' + DependenciaId).subscribe(
-      //fix (res_proyecto: ProyectoAcademicoInstitucion) => {
+       //(res_proyecto: ProyectoAcademicoInstitucion) => {
       (res_proyecto: any) => {
         this.Proyecto_nombre = res_proyecto.Nombre;
         if (!this.IsAdmin) {
@@ -407,7 +440,7 @@ idCalendario: number = 0;
                                 const loadedProcess: Proceso = new Proceso();
                                 loadedProcess.Nombre = element['Proceso'];
                                 loadedProcess.CalendarioId = { Id: response.Data[0].Id };
-                                loadedProcess.actividades = [];
+                                loadedProcess.actividades = new MatTableDataSource<Actividad>;
                                 const activities: any[] = element['Actividades']
                                 if (activities !== null) {
                                   activities.forEach(element => {
@@ -437,63 +470,70 @@ idCalendario: number = 0;
                                       loadedProcess.Descripcion = element['TipoEventoId']['Descripcion'];
                                       let id_rec = element['TipoEventoId']['TipoRecurrenciaId']['Id']
                                       loadedProcess.TipoRecurrenciaId = { Id: id_rec, Nombre: this.periodicidad.find((rec: { Id: any; }) => rec.Id == id_rec).Nombre };
-                                      loadedProcess.actividades.push(loadedActivity);
+                                      loadedProcess.actividades.data.push(loadedActivity);
                                     }
                                   });
                                   this.processes.push(loadedProcess);
+                                  this.dataSource = new MatTableDataSource(this.processes);
+                                  this.datasourceActivity = new MatTableDataSource<Actividad>
+                                  
+                                  
+                                  this.dataSource.paginator = this.paginator;
+                                  this.dataSource.sort = this.sort;
+                                  console.log(this.dataSource)
+                                  
                                 }
                               }
                             });
-                            this.processTable.load(this.processes);
                             this.loading = false;
                           } else {
                             this.loading = false;
                           }
                           if( <boolean>response.Data[0].AplicaExtension ){
-                            console.log('calendario.formulario_extension calendario.calendario_tiene_extension')
+                            
                             this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'),this.translate.instant('calendario.calendario_tiene_extension'));
                           }
                         },
                         error => {
                           this.loading = false;
-                          console.log('ERROR.general')
+                          
                           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                         }
                       );
                     },
                     (error:any) => {
                       this.loading = false;
-                      console.log('ERROR.general')
+                     
                       this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                     }
                   );
                 } else {
                   this.loading = false;
-                  console.log('ERROR.general')
+                  
                   this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                 }
               }, (error:any)  => {
                 this.loading = false;
-                console.log('ERROR.general')
+               
                 this.popUpManager.showErrorToast(this.translate.instant('ERROR.general')); 
               }
             );
           },
           (error:any)  => {
             this.loading = false;
-            console.log('ERROR.general')
+            
             this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
           }
         );
       },
       error => {
         this.loading = false;
-        console.log('ERROR.general')
+        
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       }
     )
   }
-*/
+
   validJSONdeps(DepIds: string) {
     if (DepIds == "") {
       DepIds = "{\"proyectos\":[],\"fechas\":[]}"

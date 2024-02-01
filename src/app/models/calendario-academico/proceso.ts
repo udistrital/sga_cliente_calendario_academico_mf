@@ -1,3 +1,4 @@
+import { MatTableDataSource } from '@angular/material/table';
 import { Actividad } from './actividad';
 
 export class Proceso {
@@ -6,5 +7,5 @@ export class Proceso {
     TipoRecurrenciaId!: {Id: number, Nombre?: string};
     CalendarioId!: any; // id del calendario
     procesoId!: number;
-    actividades!: Actividad[];
+    actividades!:  MatTableDataSource<Actividad>;
 }

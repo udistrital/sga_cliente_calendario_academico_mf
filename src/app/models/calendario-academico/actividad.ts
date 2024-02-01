@@ -7,5 +7,11 @@ export class Actividad {
     responsables!: any[];
     TipoEventoId!: any; // id del proceso
     actividadId!: number;
-    EventoPadreId!: any
+    EventoPadreId!: any;
+    DependenciaId!: any;
+    Editable!: any;
+    FechaInicioOrg!: any;
+    FechaFinOrg!: any
+    
+
 }

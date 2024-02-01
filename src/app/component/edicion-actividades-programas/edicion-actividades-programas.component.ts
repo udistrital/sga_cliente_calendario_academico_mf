@@ -2,11 +2,12 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-//import { LocalDataSource } from 'ng2-smart-table';
+import { LocalDataSource } from 'ng2-smart-table';
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
 import { PopUpManager } from '../../managers/popUpManager';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
+
 
 
 @Component({
@@ -32,10 +33,10 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   fecha_fin_org: string = "";
 
   settings!: Object;
-  //dataSource: LocalDataSource;
+  dataSource!: LocalDataSource;
 
   settings2!: Object;
-  //dataSource2: LocalDataSource;
+  dataSource2!: LocalDataSource;
 
   SelectorDeps!: FormGroup;
   ActivityEditor!: FormGroup;
@@ -49,8 +50,8 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     public dialogRef: MatDialogRef<EdicionActividadesProgramasComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-  //  this.dataSource = new LocalDataSource();
-   // this.dataSource2 = new LocalDataSource();
+    this.dataSource = new LocalDataSource();
+    this.dataSource2 = new LocalDataSource();
     this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
       this.createTable();
       this.createTable2();
@@ -113,7 +114,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
           FechaEdicion: moment(fdep.Modificacion,'YYYY-MM-DDTHH:mm:ss[Z]').format('DD-MM-YYYY'),
         })
       })
- //     this.dataSource.load(tablaFechas)
+      this.dataSource.load(tablaFechas)
     }
     if(this.proceso_detalle){
       console.log(this.data)
@@ -122,6 +123,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.periodicidad_proceso = this.data.process.TipoRecurrenciaId.Nombre;
     }
     if(this.editar_actividad){
+      console.log(this.data)
       this.ActividadEditable = this.data.activity.Editable;
       this.ActivityEditor = new FormGroup({
           fecha_inicio_org: new FormControl(''),
@@ -137,7 +139,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.fecha_inicio_org = this.data.activity.FechaInicioOrg;
       this.fecha_fin_org = this.data.activity.FechaFinOrg;
       this.createTable2();
-    //  this.dataSource2.load(this.data.activity.responsables);
+      this.dataSource2.load(this.data.activity.responsables);
       this.ActivityEditor.patchValue({
         fecha_inicio_org: moment(this.fecha_inicio_org,"DD-MM-YYYY").toDate(),
         fecha_fin_org: moment(this.fecha_fin_org,"DD-MM-YYYY").toDate(),

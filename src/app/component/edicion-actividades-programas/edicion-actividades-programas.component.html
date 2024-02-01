@@ -1,6 +1,6 @@
-<!--<ng-container *ngIf="select_proyectos_act">
-    <nb-card style="padding: 0;">
-        <nb-card-body>
+<ng-container *ngIf="select_proyectos_act">
+    <mat-card style="padding: 0;">
+        <mat-card-content>
             <fieldset [ngClass]="{'fieldseter':true} ">
                 <legend>{{ 'calendario.select_proyectos_actividades' | translate }}</legend>
                 <form novalidate [formGroup]="SelectorDeps">
@@ -24,41 +24,41 @@
                 </div>
                 </form>
             </fieldset>
-        </nb-card-body>
-    </nb-card>
+        </mat-card-content>
+    </mat-card>
 </ng-container>
 
 <ng-container *ngIf="actividad_detalle_proyectos">
-    <nb-card style="padding: 0;">
-        <nb-card-header>
+    <mat-card style="padding: 0;">
+        <mat-card-header>
             <div class="row" align="center">
                 <div class="col">
                     {{ 'calendario.actividad' | translate }}: {{actividad}}
                 </div>
             </div>
-        </nb-card-header>
-        <nb-card-body>
+        </mat-card-header>
+        <mat-card-content>
             <fieldset [ngClass]="{'fieldseter':true} ">
                 <legend>{{ 'calendario.descripcion_actividad' | translate }}</legend>
                 <label>{{descripcion_actividad}}</label>
             </fieldset>
             <br>
-            <ng2-smart-table [settings]="settings" [source]="dataSource">
-            </ng2-smart-table>
-        </nb-card-body>
-        <nb-card-footer>
+            <!-- <ng2-smart-table [settings]="settings" [source]="dataSource">
+            </ng2-smart-table> -->
+        </mat-card-content>
+        <mat-card-actions>
             <div class="row" align="center">
                 <div class="col">
                     <button class="float-center" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
                 </div>
             </div>
-        </nb-card-footer>
-    </nb-card>
+        </mat-card-actions>
+    </mat-card>
 </ng-container>
 
 <ng-container *ngIf="proceso_detalle">
-    <nb-card>
-        <nb-card-body>
+    <mat-card>
+        <mat-card-content>
             <fieldset [ngClass]="{'fieldseter':true} ">
                 <legend>
                     {{ 'calendario.proceso' | translate }}
@@ -94,20 +94,20 @@
                     </div>
                 </div>
             </fieldset>
-        </nb-card-body>
-    </nb-card>
+        </mat-card-content>
+    </mat-card>
 </ng-container>
 
 <ng-container *ngIf="editar_actividad">
-    <nb-card>
-        <nb-card-header>
+    <mat-card>
+        <mat-card-header>
             <div class="row" align="center">
                 <div class="col">
                     {{ 'calendario.edicion_actividades' | translate }}
                 </div>
             </div>
-        </nb-card-header>
-        <nb-card-body>
+        </mat-card-header>
+        <mat-card-content>
             <form novalidate [formGroup]="ActivityEditor">
             <fieldset [ngClass]="{'fieldseter':true} ">
                 <legend>
@@ -153,7 +153,7 @@
                             <div class="col-6">
                                 <mat-form-field style="width: 100%;">
                                     <mat-label>{{ 'calendario.fecha_inicio' | translate }}:</mat-label>
-                                    <input matInput [matDatepicker]="f_ini" formControlName="fecha_inicio_org" readonly disabled>
+                                     <input matInput [matDatepicker]="f_ini" formControlName="fecha_inicio_org" readonly [disabled]="true" > 
                                     <mat-datepicker-toggle matSuffix [for]="f_ini"></mat-datepicker-toggle>
                                     <mat-datepicker #f_ini></mat-datepicker>
                                 </mat-form-field>
@@ -161,7 +161,7 @@
                             <div class="col-6">
                                 <mat-form-field style="width: 100%;">
                                     <mat-label>{{ 'calendario.fecha_fin' | translate }}:</mat-label>
-                                    <input matInput [matDatepicker]="f_fin" formControlName="fecha_fin_org" readonly disabled>
+                                     <input matInput [matDatepicker]="f_fin" formControlName="fecha_fin_org" readonly [disabled]="true"> 
                                     <mat-datepicker-toggle matSuffix [for]="f_fin"></mat-datepicker-toggle>
                                     <mat-datepicker #f_fin></mat-datepicker>
                                 </mat-form-field>
@@ -177,7 +177,7 @@
                         <div class="col-6">
                             <mat-form-field style="width: 100%;">
                                 <mat-label>{{ 'calendario.fecha_inicio' | translate }}:</mat-label>
-                                <input matInput [matDatepicker]="f_ini_n" [min]="f_ini._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_inicio_new">
+                                <!-- <input matInput [matDatepicker]="f_ini_n" [min]="f_ini._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_inicio_new"> -->
                                 <mat-datepicker-toggle matSuffix [for]="f_ini_n"></mat-datepicker-toggle>
                                 <mat-datepicker #f_ini_n></mat-datepicker>
                             </mat-form-field>
@@ -185,7 +185,7 @@
                         <div class="col-6">
                             <mat-form-field style="width: 100%;">
                                 <mat-label>{{ 'calendario.fecha_fin' | translate }}:</mat-label>
-                                <input matInput [matDatepicker]="f_fin_n" [min]="f_ini_n._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_fin_new">
+                                <!-- <input matInput [matDatepicker]="f_fin_n" [min]="f_ini_n._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_fin_new"> -->
                                 <mat-datepicker-toggle matSuffix [for]="f_fin_n"></mat-datepicker-toggle>
                                 <mat-datepicker #f_fin_n></mat-datepicker>
                             </mat-form-field>
@@ -199,8 +199,8 @@
                 <legend>
                     {{ 'calendario.dirigido' | translate }}
                 </legend>
-                <ng2-smart-table [settings]="settings2" [source]="dataSource2">
-                </ng2-smart-table>
+                <!-- <ng2-smart-table [settings]="settings2" [source]="dataSource2"> 
+                </ng2-smart-table> -->
             </fieldset>
             <br>
             <div class="row" align="center">
@@ -214,6 +214,6 @@
                 </div>
             </div>
         </form>
-        </nb-card-body>
-    </nb-card>
-</ng-container>-->
+        </mat-card-content>
+    </mat-card>
+</ng-container>

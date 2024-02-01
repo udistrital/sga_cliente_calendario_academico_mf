@@ -1,0 +1,208 @@
+
+th{
+    color: black;
+}
+
+.buttondetprocess{
+    width: 100%;
+}
+
+.mat-mdc-card {
+    width: 100em;
+    position: relative;
+}
+
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+
+.link:hover {
+    cursor: pointer;
+}
+
+.border {
+    border: 1px solid #0093cd !important;
+    border-radius: 10px;
+    margin: 5px;
+}
+
+.p-5 {
+    padding: 12px;
+}
+
+.color {
+    color: #03678f;
+}
+
+.icono:hover {
+    color: #03678f;
+}
+
+.th-text {
+    color: black;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.width-id {
+    width: 30px;
+}
+
+.info {
+    background-color: #f6f2cf;
+    margin: 10px;
+    border-radius: 5px;
+    border: solid 1px #ddc342;
+    display: flex;
+    align-items: center;
+    color: #3c220c;
+}
+
+.info-icon {
+    padding-right: 15px;
+    color: #ad9930;
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search-input {
+    width: 200px;
+    padding: 10px 40px 10px 15px;
+    border-radius: 1.5px;
+    border: 1px solid #ccc;
+    font-size: 12pt;
+    outline: none;
+    border-color: #0093cd;
+    margin-bottom: 15px;
+}
+
+
+.search-input:focus {
+    border-color: #03678f;
+}
+
+.icon-search {
+    border: solid 1.5px #03678f;
+    color: white;
+    font-size: 25px;
+    border-radius: 1px;
+    padding: 6px;
+    padding-bottom: 8px;
+    padding-right: 10px;
+    background-color: #03678f;
+}
+
+.demo-table {
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #C0E7FF;
+
+}
+
+.mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+}
+
+.mat-mdc-header-cell {
+    border-bottom: 1px solid #C0E7FF;
+}
+
+.mat-mdc-header-row {
+    text-align: left;
+
+}
+
+.mat-mdc-row:nth-child(odd) .mat-mdc-cell {
+    background-color: #f7f9fc;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+    background-color: #edf1f7;
+}
+
+.mat-mdc-table-sticky-border-elem-right {
+    border-left: 1px solid #C0E7FF;
+}
+
+.mat-mdc-table-sticky-border-elem-left {
+    border-right: 1px solid #C0E7FF;
+}
+
+.center {
+    align-items: center;
+}
+
+.mat-column-id {
+    max-width: 60px;
+    text-align: center;
+}
+
+.mat-column-facultad {
+    min-width: 180px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-nombre_proyecto {
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-nivel_proyecto {
+    max-width: 90px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-codigo {
+    max-width: 80px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-cod_snies {
+    max-width: 80px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-activo {
+    max-width: 75px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-vencimiento_registro {
+    max-width: 130px;
+    border-right: 1px solid #C0E7FF;
+}
+
+.mat-column-vencimiento_alta_calidad {
+    max-width: 130px;
+}
+
+.mat-column-acciones {
+    max-width: 110px;
+}
+
+::ng-deep .mat-mdc-button-base:hover {
+    background-color: #C0E7FF;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+    font-size: 12pt;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+    display: flex;
+    align-items: center;
+    justify-content: center !important;
+    padding: 0 8px;
+    flex-wrap: wrap-reverse;
+    width: 100%;
+    min-height: var(--mat-paginator-container-size);
+}
+
+.mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: #03678f;
+}
