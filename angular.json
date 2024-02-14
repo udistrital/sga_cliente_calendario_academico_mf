@@ -100,16 +100,17 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/@nebular/theme/styles/prebuilt/default.css"
+              "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+
+            ]
           }
         }
       }
     }
   },
   "cli": {
-    "analytics": "2f1159d6-bb5f-4b63-9b61-e979bc47f32b"
+    "analytics": false
   }
 }

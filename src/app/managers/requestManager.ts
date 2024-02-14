@@ -46,7 +46,7 @@ export class RequestManager {
    * @returns Observable<any>
    */
   get(endpoint: any) {
-
+    console.log( window.localStorage.getItem('access_token'))
     return this.http.get<any>(`${this.path}${endpoint}`, this.httpOptions).pipe(
       map(
         (res) => {

@@ -1,0 +1,541 @@
+<div [ngSwitch]="normalform?normalform.tipo_formulario?normalform.tipo_formulario:'':''"
+    class="{{normalform?normalform.customPadding?'dinamic-form padding-custom-' + normalform.customPadding: 'dinamic-form padding-custom-1': 'dinamic-form padding-custom-1'}}">
+
+    <!-- Form  basic -->
+    <form class="form-horizontal" *ngSwitchCase="'basic'">
+        <fieldset>
+            <legend align="{{normalform.alineacion_titulo}}">
+                <small>{{normalform.titulo}}</small>
+            </legend>
+            <div class="row">
+                <div *ngFor="let c of normalform.campos" class="{{c.claseGrid}}" [ngSwitch]="c.etiqueta">
+                    <div class="form-group">
+                        <label for="{{c.nombre}}" class="form-control-label">
+                            <small>{{c.label}}</small>
+                            <small id="{{c.nombre}}" class="text-muted" [hidden]="!normalform.alertas">
+                                {{c.alerta}}
+                            </small>
+                        </label>
+                        <br>
+
+                        <!-- input -->
+                        <input [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                            [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}"
+                            placeholder="{{c.placeholder}}" [disabled]="c.deshabilitar" />
+                        <!-- textarea -->
+                        <textarea *ngSwitchCase="'textarea'" [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                            [ngModelOptions]="{standalone: true}" type="text" id="{{c.nombre}}" class="{{c.clase}}"
+                            placeholder="{{c.placeholder}}">
+                        </textarea>
+
+                        <!-- radio -->
+                        <div *ngSwitchCase="'radio'">
+                            <div *ngFor="let item of c.opciones" class="form-check">
+                                <label class="row custom-control custom-radio">
+                                    <input type="radio" checked class="custom-control-input" name="{{c.nombre}}"
+                                        [value]="item" [(ngModel)]="c.valor" [ngModelOptions]="{standalone: true}"
+                                        checked="{{isEqual(item.Id, c.valor.Id)}}">
+                                    <span class="custom-control-indicator">
+                                    </span>
+                                    <span class="custom-control-description">
+                                        {{item.valor}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- checkbox -->
+                        <div *ngSwitchCase="'checkbox'" class="form-group validation-checkboxes">
+                            <input type="checkbox" class="customised-control-input" [disabled]="c.deshabilitar"
+                                [checked]="c.valor" (change)="c.valor = !c.valor"> {{c.nombre}}
+                        </div>
+
+                        <!-- date material -->
+
+                        <mat-form-field *ngSwitchCase="'mat-date'">
+                            <input matInput [(ngModel)]="c.valor" [matDatepicker]="picker"
+                                (dateChange)="onChangeDate($event,c)" [ngModelOptions]="{standalone: true}">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+
+                        <!-- select -->
+                        <select *ngSwitchCase="'select'" [(ngModel)]="c.valor.Id" (ngModelChange)="validCampo(c)"
+                            class="{{c.clase}}" [ngModelOptions]="{standalone: true}">
+                            <option class="{{c.clase}}" *ngFor="let item of c.opciones" [ngValue]="item.Id"
+                                [selected]="c.valor.Id === item.Id">
+                                {{item.valor}}
+                            </option>
+                        </select>
+
+                        <!-- select multiple-->
+                        <select multiple *ngSwitchCase="'selectmultiple'" [(ngModel)]="c.valor"
+                            (ngModelChange)="validCampo(c)" class="{{c.clase}} " [ngModelOptions]="{standalone: true}">
+                            <option *ngFor="let item of c.opciones" [ngValue]="item" [selected]="c.valor === item">
+                                {{item.valor}}
+                            </option>
+                        </select>
+
+                        <!-- input-file -->dsf
+                        <div *ngSwitchCase="'file'">wrq
+                            <label for="{{c.nombre}}" class="upload-file">
+                                add_a_photo
+                            </label>
+                            <input type="file" id="{{c.nombre}}" class="{{c.clase}}" (change)="onChange($event,c)" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <br>
+        <!-- Botones de form con acción de botones -->
+        <div align="center">
+            <button class="btn btn-success btn-tiny" (click)="validForm()"
+                [hidden]="!normalform.btn">{{normalform.btn}}</button>
+            <button class="btn btn-primary btn-tiny" (click)="clearForm()"
+                [hidden]="!normalform.btnLimpiar">{{normalform.btnLimpiar}}</button>
+
+        </div>
+        <br>
+    </form>
+    <!-- End Form basic -->
+
+    <!-- Form grid -->
+    <form class="form-horizontal" *ngSwitchCase="'grid'">
+        <fieldset>
+            <legend align="{{normalform.alineacion_titulo}}">
+                <small>{{normalform.titulo}}</small>
+            </legend>
+            <div class="form-group row" *ngFor="let c of normalform.campos" [ngSwitch]="c.etiqueta">
+                <label for="{{c.nombre}}" class="col-sm-3 form-control-label">
+                    <small>{{c.label}}</small>
+                    <br>
+                    <small id="{{c.nombre}}" class="text-muted" [hidden]="!normalform.alertas">
+                        {{c.alerta}}
+                    </small>
+                </label>
+
+                <div class="{{normalform.clase}}">
+
+                    <!-- input -->
+                    <input *ngSwitchCase="'input'" [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                        [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}" class="{{c.clase}}"
+                        placeholder="{{c.placeholder}}" [disabled]="c.deshabilitar" />
+
+                    <!-- textarea -->
+                    <textarea *ngSwitchCase="'textarea'" [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                        [ngModelOptions]="{standalone: true}" type="text" id="{{c.nombre}}" class="{{c.clase}}"
+                        placeholder="{{c.placeholder}}">
+                    </textarea>
+
+                    <!-- radio -->
+                    <div *ngSwitchCase="'radio'">
+                        <div *ngFor="let item of c.opciones" class="form-check">
+                            <label class="row custom-control custom-radio">
+                                <input type="radio" checked class="custom-control-input" name="{{c.nombre}}"
+                                    [value]="item" [(ngModel)]="c.valor" [ngModelOptions]="{standalone: true}"
+                                    checked="{{isEqual(item.Id, c.valor.Id)}}">
+                                <span class="custom-control-indicator">
+                                </span>
+                                <span class="custom-control-description">
+                                    {{item.valor}}
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- checkbox -->
+                    <div *ngSwitchCase="'checkbox'" class="form-group validation-checkboxes">
+                        <input type="checkbox" class="customised-control-input" [disabled]="c.deshabilitar"
+                            [checked]="c.valor" (change)="c.valor = !c.valor"> {{c.nombre}}
+                    </div>
+
+
+                    <!-- date material -->
+                    <mat-form-field *ngSwitchCase="'mat-date'">
+                        <input matInput [matDatepicker]="picker" (dateChange)="onChangeDate($event,c)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+
+                    <!-- select -->
+                    <select *ngSwitchCase="'select'" [(ngModel)]="c.valor.Id" (ngModelChange)="validCampo(c)"
+                        class="{{c.clase}}" [ngModelOptions]="{standalone: true}">
+                        <option class="{{c.clase}}" *ngFor="let item of c.opciones" [ngValue]="item.Id"
+                            [selected]="c.valor.Id === item.Id">
+                            {{item.valor}}
+
+                        </option>
+                    </select>
+
+                    <!-- select multiple-->
+                    <select multiple *ngSwitchCase="'selectmultiple'" [(ngModel)]="c.valor"
+                        (ngModelChange)="validCampo(c)" class="{{c.clase}} " [ngModelOptions]="{standalone: true}">
+                        <option *ngFor="let item of c.opciones" [ngValue]="item" [selected]="c.valor === item">
+                            {{item.valor}}
+                        </option>
+                    </select>
+
+                    <!-- input-file -->
+                    <input type="file" name="{{c.nombre}}" class="{{c.clase}}" *ngSwitchCase="'file'"
+                        (change)="onChange($event,c)" />
+
+                </div>
+            </div>
+        </fieldset>
+        <br>
+        <div align="center">
+            <button class="btn btn-success btn-tiny" (click)="validForm()"
+                [hidden]="!normalform.btn">{{normalform.btn}}</button>
+            <button class="btn btn-primary btn-tiny" (click)="clearForm()"
+                [hidden]="!normalform.btnLimpiar">{{normalform.btnLimpiar}}</button>
+        </div>
+        <br>
+    </form>
+    <!-- End Form Grid -->
+
+    <!-- Form simple -->
+    <form class="form-horizontal" *ngSwitchCase="'simple'">
+        <div class="row">
+            <div *ngFor="let c of normalform.campos" class="{{c.claseGrid}}" [ngSwitch]="c.etiqueta">
+                <div class="form-group">
+                    <label for="{{c.nombre}}" class="form-control-label">
+                        <small>{{c.label}}</small>
+                        <small id="{{c.nombre}}" class="text-muted" [hidden]="!normalform.alertas">
+                            {{c.alerta}}
+                        </small>
+                    </label>
+
+                    <!-- input -->
+                    <input *ngSwitchCase="'input'" [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                        [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}" class="{{c.clase}}"
+                        placeholder="{{c.placeholder}}" [disabled]="c.deshabilitar" />
+
+                    <!-- textarea -->
+                    <textarea *ngSwitchCase="'textarea'" [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                        [ngModelOptions]="{standalone: true}" type="text" id="{{c.nombre}}" class="{{c.clase}}"
+                        placeholder="{{c.placeholder}}">
+                    </textarea>
+
+                    <!-- radio -->
+                    <div *ngSwitchCase="'radio'">
+                        <div *ngFor="let item of c.opciones" class="form-check">
+                            <label class="row custom-control custom-radio">
+                                <input type="radio" checked class="custom-control-input" name="{{c.nombre}}"
+                                    [value]="item" [(ngModel)]="c.valor" [ngModelOptions]="{standalone: true}"
+                                    checked="{{isEqual(item.Id, c.valor.Id)}}">
+                                <span class="custom-control-indicator">
+                                </span>
+                                <span class="custom-control-description">
+                                    {{item.valor}}
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- checkbox -->
+                    <div *ngSwitchCase="'checkbox'" class="form-group validation-checkboxes">
+                        <input type="checkbox" class="customised-control-input" [disabled]="c.deshabilitar"
+                            [checked]="c.valor" (change)="c.valor = !c.valor"> {{c.nombre}}
+                    </div>
+
+                    <!-- date material -->
+
+                    <mat-form-field *ngSwitchCase="'mat-date'">
+                        <input matInput [matDatepicker]="picker" (dateChange)="onChangeDate($event,c)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+
+                    <!-- select -->
+                    <select *ngSwitchCase="'select'" [(ngModel)]="c.valor.Id" (ngModelChange)="validCampo(c)"
+                        class="{{c.clase}}" [ngModelOptions]="{standalone: true}">
+                        <option class="{{c.clase}}" *ngFor="let item of c.opciones" [ngValue]="item.Id"
+                            [selected]="c.valor.Id === item.Id">
+                            {{item.valor}}
+
+                        </option>
+                    </select>
+
+                    <!-- select multiple-->
+                    <select multiple *ngSwitchCase="'selectmultiple'" [(ngModel)]="c.valor"
+                        (ngModelChange)="validCampo(c)" class="{{c.clase}} " [ngModelOptions]="{standalone: true}">
+                        <option *ngFor="let item of c.opciones" [ngValue]="item" [selected]="c.valor === item">
+                            {{item.valor}}
+                        </option>
+                    </select>
+
+                    <!-- input-file -->
+                    <div class="{{c.clase}} ">
+                        <input type="file" name="{{c.nombre}}" class="{{c.clase}}" *ngSwitchCase="'file'"
+                            (change)="onChange($event,c)" />
+                        <div class="{{c.clase}}">
+                            <mat-card size="small">
+                                <mat-card-content>
+                                    <img class="carousel-image" src="{{c.img}}" alt="imagen">
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- Botones de form con accaión de botones -->
+        <div align="center">
+            <button class="btn btn-success btn-tiny" (click)="validForm()"
+                [hidden]="!normalform.btn">{{normalform.btn}}</button>
+            <button class="btn btn-primary btn-tiny" (click)="clearForm()"
+                [hidden]="!normalform.btnLimpiar">{{normalform.btnLimpiar}}</button>
+        </div>
+        <br>
+    </form>
+
+    <!-- Form  mini -->
+    <form class="form-horizontal" *ngSwitchCase="'mini'">
+        <fieldset [ngClass]="{'fieldseter':!normalform.hidefield}">
+            <legend align="{{normalform.alineacion_titulo}}">
+                <small>{{normalform.titulo}}</small>
+            </legend>
+            <div class="row">
+                <div *ngFor="let c of normalform.campos" class="{{c.claseGrid}}" [ngSwitch]="c.etiqueta">
+                    <div class=" form-group">
+                        <!-- input -->
+                        <mat-form-field *ngSwitchCase="'input'" style="width: 100%;" class="form-group"
+                            floatLabel="always" [hidden]="c.ocultar">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <input matInput [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                                [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}" [min]="c.min" [max]="c.max"
+                                [placeholder]="c.placeholder" [disabled]="c.deshabilitar" pattern="{{c.pattern}}" />
+                            <span matPrefix *ngIf="c.prefix">{{c.prefix.value}}</span>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- input confirmacion -->
+                        <mat-form-field *ngSwitchCase="'inputConfirmacion'" style="width: 100%;" class="form-group"
+                            floatLabel="always" [hidden]="c.ocultar">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <input matInput [(ngModel)]="c.valor" (ngModelChange)="confirmacion(c)"
+                                [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}"
+                                [placeholder]="c.placeholder" [disabled]="c.deshabilitar" pattern="{{c.pattern}}" />
+                            <span matPrefix *ngIf="c.prefix">{{c.prefix.value}}</span>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- input log 1 -->
+                        <mat-form-field *ngSwitchCase="'inputLog1'" style="width: 100%;" class="form-group"
+                            floatLabel="always">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <input matInput [(ngModel)]="c.valor" (ngModelChange)="validlog1(c)"
+                                [ngModelOptions]="{standalone: true}" type="{{c.tipo}}" id="{{c.nombre}}"
+                                [placeholder]="c.placeholder" [disabled]="c.deshabilitar" pattern="c.pattern || *" />
+                            <span matPrefix *ngIf="c.prefix">{{c.prefix.value}}</span>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- checkbox -->
+                        <div *ngSwitchCase="'checkbox'" class="form-group validation-checkboxes" [hidden]="c.ocultar">
+                            <!-- <mat-checkbox type="checkbox" class="customised-control-input" [disabled]="c.deshabilitar"
+                                color="primary" [(checked)]="c.valor" (change)="c.valor = !c.valor; c.alerta = '';">
+                                {{c.requerido?'* '+c.label:c.label}}</mat-checkbox> -->
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </div>
+
+                        <!-- textarea -->
+                        <mat-form-field *ngSwitchCase="'textarea'" style="width: 100%;" class="form-group"
+                            floatLabel="always">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <textarea matInput placeholder="Autosize textarea" matTextareaAutosize
+                                matAutosizeMinRows="3" matAutosizeMaxRows="6" [(ngModel)]="c.valor"
+                                (ngModelChange)="validCampo(c)" [ngModelOptions]="{standalone: true}" type="text"
+                                id="{{c.nombre}}" class="{{c.clase}}" placeholder="{{c.placeholder}}"
+                                [disabled]="c.deshabilitar"></textarea>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- radio -->
+                        <div *ngSwitchCase="'radio'">
+                            <div *ngFor="let item of c.opciones" class="form-check">
+                                <label class="row custom-control custom-radio">
+                                    <input type="radio" checked class="custom-control-input" name="{{c.nombre}}"
+                                        [value]="item" [(ngModel)]="c.valor" [ngModelOptions]="{standalone: true}"
+                                        checked="{{isEqual(item.Id, c.valor.Id)}}" [disabled]="c.deshabilitar">
+                                    <span class="custom-control-indicator">
+                                    </span>
+                                    <span class="custom-control-description">
+                                        {{item.valor}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- date material -->
+                        <mat-form-field *ngSwitchCase="'mat-date'" style="width: 100%;" floatLabel="always">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <input matInput [(ngModel)]="c.valor" [matDatepicker]="picker"
+                                (dateChange)="onChangeDate($event,c); validCampo(c)"
+                                [ngModelOptions]="{standalone: true}" [placeholder]="c.placeholder"
+                                [disabled]="c.deshabilitar">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- select -->
+                        <mat-form-field *ngSwitchCase="'select'" style="width: 100%;" class="form-group" floatLabel="always"
+                            [hidden]="c.ocultar">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <mat-select
+                                [placeholder]="c.valor?c.key?c.valor[c.key]?c.valor[c.key]:(c.valor|json):c.placeholder:c.placeholder"
+                                [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                                [ngModelOptions]="{standalone: true}" [disabled]="c.deshabilitar">
+                                <mat-option>--Seleccionar--</mat-option>
+                                <mat-option class="multiline-mat-option" *ngFor="let item of c.opciones" [value]="item?item:''">
+                                    {{c.key? item[c.key] ? item[c.key]: (item | json) : (item | json)}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- select multiple -->
+                        <mat-form-field *ngSwitchCase="'selectmultiple'" style="width: 100%;" floatLabel="always">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <mat-select
+                                [placeholder]="c.valor?c.key?c.valor[c.key]?c.valor[c.key]:(c.valor|json):c.placeholder:c.placeholder"
+                                [(ngModel)]="c.valor" (ngModelChange)="validCampo(c)"
+                                [ngModelOptions]="{standalone: true}" [disabled]="c.deshabilitar" multiple>
+                                <mat-option *ngFor="let item of c.opciones" [value]="item">
+                                    {{c.key?item[c.key]?item[c.key]:(item | json):(item | json)}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+                        </mat-form-field>
+
+                        <!-- auto complete-->
+                        <mat-form-field *ngSwitchCase="'autocomplete'" style="width: 100%;" floatLabel="always"
+                            class="example-full-width">
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}:</mat-label>
+                            <!-- <input matInput type="text" class="inputAuto"
+                                [placeholder]="c.valor?c.key?c.valor[c.key]?c.valor[c.key]:(c.valor|json):c.placeholder:c.placeholder"
+                                aria-label="Number" [matAutocomplete]="auto" [disabled]="c.deshabilitar"
+                                (keyup)="searchTerm$.next({text: $event.target.value, path: c.path, query: c.query, field: c, keyToFilter: c.keyToFilter})"> -->
+                            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                                [displayWith]="displayWithFn"
+                                (optionSelected)="setNewValue({element: $event, field: c})">
+                                <mat-option *ngFor="let item of c.opciones" [value]="item">
+                                    {{c.key?item[c.key]:item | json}}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-hint style="width: 100%;">
+                                <div class="row text-danger">
+                                    <div class="col-12">{{c.alerta}}</div>
+                                </div>
+                                <div class="row" style="font-size: 13px;" *ngIf="c.placeholder2">
+                                    <div class="col-12">{{c.placeholder2}}</div>
+                                </div>
+                            </mat-hint>
+                        </mat-form-field>
+
+                        <!-- editor -->
+                        <div *ngSwitchCase="'editor'" class="form-group">
+                            <label for="{{c.nombre}}">
+                                {{c.requerido?'* '+c.label:c.label}}
+                            </label>
+
+                            <mat-card>
+                                <mat-card-header>
+                                    Tiny MCE
+                                </mat-card-header>
+                                <mat-card-content>
+                                    <ngx-tiny-mce ngDefaultControl [(ngModel)]="c.valor"
+                                        [ngModelOptions]="{standalone: true}" id="{{c.nombre}}" name="{{c.nombre}}"
+                                        (ngModelChange)="validCampo(c)" type="text"></ngx-tiny-mce>
+                                </mat-card-content>
+                            </mat-card>
+
+                            <mat-hint class=" text-danger ">{{c.alerta}}</mat-hint>
+                        </div>
+
+                        <!-- input-file -->
+                        <div *ngSwitchCase="'file'" class="input-file {{c.clase}} {{c.ocultar?'no-mostrar':''}}">
+                            <div class="row">
+                                <div class="col-9">
+                                    <label for="{{c.nombre}}" class="upload-file">
+                                        {{c.requerido?'* '+c.label:c.label}}
+                                    </label>
+                                    <input #documento [disabled]="c.deshabilitar" type="file" id="{{c.nombre}}"
+                                        (change)="onChange($event,c)" />
+                                    <br>
+                                    <mat-hint class="text-danger">{{c.alerta}}</mat-hint>
+
+                                </div>
+                                <div class="col-3" *ngIf="c.urlTemp">
+                                    <div class="ver-documento" (click)="download(c.urlTemp,c.nombre,500,500)">
+                                        <i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i>
+                                        <span>{{'GLOBAL.click_aqui' | translate}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- input-file with revision -->
+                        <mat-form-field *ngSwitchCase="'fileRev'" style="width: 100%;" class="form-group" floatLabel="always" [hidden]="c.ocultar">
+                            <input #documento type="file" (change)="onChange2($event,c)" style="display: none;"/>
+                            <mat-label>{{c.requerido?'* '+c.label:c.label}}</mat-label>
+                            <div class="row">
+                                <div class="col-9">
+                                    <button type="button" mat-raised-button (click)="documento.click()" [disabled]="(c.estadoDoc ? c.estadoDoc.aprobado : false) || (c.deshabilitar ? c.deshabilitar : false)">{{'GLOBAL.seleccionar_archivo' | translate}}</button>
+                                    <span *ngIf="c.File" class="enlace-documento" (click)="download(c.urlTemp,c.File.name,500,500,c.previewForm,c.messagepreview)" title="{{'GLOBAL.tooltip_previsualizar_archivo' | translate}}">
+                                        {{c.File?.name}}
+                                     </span>
+                                </div>
+                                <div class="col-3">
+                                    <span *ngIf="c.valor && !c.File" class="enlace-documento alinear" (click)="download(c.valor,c.nombre,500,500,c.previewForm,c.messagepreview)" title="{{'GLOBAL.tooltip_descargar_arhivo' | translate}}">
+                                        <i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i>
+                                        <i>{{'GLOBAL.tooltip_descargar' | translate}}</i>
+                                    </span>
+                                </div>
+                            </div>
+                            <mat-hint style="width: 100%;">
+                                <div class="row text-danger">
+                                    <div class="col-12">{{c.alerta}}</div>
+                                </div>
+                                <div *ngIf="c.estadoDoc && !c.File" class="row" style="font-size: 13px;">
+                                    <div class="col-4" [ngClass]="{'text-danger': c.estadoDoc.aprobado == false}">{{'GLOBAL.estado' | translate}}: {{c.estadoDoc.estadoObservacion}}</div>
+                                    <div class="col-8">{{'GLOBAL.observacion' | translate}}: {{c.estadoDoc.observacion}}</div>
+                                </div>
+                            </mat-hint>
+                            <input matInput style="display: none;"/>
+                        </mat-form-field>
+
+                        <!--buttton -->
+                        <div *ngSwitchCase="'button'" class="row {{c.ocultar?'no-mostrar':''}}">
+                            <div class="{{c.claseGrid }}">
+                                <button mat-button id="{{c.id}}" (click)="auxButton(c)">
+                                    <i class="{{c.icono}}"></i>
+                                    {{ c.label }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!--label-->
+                        <mat-label class="{{c.claseGrid}} {{c.ocultar?'no-mostrar':''}}" *ngSwitchCase="'label'">{{ c.valor ? c.valor : c.label }}</mat-label>
+                    </div>
+                </div>
+            </div>
+            <ng-content></ng-content>
+            <div class="buttons-container" *ngIf="normalform.btnLimpiar || normalform.btn">
+                <button class="btn btn-primary btn-sm" (click)="clearForm()"
+                    [hidden]="!normalform.btnLimpiar">{{normalform.btnLimpiar}}</button>
+                <button class="btn btn-success btn-sm ml-2" (click)="validForm()"
+                    [hidden]="!normalform.btn">{{normalform.btn}}</button>
+            </div>
+
+
+        </fieldset>
+        <!-- Botones de form con acción de botones -->
+    </form>
+</div>

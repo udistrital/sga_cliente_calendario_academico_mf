@@ -17,7 +17,8 @@ export class PopUpManager {
       this.snackBar.open(translatedMessage, 'Cerrar', {
         duration: duration,
         horizontalPosition: 'center',
-        verticalPosition: 'bottom'
+        verticalPosition: 'bottom',
+        panelClass: ['success-snackbar']
       });
     });
   }
@@ -26,7 +27,7 @@ export class PopUpManager {
     this.translate.get(message).subscribe((translatedMessage: string) => {
       this.snackBar.open(translatedMessage, 'Cerrar', {
         duration: 5000, // Ejemplo de duración
-        panelClass: ['snackbar-error'], // Clase CSS personalizada para el toast de error
+        panelClass: ['error-snackbar'], // Clase CSS personalizada para el toast de error
       });
     });
   }
@@ -35,7 +36,7 @@ export class PopUpManager {
     this.translate.get(message).subscribe((translatedMessage: string) => {
       this.snackBar.open(translatedMessage, 'Cerrar', {
         duration: duration,
-        panelClass: ['snackbar-info'], // Clase CSS personalizada para el toast de información
+        panelClass: ['info-snackbar'], // Clase CSS personalizada para el toast de información
       });
     });
   }
@@ -109,17 +110,17 @@ export class PopUpManager {
     });
   }
 
-  /*public showManyPopUp(title: string, steps: any[], type: any) {
-    const opts = steps.map(step => {
-      return {
-        title: title,
-        html: step,
-        icon: type,
-        confirmButtonText: this.translate.instant('GLOBAL.aceptar')
-      };
-    });
-    return Swal.queue(opts);
-  }*/
+  // public showManyPopUp(title: string, steps: any[], type: any) {
+  //   const opts = steps.map(step => {
+  //     return {
+  //       title: title,
+  //       html: step,
+  //       icon: type,
+  //       confirmButtonText: this.translate.instant('GLOBAL.aceptar')
+  //     };
+  //   });
+  //   return Swal.queue(opts);
+  // }
 }
 // import { Injectable } from '@angular/core';
 // import { NbToastrService } from '@nebular/theme';

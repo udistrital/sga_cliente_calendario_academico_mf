@@ -8,4 +8,6 @@ export class Proceso {
     CalendarioId!: any; // id del calendario
     procesoId!: number;
     actividades!:  MatTableDataSource<Actividad>;
+
+
 }

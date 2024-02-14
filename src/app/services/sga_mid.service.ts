@@ -38,11 +38,11 @@ export class SgaMidService {
     return this.requestManager.post_file(endpoint, element);
   }
 
-  put(endpoint: any, element: { Id: any; }) {
+  put(endpoint: any, element: any ) {
     this.requestManager.setPath('SGA_MID_SERVICE');
     return this.requestManager.put(endpoint, element);
   }
-  delete(endpoint: any, element: { Id: any; }) {
+  delete(endpoint: any, element:  any) {
     this.requestManager.setPath('SGA_MID_SERVICE');
     return this.requestManager.delete(endpoint, element.Id);
   }

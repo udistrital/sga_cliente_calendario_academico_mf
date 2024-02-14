@@ -1,3 +1,6 @@
+th{
+  color: black;
+}
 .message-alert {
     background-color: var(--warning-main);
     font-weight: 500;
@@ -5,3 +8,16 @@
     border-radius: 0.4rem;
     margin-bottom: 1rem;
   }
+
+  .boton-primary {
+    border: solid 1px #03678f;
+    border-radius: 5px;
+    font-weight: 300;
+    background-color: #03678f;
+    border-color: #03678f;
+    margin: 0 80px;
+    cursor: pointer;
+    color: white !important;
+    padding: 8px;
+  }
+

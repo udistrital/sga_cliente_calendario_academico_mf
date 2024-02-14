@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -18,29 +17,55 @@ import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatExpansionModule} from '@angular/material/expansion';
-import { LocalDataSource } from 'ng2-smart-table';
 import { PopUpManager } from './managers/popUpManager';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { EdicionActividadesProgramasComponent } from './component/edicion-actividades-programas/edicion-actividades-programas.component';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { ReactiveFormsModule } from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-
+import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
+import { AsignarCalendarioProyectoComponent } from './component/asignar-calendario-proyecto/asignar-calendario-proyecto.component';
+import { DefCalendarioAcademicoComponent } from './component/def-calendario-academico/def-calendario-academico.component';
+import { ActividadCalendarioAcademicoComponent } from './component/actividad-calendario-academico/actividad-calendario-academico.component';
+import { ProcesoCalendarioAcademicoComponent } from './component/proceso-calendario-academico/proceso-calendario-academico.component';
+import { CrudPeriodoComponent } from './component/crud-periodo/crud-periodo.component';
+import { DinamicformComponent } from './component/dinamicform/dinamicform.component';
+import { DialogPreviewFileComponent } from './component/dialog-preview-file/dialog-preview-file.component';
+import { DocumentoService } from './services/documento.service';
+import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
+import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 
 
 
 @NgModule({
   declarations: [
+    
     AppComponent,
+    DinamicformComponent,
+    CrudPeriodoComponent,
+    DialogPreviewFileComponent,
+    DetalleCalendarioComponent,
+    CalendarioProyectoComponent,
+    DefCalendarioAcademicoComponent,
+    ListCalendarioAcademicoComponent,
     AdministracionCalendarioComponent,
-    EdicionActividadesProgramasComponent
+    AsignarCalendarioProyectoComponent,
+    ProcesoCalendarioAcademicoComponent,
+    EdicionActividadesProgramasComponent,
+    ActividadCalendarioAcademicoComponent,
+
+
+
+    
   ],
   imports: [
     ReactiveFormsModule,
@@ -53,7 +78,9 @@ import {MatNativeDateModule} from '@angular/material/core';
     MatProgressSpinnerModule,
     MatCardModule,
     MatFormFieldModule,
+    MatCheckboxModule,
     MatSelectModule,
+    MatAutocompleteModule,
     MatTableModule,
     MatDatepickerModule,
     MatTabsModule,
@@ -73,11 +100,11 @@ import {MatNativeDateModule} from '@angular/material/core';
   providers: [
     MatSnackBar,
     HttpErrorManager,
+    DocumentoService,
     RequestManager,
     ParametrosService,
     SgaMidService,
     EventoService,
-    LocalDataSource,
     PopUpManager,
    
   ],

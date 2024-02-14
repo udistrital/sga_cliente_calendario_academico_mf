@@ -1,12 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { LocalDataSource } from 'ng2-smart-table';
+
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
 import { PopUpManager } from '../../managers/popUpManager';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 
 
@@ -31,12 +34,17 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   periodo: string = "";
   fecha_inicio_org: string = "";
   fecha_fin_org: string = "";
+  displayedColumns: string[] = ['ProyectoCurricular', 'FechaInicio', 'FechaFin','FechaEdicion' ];
+  dataSource!: MatTableDataSource<any>;
+  dataSource2!: MatTableDataSource<any>
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   settings!: Object;
-  dataSource!: LocalDataSource;
+
 
   settings2!: Object;
-  dataSource2!: LocalDataSource;
+  //dataSource2!: LocalDataSource;
 
   SelectorDeps!: FormGroup;
   ActivityEditor!: FormGroup;
@@ -50,8 +58,8 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     public dialogRef: MatDialogRef<EdicionActividadesProgramasComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-    this.dataSource = new LocalDataSource();
-    this.dataSource2 = new LocalDataSource();
+   // this.dataSource = new LocalDataSource();
+   // this.dataSource2 = new LocalDataSource();
     this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
       this.createTable();
       this.createTable2();
@@ -85,13 +93,14 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   }
 
   ngOnInit() {
+
     // Seleccion de proyectos a editar fechas actividades
     if (this.select_proyectos_act) {
       this.SelectorDeps = this.builder.group({
         Dependencias: ['', Validators.required],
       });
       this.projects = this.data.dependencias;
-      console.log(this.data)
+ 
       let dependenciasJSON = this.data.activity.DependenciaId;
       console.log("deps:", dependenciasJSON.proyectos)
       this.SelectorDeps.patchValue({
@@ -101,7 +110,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
 
     if(this.actividad_detalle_proyectos){
       this.createTable();
-      console.log(this.data)
       this.actividad = this.data.activity.Nombre;
       this.descripcion_actividad = this.data.activity.Descripcion;
       let deps = this.data.activity.DependenciaId;
@@ -114,7 +122,9 @@ export class EdicionActividadesProgramasComponent implements OnInit {
           FechaEdicion: moment(fdep.Modificacion,'YYYY-MM-DDTHH:mm:ss[Z]').format('DD-MM-YYYY'),
         })
       })
-      this.dataSource.load(tablaFechas)
+      console.log(tablaFechas)
+      this.dataSource = new MatTableDataSource(tablaFechas);
+    
     }
     if(this.proceso_detalle){
       console.log(this.data)
@@ -139,7 +149,9 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.fecha_inicio_org = this.data.activity.FechaInicioOrg;
       this.fecha_fin_org = this.data.activity.FechaFinOrg;
       this.createTable2();
-      this.dataSource2.load(this.data.activity.responsables);
+    //  this.dataSource2.load(this.data.activity.responsables);
+        console.log(this.data)
+        // this.dataSource2 = new MatTableDataSource(this.data.activity.responsables)
       this.ActivityEditor.patchValue({
         fecha_inicio_org: moment(this.fecha_inicio_org,"DD-MM-YYYY").toDate(),
         fecha_fin_org: moment(this.fecha_fin_org,"DD-MM-YYYY").toDate(),

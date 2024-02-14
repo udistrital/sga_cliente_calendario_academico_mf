@@ -45,11 +45,53 @@
             <br>
             <!-- <ng2-smart-table [settings]="settings" [source]="dataSource">
             </ng2-smart-table> -->
+
+            
+
+              <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="dataSource " matSort>
+
+                  <!-- ID Column -->
+                  <ng-container matColumnDef="ProyectoCurricular">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 40%;"> {{"calendario.proyecto_curricular" |
+                      translate}} </th>
+                    <td mat-cell *matCellDef="let row"> {{row.ProyectoCurricular}} </td>
+                  </ng-container>
+
+                  <!-- Progress Column -->
+                  <ng-container matColumnDef="FechaInicio">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.fecha_inicio'
+                      | translate}} </th>
+
+                    <td mat-cell *matCellDef="let row"> {{row.FechaInicio}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="FechaFin">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;">
+                      {{'calendario.fecha_fin' | translate}} </th>
+                    <td mat-cell *matCellDef="let row"> {{row.FechaFin}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="FechaEdicion">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;">
+                      {{'calendario.fecha_edicion' | translate}} </th>
+                    <td mat-cell *matCellDef="let row"> {{row.FechaEdicion}} </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                  <!-- Row shown when there is no matching data. -->
+                  <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="4">"{{"calendario.sin_proyectos_actividades"| translate}}"</td>
+                  </tr>
+                </table>
+
+              </div>
         </mat-card-content>
         <mat-card-actions>
             <div class="row" align="center">
                 <div class="col">
-                    <button class="float-center" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                    <button class=" boton-primary " mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
                 </div>
             </div>
         </mat-card-actions>
@@ -90,7 +132,7 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <button class="float-right" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                        <button class="float-right boton-primary" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
                     </div>
                 </div>
             </fieldset>
@@ -177,7 +219,7 @@
                         <div class="col-6">
                             <mat-form-field style="width: 100%;">
                                 <mat-label>{{ 'calendario.fecha_inicio' | translate }}:</mat-label>
-                                <!-- <input matInput [matDatepicker]="f_ini_n" [min]="f_ini._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_inicio_new"> -->
+                                <!--<input matInput [matDatepicker]="f_ini_n" [min]="f_ini._datepickerInput._value" [max]="f_fin._datepickerInput._value" formControlName="fecha_inicio_new"> -->
                                 <mat-datepicker-toggle matSuffix [for]="f_ini_n"></mat-datepicker-toggle>
                                 <mat-datepicker #f_ini_n></mat-datepicker>
                             </mat-form-field>
@@ -199,17 +241,36 @@
                 <legend>
                     {{ 'calendario.dirigido' | translate }}
                 </legend>
-                <!-- <ng2-smart-table [settings]="settings2" [source]="dataSource2"> 
-                </ng2-smart-table> -->
+                <div class="mat-elevation-z8" >
+                    <table mat-table  [dataSource]="dataSource" matSort>
+                  
+                      <!-- ID Column -->
+                      <ng-container matColumnDef="Nombre">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{"'GLOBAL.nombre'" | translate}} </th>
+                        <td mat-cell *matCellDef="let row"> {{row.Nombre}} </td>
+                      </ng-container>
+                  
+                      <!-- Progress Column -->
+                      <ng-container matColumnDef="Aspirante">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.sin_responsables' | translate}} </th>
+                        
+                        <td mat-cell *matCellDef="let row"> {{row.responsableID}} </td>
+                      </ng-container>
+          
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                  
+                  </div>
             </fieldset>
             <br>
             <div class="row" align="center">
                 <div class="col">
                     <div *ngIf="ActividadEditable">
-                        <button class="float-center" mat-button (click)='guardar()' [disabled]="ActivityEditor.invalid">{{ 'GLOBAL.guardar' | translate }}</button>
+                        <button  class="float-center; boton-primary" mat-button (click)='guardar()' [disabled]="ActivityEditor.invalid">{{ 'GLOBAL.guardar' | translate }}</button>
                     </div>
                     <div *ngIf="!ActividadEditable">
-                        <button class="float-center" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
+                        <button class="float-center; boton-primary" mat-button (click)='regresar()'>{{ 'GLOBAL.regresar' | translate }}</button>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, provideRouter } from '@angular/router';
-import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
 import { APP_BASE_HREF } from '@angular/common';
 import { getSingleSpaExtraProviders } from 'single-spa-angular';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
+import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
+import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 
  const routes: Routes = [
   /*{
@@ -16,9 +18,22 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
   path: 'administracion-calendario',
   component: AdministracionCalendarioComponent,
   //canActivate: [AuthGuard],
+},
+{
+  path: 'list-calendario-academico',
+  component: ListCalendarioAcademicoComponent,
+  //canActivate: [AuthGuard],
+},
+{
+
+path: 'calendario-proyecto',
+component: CalendarioProyectoComponent,
+//canActivate: [AuthGuard],
 }
  
 ];
+
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

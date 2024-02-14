@@ -1,0 +1,49 @@
+<div class="dinamic-form">
+  <form novalidate [formGroup]="processForm" #fform="ngForm" (ngSubmit)="saveProcess()" class="form-horizontal">
+    <fieldset [ngClass]="{'fieldseter':true} ">
+      <legend>
+        {{ 'calendario.proceso' | translate }}
+      </legend>
+      <div class="row">
+        <div class="col-12">
+          <mat-form-field floatLabel="always" style="width: 100%;">
+            <input matInput type="text" formControlName="Nombre" placeholder="*{{ 'calendario.nombre' | translate }} " required/>
+            <mat-error *ngIf="processForm.get('Nombre')?.hasError('required') && processForm.get('Nombre')?.touched" >
+              {{ 'calendario.error_nombre_proceso' | translate }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row my-2">
+        <div class="col-12">
+          <mat-form-field floatLabel="always" style="width: 100%;">
+            <input matInput type="text" formControlName="Descripcion" placeholder="*{{ 'GLOBAL.descripcion' | translate }} " />
+            <mat-error *ngIf="processForm.get('Descripcion')?.hasError('required') && processForm.get('Descripcion')?.touched" >
+              {{ 'calendario.error_desc_proceso' | translate }}
+            </mat-error> 
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <mat-form-field style="width: 100%;" floatLabel="always">
+            <mat-label>*{{ 'calendario.periodicidad' | translate }} </mat-label>
+            <mat-select placeholder="Semestral/Anual" formControlName="TipoRecurrenciaId" required>
+              <mat-option *ngFor="let period of periodicidad" [value]="period.Id">
+                {{ period.Nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="processForm.get('TipoRecurrenciaId')?.hasError('required') && processForm.get('TipoRecurrenciaId')?.touched" >
+              {{ 'calendario.error_period_proceso' | translate }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 ml-auto " >
+          <button class="float-right boton-primary" mat-button type="submit" [disabled]="processForm.invalid">{{ 'GLOBAL.guardar' | translate }} </button>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>

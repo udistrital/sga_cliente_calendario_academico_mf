@@ -1,0 +1,10 @@
+<h5 align="center">{{title}}</h5>
+<object [data]="ulrfileSafe" type="application/pdf" *ngIf="validsafe"></object>
+<div class="nofile" *ngIf="!validsafe">
+    {{ 'ERROR.error_previsualizar_doc' | translate }}
+</div>
+<mat-dialog-actions align="center">
+    <!-- <button mat-button mat-dialog-close style="background-color: var(--primary);color: white;" matTooltip="{{ 'GLOBAL.cerrar_visualizador' | translate }}">
+        {{ 'GLOBAL.cerrar_visualizador' | translate }}
+    </button> -->
+</mat-dialog-actions>

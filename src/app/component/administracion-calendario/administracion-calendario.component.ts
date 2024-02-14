@@ -39,32 +39,32 @@ export class AdministracionCalendarioComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-loading: boolean = false;
-processSettings: any;
-activitiesSettings: any;
+  loading: boolean = false;
+  processSettings: any;
+  activitiesSettings: any;
 
-processes: Proceso[] = [];
+  processes: Proceso[] = [];
 
-userId: number = 0;
-DependenciaID: number = 0;
-IsAdmin: boolean = false;
+  userId: number = 0;
+  DependenciaID: number = 0;
+  IsAdmin: boolean = false;
 
-niveles!: NivelFormacion[];
-nivelesSelected!: NivelFormacion; 
-ProyectosFull!: ProyectoAcademicoInstitucion[];
-Proyectos!: ProyectoAcademicoInstitucion[];
-proyectoSelected!: any; //ProyectoAcademicoInstitucion;
+  niveles!: NivelFormacion[];
+  nivelesSelected!: NivelFormacion;
+  ProyectosFull!: ProyectoAcademicoInstitucion[];
+  Proyectos!: ProyectoAcademicoInstitucion[];
+  proyectoSelected!: any; //ProyectoAcademicoInstitucion;
 
-Proyecto_nombre: string = "";
-Calendario_academico: any = "";
-periodicidad!: any;
-periodo_calendario: string = "";
-idCalendario: number = 0;
+  Proyecto_nombre: string = "";
+  Calendario_academico: any = "";
+  periodicidad!: any;
+  periodo_calendario: string = "";
+  idCalendario: number = 0;
 
-displayedColumns: string[] = ['Nombre', 'Descripcion', "Acciones" ];
-displayedColumnsActividades : string [] =["Nombre","Descripcion","FechaInicio","FechaFin","Activo","Acciones"]
-dataSource!: MatTableDataSource<Proceso>;
-datasourceActivity!: MatTableDataSource<Actividad>
+  displayedColumns: string[] = ['Nombre', 'Descripcion', "Acciones"];
+  displayedColumnsActividades: string[] = ["Nombre", "Descripcion", "FechaInicio", "FechaFin", "Activo", "Acciones"]
+  dataSource!: MatTableDataSource<Proceso>;
+  datasourceActivity!: MatTableDataSource<Actividad>
 
 
   constructor(
@@ -72,7 +72,7 @@ datasourceActivity!: MatTableDataSource<Actividad>
     private dialog: MatDialog,
     private popUpManager: PopUpManager,
     private userService: UserService,
-  
+
     private projectService: ProyectoAcademicoService,
     private sgaMidService: SgaMidService,
     private eventoService: EventoService,
@@ -80,46 +80,46 @@ datasourceActivity!: MatTableDataSource<Actividad>
     private router: Router,
     private route: ActivatedRoute,
     private autenticationService: ImplicitAutenticationService,
-    ) {
+  ) {
+    this.createProcessTable();
+    this.createActivitiesTable();
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
       this.createProcessTable();
       this.createActivitiesTable();
-      this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
-        this.createProcessTable();
-        this.createActivitiesTable();
-      });
-    }
+    });
+  }
 
 
   ngOnInit() {
-    this.dataSource  = new MatTableDataSource<Proceso>();
-   
-    
+    this.dataSource = new MatTableDataSource<Proceso>();
+
+
 
     this.autenticationService.getRole().then(
       //1.fix (rol: Array <String>) => {
       (rol: any) => {
 
-          let r = rol.find((role: string) => (role == "ADMIN_SGA" || role == "VICERRECTOR" || role == "ASESOR_VICE")); // rol admin o vice
-          if (r) {
-            this.IsAdmin = true;
-            this.getNivel();
-            this.getListaProyectos();
-          } else {
-            this.IsAdmin = false;
-           //2. fix this.getProgramaIdByUser().then((id: number) => {
-              this.getProgramaIdByUser().then((id: any) => {
-              this.DependenciaID = id;
-              this.getInfoPrograma(this.DependenciaID);
-            },(err: any) => {
-              if (err) {
-                console.log('error en el contructor X(')
-                this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'),this.translate.instant('admision.multiple_vinculacion')+". "+this.translate.instant('GLOBAL.comunicar_OAS_error'));
-              } else {
-                console.log('error en el contructor X(')
-                this.popUpManager.showErrorAlert(this.translate.instant('admision.no_vinculacion_no_rol')+". "+this.translate.instant('GLOBAL.comunicar_OAS_error'));
-              }
-            })
-          }
+        let r = rol.find((role: string) => (role == "ADMIN_SGA" || role == "VICERRECTOR" || role == "ASESOR_VICE")); // rol admin o vice
+        if (r) {
+          this.IsAdmin = true;
+          this.getNivel();
+          this.getListaProyectos();
+        } else {
+          this.IsAdmin = false;
+          //2. fix this.getProgramaIdByUser().then((id: number) => {
+          this.getProgramaIdByUser().then((id: any) => {
+            this.DependenciaID = id;
+            this.getInfoPrograma(this.DependenciaID);
+          }, (err: any) => {
+            if (err) {
+              console.log('error en el contructor X(')
+              this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'), this.translate.instant('admision.multiple_vinculacion') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
+            } else {
+              console.log('error en el contructor X(')
+              this.popUpManager.showErrorAlert(this.translate.instant('admision.no_vinculacion_no_rol') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
+            }
+          })
+        }
       }
     );
   }
@@ -149,8 +149,8 @@ datasourceActivity!: MatTableDataSource<Actividad>
           {
             name: 'view',
             title: '<i class="nb-search" title="' +
-                this.translate.instant('calendario.tooltip_detalle_proceso') +
-                '"></i>',
+              this.translate.instant('calendario.tooltip_detalle_proceso') +
+              '"></i>',
           },
         ],
       },
@@ -202,14 +202,14 @@ datasourceActivity!: MatTableDataSource<Actividad>
           {
             name: 'edit',
             title: '<i class="nb-edit" title="' +
-                this.translate.instant('calendario.tooltip_editar_actividad') +
-                '"></i>',
+              this.translate.instant('calendario.tooltip_editar_actividad') +
+              '"></i>',
           },
           {
             name: 'disable',
             title: '<i class="nb-locked" title="' +
-                this.translate.instant('calendario.tooltip_estado_actividad') +
-                '" ></i>',
+              this.translate.instant('calendario.tooltip_estado_actividad') +
+              '" ></i>',
           }
         ],
       },
@@ -217,28 +217,28 @@ datasourceActivity!: MatTableDataSource<Actividad>
     };
   }
 
-  
-applyFilterProces(event: Event) {
-  const filterValue = (event.target as HTMLInputElement).value;
-  console.log(filterValue)
-  this.dataSource.filter = filterValue.trim().toLowerCase();
 
-  if (this.dataSource.paginator) {
-    this.dataSource.paginator.firstPage();
+  applyFilterProces(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    console.log(filterValue)
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
-}
-applyFilterActividades(event: Event, data:any, i : number) {
-  const filterValue = (event.target as HTMLInputElement).value;
-  this.processes[i].actividades.filter  = filterValue.trim().toLowerCase();
-   this.datasourceActivity = data
-   
-}
+  applyFilterActividades(event: Event, data: any, i: number) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.processes[i].actividades.filter = filterValue.trim().toLowerCase();
+    this.datasourceActivity = data
 
-  verCalendario(){
+  }
+
+  verCalendario() {
     this.router.navigate(['../detalle-calendario', { Id: this.idCalendario }], { relativeTo: this.route });
   }
-  
-  onAction(event:any,  process:any) {
+
+  onAction(event: any, process: any) {
     switch (event.action) {
       case 'view':
         this.viewProcess(event, process)
@@ -252,7 +252,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
     }
   }
 
-  viewProcess(event:any, process:any){
+  viewProcess(event: any, process: any) {
     console.log(event)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
@@ -264,7 +264,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
     });
   }
 
-  editActivity(event:any, process:any){
+  editActivity(event: any, process: any) {
     console.log(event)
     console.log(process)
     const activityConfig = new MatDialogConfig();
@@ -275,7 +275,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
     newActivity.afterClosed().subscribe((activity: any) => {
       if (activity != undefined) {
         this.eventoService.get('calendario_evento/' + event.data.actividadId).subscribe(
-          (respGet:any)=> {              
+          (respGet: any) => {
             respGet.DependenciaId = JSON.stringify(activity.UpdateDependencias)
             this.eventoService.put('calendario_evento', respGet).subscribe(
               respPut => {
@@ -285,24 +285,24 @@ applyFilterActividades(event: Event, data:any, i : number) {
                 this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
               }
             )
-          }, (error:any) => {
+          }, (error: any) => {
             this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
           }
-        
+
         )
       }
     });
   }
 
-  disableActivity(event:any, process:any){
-    this.popUpManager.showConfirmAlert(this.translate.instant('calendario.mensaje_estado_actividad'),this.translate.instant('calendario.procesos_actividades')).then(accion => {
-      if(accion.value){
-        if(event.data.Editable){
+  disableActivity(event: any, process: any) {
+    this.popUpManager.showConfirmAlert(this.translate.instant('calendario.mensaje_estado_actividad'), this.translate.instant('calendario.procesos_actividades')).then(accion => {
+      if (accion.value) {
+        if (event.data.Editable) {
           this.eventoService.get('calendario_evento/' + event.data.actividadId).subscribe(
-           (respGet:any) => {
+            (respGet: any) => {
               var dep = JSON.parse(respGet.DependenciaId);
               dep.fechas.forEach((fd: { Id: number; Activo: boolean; Modificacion: string; }) => {
-                if(fd.Id == this.DependenciaID){
+                if (fd.Id == this.DependenciaID) {
                   fd.Activo = !fd.Activo;
                   fd.Modificacion = moment(new Date()).format('DD-MM-YYYY');
                 }
@@ -316,12 +316,12 @@ applyFilterActividades(event: Event, data:any, i : number) {
                   this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
                 }
               )
-            }, (error:any) => {
+            }, (error: any) => {
               this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
             }
           )
         } else {
-          this.popUpManager.showAlert(this.translate.instant('calendario.actividades'),this.translate.instant('calendario.sin_permiso_edicion'))
+          this.popUpManager.showAlert(this.translate.instant('calendario.actividades'), this.translate.instant('calendario.sin_permiso_edicion'))
         }
       }
     })
@@ -330,11 +330,11 @@ applyFilterActividades(event: Event, data:any, i : number) {
   getNivel() {
     this.projectService.get('nivel_formacion?query=NivelFormacionPadreId__isnull:true&limit=0').subscribe(
       //(response: NivelFormacion[]) => {
-        (response: any) => {
+      (response: any) => {
         this.niveles = response;
-     
-        
-       
+
+
+
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
@@ -346,7 +346,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
     this.projectService.get('proyecto_academico_institucion?query=Activo:true&limit=0&fields=Id,Nombre,NivelFormacionId')
       .subscribe(
         //(response: ProyectoAcademicoInstitucion[]) => {
-          (response: any) => {
+        (response: any) => {
           this.ProyectosFull = response;
           console.log(this.ProyectosFull)
         },
@@ -355,7 +355,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
         }
       );
   }
-  
+
 
   onSelectLevel() {
     this.proyectoSelected = undefined;
@@ -364,7 +364,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
     this.Proyectos = this.ProyectosFull.filter((proyecto) => this.filtrarProyecto(proyecto));
   }
 
-  filtrarProyecto(proyecto:any)  {
+  filtrarProyecto(proyecto: any) {
     if (this.nivelesSelected.Id === proyecto['NivelFormacionId']['Id']) {
       return true
     }
@@ -386,34 +386,34 @@ applyFilterActividades(event: Event, data:any, i : number) {
 
 
 
- 
+
   }
 
   getProgramaIdByUser() {
     return new Promise((resolve, reject) => {
       this.userId = this.userService.getPersonaId();
-      this.sgaMidService.get('admision/dependencia_vinculacion_tercero/'+this.userId)
+      this.sgaMidService.get('admision/dependencia_vinculacion_tercero/' + this.userId)
         .subscribe(
           (respDependencia: any) => {
             const dependencias = <Number[]>respDependencia.Data.DependenciaId;
-            if (dependencias.length == 1){
+            if (dependencias.length == 1) {
               resolve(dependencias[0])
             } else {
               reject(dependencias)
             }
           },
-          (error:any) => {
+          (error: any) => {
             reject(null)
           }
         );
-    });  
+    });
   }
 
   getInfoPrograma(DependenciaId: number) {
     this.loading = true;
     this.processes = [];
     this.projectService.get('proyecto_academico_institucion/' + DependenciaId).subscribe(
-       //(res_proyecto: ProyectoAcademicoInstitucion) => {
+      //(res_proyecto: ProyectoAcademicoInstitucion) => {
       (res_proyecto: any) => {
         this.Proyecto_nombre = res_proyecto.Nombre;
         if (!this.IsAdmin) {
@@ -421,16 +421,16 @@ applyFilterActividades(event: Event, data:any, i : number) {
           this.proyectoSelected = res_proyecto;
         }
         this.eventoService.get('tipo_recurrencia?limit=0').subscribe(
-          (res_recurrencia:any) => {
+          (res_recurrencia: any) => {
             this.periodicidad = res_recurrencia;
             this.sgaMidService.get('consulta_calendario_proyecto/' + DependenciaId).subscribe(
-              (resp_calendar_project:any) => {
+              (resp_calendar_project: any) => {
                 this.idCalendario = resp_calendar_project["CalendarioId"];
                 if (this.idCalendario > 0) {
                   this.sgaMidService.get('calendario_academico/v2/' + resp_calendar_project["CalendarioId"]).subscribe(
-                    (response:any) => {
+                    (response: any) => {
                       this.parametrosService.get('periodo/' + response.Data[0].PeriodoId).subscribe(
-                        (resp:any )=> {
+                        (resp: any) => {
                           this.periodo_calendario = resp.Data.Nombre;
                           this.Calendario_academico = response.Data[0].Nombre
                           const processes: any[] = response.Data[0].proceso;
@@ -452,7 +452,7 @@ applyFilterActividades(event: Event, data:any, i : number) {
                                       loadedActivity.Descripcion = element['Descripcion'];
                                       loadedActivity['DependenciaId'] = this.validJSONdeps(element['DependenciaId']);
                                       var FechasParticulares = this.findDatesforDep(loadedActivity['DependenciaId'], DependenciaId);
-                                      if(FechasParticulares == undefined){
+                                      if (FechasParticulares == undefined) {
                                         loadedActivity.FechaInicio = moment(element['FechaInicio'], 'YYYY-MM-DD').format('DD-MM-YYYY');
                                         loadedActivity.FechaFin = moment(element['FechaFin'], 'YYYY-MM-DD').format('DD-MM-YYYY');
                                         loadedActivity.Activo = element['Activo'];
@@ -476,12 +476,12 @@ applyFilterActividades(event: Event, data:any, i : number) {
                                   this.processes.push(loadedProcess);
                                   this.dataSource = new MatTableDataSource(this.processes);
                                   this.datasourceActivity = new MatTableDataSource<Actividad>
-                                  
-                                  
+
+
                                   this.dataSource.paginator = this.paginator;
                                   this.dataSource.sort = this.sort;
-                                  console.log(this.dataSource)
-                                  
+
+
                                 }
                               }
                             });
@@ -489,46 +489,46 @@ applyFilterActividades(event: Event, data:any, i : number) {
                           } else {
                             this.loading = false;
                           }
-                          if( <boolean>response.Data[0].AplicaExtension ){
-                            
-                            this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'),this.translate.instant('calendario.calendario_tiene_extension'));
+                          if (<boolean>response.Data[0].AplicaExtension) {
+
+                            this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'), this.translate.instant('calendario.calendario_tiene_extension'));
                           }
                         },
                         error => {
                           this.loading = false;
-                          
+
                           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                         }
                       );
                     },
-                    (error:any) => {
+                    (error: any) => {
                       this.loading = false;
-                     
+
                       this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                     }
                   );
                 } else {
                   this.loading = false;
-                  
+
                   this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                 }
-              }, (error:any)  => {
+              }, (error: any) => {
                 this.loading = false;
-               
-                this.popUpManager.showErrorToast(this.translate.instant('ERROR.general')); 
+
+                this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
               }
             );
           },
-          (error:any)  => {
+          (error: any) => {
             this.loading = false;
-            
+
             this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
           }
         );
       },
       error => {
         this.loading = false;
-        
+
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       }
     )
@@ -539,34 +539,34 @@ applyFilterActividades(event: Event, data:any, i : number) {
       DepIds = "{\"proyectos\":[],\"fechas\":[]}"
     }
     let jsoncheck = JSON.parse(DepIds);
-    if(!jsoncheck.hasOwnProperty("proyectos")){
+    if (!jsoncheck.hasOwnProperty("proyectos")) {
       jsoncheck['proyectos'] = [];
     }
-    if(!jsoncheck.hasOwnProperty("fechas")){
+    if (!jsoncheck.hasOwnProperty("fechas")) {
       jsoncheck['fechas'] = [];
     } else {
-      jsoncheck.fechas.forEach((f:any)=>{
-        if(!f.hasOwnProperty("Activo")){
-            f['Activo'] = true;
+      jsoncheck.fechas.forEach((f: any) => {
+        if (!f.hasOwnProperty("Activo")) {
+          f['Activo'] = true;
         }
-        if(!f.hasOwnProperty("Modificacion")){
-            f['Modificacion'] = "";
+        if (!f.hasOwnProperty("Modificacion")) {
+          f['Modificacion'] = "";
         }
-        if(!f.hasOwnProperty("Fin")){
-            f['Fin'] = "";
+        if (!f.hasOwnProperty("Fin")) {
+          f['Fin'] = "";
         }
-        if(!f.hasOwnProperty("Inicio")){
-            f['Inicio'] = "";
+        if (!f.hasOwnProperty("Inicio")) {
+          f['Inicio'] = "";
         }
-        if(!f.hasOwnProperty("Id")){
+        if (!f.hasOwnProperty("Id")) {
           f['Id'] = "";
         }
-    });
+      });
     }
     return jsoncheck;
   }
 
-  findDatesforDep(listDeps: any, DepId: number){
+  findDatesforDep(listDeps: any, DepId: number) {
 
     return listDeps.fechas.find((p: any) => p.Id == DepId)
   }

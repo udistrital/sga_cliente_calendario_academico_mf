@@ -1,13 +1,13 @@
 export class CalendarioEvento {
-    Id: number;
-    Nombre: string;
+    Id!: number;
+    Nombre!: string;
     Descripcion: any;
-    FechaCreacion: string;
-    FechaModificacion: string;
-    FechaInicio: string;
-    FechaFin: string;
-    Activo: boolean;
+    FechaCreacion!: string;
+    FechaModificacion!: string;
+    FechaInicio!: string;
+    FechaFin!: string;
+    Activo!: boolean;
     DependenciaId: any;
-    EventoPadreId: {Id: number};
+    EventoPadreId!: {Id: number};
     TipoEventoId: any;
 }

@@ -7,7 +7,6 @@ import { getCookie } from 'src/utils/cookie';
 
 @Component({
     selector: 'sga-calendarioacademico-mf',
-
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
 
