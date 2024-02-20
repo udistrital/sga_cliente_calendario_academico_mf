@@ -46,4 +46,8 @@ $my-theme: mat.define-light-theme((
     typography: $my-typography,    
 ));
 
+
+button{
+    background: transparent;
+  }
 @include mat.all-component-themes($my-theme);

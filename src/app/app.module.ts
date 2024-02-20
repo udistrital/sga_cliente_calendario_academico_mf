@@ -45,6 +45,10 @@ import { DetalleCalendarioComponent } from './component/detalle-calendario/detal
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 
 
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, 'http://localhost:4203/assets/i18n/', '.json');
+}
+ 
 
 @NgModule({
   declarations: [
@@ -111,8 +115,3 @@ import { CalendarioProyectoComponent } from './component/calendario-proyecto/cal
   bootstrap: [AppComponent]
 })
 export class AppModule { }
-
-export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'http://localhost:4203/assets/i18n/', '.json');
-}
- 
