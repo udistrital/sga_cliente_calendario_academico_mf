@@ -12,6 +12,7 @@ import { NivelFormacion } from '../../models/proyecto_academico/nivel_formacion'
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 @Component({
   selector: 'list-calendario-academico',
@@ -299,13 +300,18 @@ export class ListCalendarioAcademicoComponent implements OnInit {
  
 
   }
+
+  tabChanged(tabChangeEvent: MatTabChangeEvent): void {
+    if (tabChangeEvent.index === 0) {
+      this.activateTab();
+    }
+  }
+
   activateTab(calendarId = 0, calendarState = false, tab=0) {
     
     this.activetab = tab;
     this.calendarForEditId = calendarId;
     this.calendarForNew = calendarState;
-    
-
   }
 
 }
