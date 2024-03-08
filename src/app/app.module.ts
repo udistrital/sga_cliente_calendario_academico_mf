@@ -43,6 +43,7 @@ import { DialogPreviewFileComponent } from './component/dialog-preview-file/dial
 import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
+import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -102,6 +103,7 @@ export function createTranslateLoader(http: HttpClient) {
     })
   ],
   providers: [
+    SgaCalendarioMidService,
     MatSnackBar,
     HttpErrorManager,
     DocumentoService,
