@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ImplicitAutenticationService } from './implicit_autentication.service';
 import { AnyService } from './any.service';
+import { decrypt } from 'src/utils/util-encrypt';
 
 const path = environment.TERCEROS_SERVICE;
 
@@ -145,7 +146,8 @@ export class UserService {
   }*/
 
   public getPersonaId(): number {
-    return parseInt(window.localStorage.getItem('persona_id')!, 10);
+    const id = decrypt(window.localStorage.getItem('persona_id'));
+    return parseInt(id!, 10);
   }
 /*
 
