@@ -43,7 +43,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     private translate: TranslateService,
     private router: Router,
     private route: ActivatedRoute,
-    private sgaMidService: SgaMidService,
     private eventoService: EventoService,
     private proyectoService: ProyectoAcademicoService,
     private dialog: MatDialog,

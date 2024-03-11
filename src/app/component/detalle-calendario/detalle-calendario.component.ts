@@ -19,6 +19,7 @@ import * as moment from 'moment';
 import { Actividad } from 'src/app/models/calendario-academico/actividad';
 import { NewNuxeoService } from 'src/app/services/new_nuxeo.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 
 @Component({
   selector: 'detalle-calendario',
@@ -52,6 +53,7 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
 
   constructor(
     private sgaMidService: SgaMidService,
+    private SgaCalendarioMidServide: SgaCalendarioMidService,
     private translate: TranslateService,
     //private nuxeoService: NuxeoService,
     private documentoService: DocumentoService,
@@ -290,7 +292,7 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
             activityPut['FechaFin'] = activity.Actividad.FechaFin;
             this.eventoService.put('calendario_evento', activityPut).subscribe(
               response => {
-                this.sgaMidService.put('crear_actividad_calendario/update', { Id: event.data.actividadId, resp: activity.responsable }).subscribe(
+                this.SgaCalendarioMidServide.put('actividad-calendario/calendario/actividad/', { Id: event.data.actividadId, resp: activity.responsable }).subscribe(
                   response => {
                     this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
                     this.loadSelects(this.calendar.calendarioId);
