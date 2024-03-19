@@ -11,7 +11,6 @@ import { ParametrosService } from './services/parametros.service';
 import { RequestManager } from './managers/requestManager';
 import { HttpErrorManager } from './managers/errorManager';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SgaMidService } from './services/sga_mid.service';
 import { EventoService } from './services/evento.service';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -109,7 +108,6 @@ export function createTranslateLoader(http: HttpClient) {
     DocumentoService,
     RequestManager,
     ParametrosService,
-    SgaMidService,
     EventoService,
     PopUpManager,
    

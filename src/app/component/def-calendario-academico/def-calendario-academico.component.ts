@@ -22,7 +22,6 @@ import { DocumentoService } from 'src/app/services/documento.service';
 //import { NuxeoService } from 'src/app/services/nuxeo.service';
 import { NewNuxeoService } from 'src/app/services/new_nuxeo.service';
 import { EventoService } from 'src/app/services/evento.service';
-import { SgaMidService } from 'src/app/services/sga_mid.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
 import { EdicionActividadesProgramasComponent } from '../edicion-actividades-programas/edicion-actividades-programas.component';
@@ -115,7 +114,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     //private nuxeoService: NuxeoService,
     private documentoService: DocumentoService,
     private eventoService: EventoService,
-    private sgaMidService: SgaMidService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
     private proyectoService: ProyectoAcademicoService,
     private popUpManager: PopUpManager,
@@ -346,25 +344,25 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
 
   loadExtension(IdExt: number) {
     this.loading = true;
-    this.sgaMidService.get('calendario_academico/v2/' + IdExt).subscribe(
+    this.sgaCalendarioMidService.get('calendario-academico/v2/' + IdExt).subscribe(
       (response: any) => {
         if (response != null && response.Success) {
-          console.log("calendario extension:", response.Data)
-          this.proyectosParticulares = JSON.parse(response.Data[0].DependenciaParticularId);
+          console.log("calendario extension:", response.data)
+          this.proyectosParticulares = JSON.parse(response.data[0].DependenciaParticularId);
           this.projects = this.proyectos.filter(proyecto => this.filterProject(this.proyectosParticulares.proyectos, proyecto.Id));
           this.calendarFormExtend.patchValue({
-            Nivel: response.Data[0].Nivel,
-            PeriodoId: response.Data[0].PeriodoId,
-            resolucion: response.Data[0].resolucionExt.Resolucion,
-            anno: response.Data[0].resolucionExt.Anno,
+            Nivel: response.data[0].Nivel,
+            PeriodoId: response.data[0].PeriodoId,
+            resolucion: response.data[0].resolucionExt.Resolucion,
+            anno: response.data[0].resolucionExt.Anno,
             fileResolucion: "",
             selProyectos: this.proyectosParticulares.proyectos,
           })
-          this.fileExtId = response.Data[0].resolucionExt.Id;
+          this.fileExtId = response.data[0].resolucionExt.Id;
 
           this.processesExt = [];
           this.activitiesExt = [];
-          const calendarExt = response.Data[0];
+          const calendarExt = response.data[0];
           const processes: any[] = calendarExt['proceso'];
           if (processes !== null) {
             processes.forEach(element => {

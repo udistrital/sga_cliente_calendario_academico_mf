@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SgaMidService } from '../../services/sga_mid.service'
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service'
 import { Calendario } from 'src/app/models/calendario-academico/calendario';
 import { PopUpManager } from '../../managers/popUpManager';
