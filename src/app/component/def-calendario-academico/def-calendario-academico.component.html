@@ -226,7 +226,7 @@
                                                     fontIcon="edit" class=" icon" disabl>
                                                 </mat-icon>
                                             </button>
-                                            <button [disabled]="view" (click)="deleteProcess($event)"
+                                            <button [disabled]="view" (click)="deleteProcess({data:row})"
                                                 style="border: none; width: 50%;">
                                                 <mat-icon aria-hidden="false"
                                                     title="{{'calendario.tooltip_detalle_proceso' | translate}}"

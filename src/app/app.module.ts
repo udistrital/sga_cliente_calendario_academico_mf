@@ -11,7 +11,6 @@ import { ParametrosService } from './services/parametros.service';
 import { RequestManager } from './managers/requestManager';
 import { HttpErrorManager } from './managers/errorManager';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SgaMidService } from './services/sga_mid.service';
 import { EventoService } from './services/evento.service';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -43,6 +42,7 @@ import { DialogPreviewFileComponent } from './component/dialog-preview-file/dial
 import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
+import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -102,12 +102,12 @@ export function createTranslateLoader(http: HttpClient) {
     })
   ],
   providers: [
+    SgaCalendarioMidService,
     MatSnackBar,
     HttpErrorManager,
     DocumentoService,
     RequestManager,
     ParametrosService,
-    SgaMidService,
     EventoService,
     PopUpManager,
    
