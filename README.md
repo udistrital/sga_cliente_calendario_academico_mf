@@ -9,7 +9,7 @@ Cliente para la gestión del calendario académico, parte del Sistema de Gestió
 - [Angular](https://angular.io/docs) 16.2.0
   - Incluye Animations, Common, Compiler, Core, Forms, Platform-Browser, Platform-Browser-Dynamic, Router
 - [Angular Material](https://material.angular.io/) 16.2.14
-- [ngx-translate](http://www.ngx-translate.com/) 15.0.0
+- [ngx-translate](https://github.com/ngx-translate/core) 15.0.0
 - [Eva Icons](https://akveo.github.io/eva-icons/#/) 1.1.3
 - [Moment.js](https://momentjs.com/docs/) 2.30.1
 - [Moment Timezone](https://momentjs.com/timezone/docs/) 0.5.44
