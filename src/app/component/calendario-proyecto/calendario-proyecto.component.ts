@@ -20,7 +20,6 @@ export class CalendarioProyectoComponent {
   calendarioId: string = '';
   projectId: number = 0;
   showCalendar: boolean = false;
-  loading: boolean = false;
 
   constructor(
     private projectService: ProyectoAcademicoService,
@@ -47,7 +46,6 @@ export class CalendarioProyectoComponent {
   }
 
   onSelectLevel() {
-    this.loading = true;
     this.showCalendar = false;
     this.projectService.get('proyecto_academico_institucion?limit=0&fields=Id,Nombre,NivelFormacionId').subscribe(
       (response:any) => {
@@ -56,17 +54,14 @@ export class CalendarioProyectoComponent {
         } else {
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
         }
-        this.loading = false;
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
 
   onSelectProject() {
-    this.loading = true;
     this.showCalendar = false;
     this.sgaMidService.get('consulta_calendario_proyecto/' + this.selectedProject.value).subscribe(
       (response:any) => {
@@ -78,11 +73,9 @@ export class CalendarioProyectoComponent {
         } else {
           this.showCalendar = true;
         }
-        this.loading = false;
       },
       (error:any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
