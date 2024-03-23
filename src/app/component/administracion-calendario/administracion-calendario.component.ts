@@ -39,7 +39,6 @@ export class AdministracionCalendarioComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  loading: boolean = false;
   processSettings: any;
   activitiesSettings: any;
 
@@ -410,7 +409,6 @@ export class AdministracionCalendarioComponent implements OnInit {
   }
 
   getInfoPrograma(DependenciaId: number) {
-    this.loading = true;
     this.processes = [];
     this.projectService.get('proyecto_academico_institucion/' + DependenciaId).subscribe(
       //(res_proyecto: ProyectoAcademicoInstitucion) => {
@@ -485,9 +483,6 @@ export class AdministracionCalendarioComponent implements OnInit {
                                 }
                               }
                             });
-                            this.loading = false;
-                          } else {
-                            this.loading = false;
                           }
                           if (<boolean>response.Data[0].AplicaExtension) {
 
@@ -495,40 +490,28 @@ export class AdministracionCalendarioComponent implements OnInit {
                           }
                         },
                         error => {
-                          this.loading = false;
-
                           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                         }
                       );
                     },
                     (error: any) => {
-                      this.loading = false;
-
                       this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                     }
                   );
                 } else {
-                  this.loading = false;
-
                   this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                 }
               }, (error: any) => {
-                this.loading = false;
-
                 this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
               }
             );
           },
           (error: any) => {
-            this.loading = false;
-
             this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
           }
         );
       },
       error => {
-        this.loading = false;
-
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       }
     )

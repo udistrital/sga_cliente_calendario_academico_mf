@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -43,7 +43,7 @@ import { DialogPreviewFileComponent } from './component/dialog-preview-file/dial
 import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
-
+import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, 'http://localhost:4203/assets/i18n/', '.json');
@@ -93,6 +93,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatExpansionModule,
     MatIconModule,
     HttpClientModule,
+    SpinnerUtilModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
@@ -110,7 +111,7 @@ export function createTranslateLoader(http: HttpClient) {
     SgaMidService,
     EventoService,
     PopUpManager,
-   
+    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
