@@ -15,7 +15,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <mat-form-field floatLabel="always" style="width: 60%;">
+                    <mat-form-field floatLabel="always" class="w-100">
                         <input matInput type="text" formControlName="Nombre"
                             placeholder="*{{ 'calendario.actividad' | translate }} " required />
                         <mat-error
@@ -27,7 +27,7 @@
             </div>
             <div class="row my-2">
                 <div class="col-12">
-                    <mat-form-field floatLabel="always" style="width: 75%;">
+                    <mat-form-field floatLabel="always" class="w-100">
                         <input matInput type="text" formControlName="Descripcion"
                             placeholder="*{{ 'GLOBAL.descripcion' | translate }} " required />
                         <mat-error
@@ -37,9 +37,9 @@
                     </mat-form-field>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-6">
-                    <mat-form-field floatLabel="always">
+            <div>
+                <div>
+                    <mat-form-field floatLabel="always" class="w-100">
                         <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="fechaInicioPicker"
                             formControlName="FechaInicio" placeholder="*{{ 'calendario.fecha_inicio' | translate }} "
                             required />
@@ -51,8 +51,8 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <div class="col-6">
-                    <mat-form-field floatLabel="always">
+                <div>
+                    <mat-form-field floatLabel="always" class="w-100">
                         <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="fechaFinPicker"
                             formControlName="FechaFin" placeholder="*{{ 'calendario.fecha_fin' | translate }} "
                             required />
@@ -87,21 +87,21 @@
                     <div class=col-12>
                         <!-- <ng2-smart-table [settings]="publicTable" [source]="tableSource" (delete)="deletePublic($event)"></ng2-smart-table>-->
                         <div class="mat-elevation-z8">
-                            <table mat-table [dataSource]="tableSource" class="demo-table" matSort>
+                            <mat-table [dataSource]="tableSource" class="demo-table" matSort>
 
                                 <!-- ID Column -->
                                 <ng-container matColumnDef="Nombre" sticky>
-                                    <th class="text-left" mat-header-cell *matHeaderCellDef mat-sort-header
+                                    <mat-header-cell class="text-left" *matHeaderCellDef mat-sort-header
                                         style="width: 90%;">
-                                        {{'calendario.nombre' | translate}} </th>
-                                    <td mat-cell *matCellDef="let row"> {{row.Nombre}} </td>
+                                        {{'calendario.nombre' | translate}} </mat-header-cell>
+                                    <mat-cell *matCellDef="let row"> {{row.Nombre}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="Acciones">
-                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 90%;">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 90%;">
                                         {{'GLOBAL.acciones' |
-                                        translate}} </th>
-                                    <td mat-cell *matCellDef="let row">
+                                        translate}} </mat-header-cell>
+                                    <mat-cell  *matCellDef="let row">
                                         <button class="buttondetprocess" (click)="deletePublic($event)"
                                             style="border: none;">
                                             <mat-icon aria-hidden="false"
@@ -109,16 +109,17 @@
                                                 fontIcon="delete">
                                             </mat-icon>
                                         </button>
+                                    </mat-cell>
                                 </ng-container>
 
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
                                 <!-- Row shown when there is no matching data. -->
                                 <tr class="mat-row" *matNoDataRow>
                                     <td class="mat-cell" colspan="4">{{'calendario.sin_procesos' | translate}}</td>
                                 </tr>
-                            </table>
+                            </mat-table>
 
 
                         </div>
@@ -146,43 +147,35 @@
             <legend>
                 {{ 'calendario.actividad_dirigido' | translate }}
             </legend>
-            <div class="row">
-                <div class="col-6">
-                    <mat-form-field floatLabel="always">
-                        <input matInput type="text" formControlName="Nombre"
-                            placeholder="{{ 'calendario.nombre' | translate }}" required>
-                        <mat-error
-                            *ngIf="publicTypeForm.get('Nombre')?.hasError('required') && publicTypeForm.get('Nombre')?.touched">
-                            {{ 'calendario.nombre' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="col-6">
-                    <mat-form-field floatLabel="always">
-                        <input matInput type="text" formControlName="CodigoAbreviacion"
-                            placeholder="{{ 'GLOBAL.codigo_abreviacion' | translate }}" required>
-                        <mat-error
-                            *ngIf="publicTypeForm.get('CodigoAbreviacion')?.hasError('required') && publicTypeForm.get('CodigoAbreviacion')?.touched">
-                            {{ 'calendario.error_dirigido_codigo' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
+            <div>
+                <mat-form-field floatLabel="always" class="w-100">
+                    <input matInput type="text" formControlName="Nombre"
+                        placeholder="{{ 'calendario.nombre' | translate }}" required>
+                    <mat-error
+                        *ngIf="publicTypeForm.get('Nombre')?.hasError('required') && publicTypeForm.get('Nombre')?.touched">
+                        {{ 'calendario.nombre' | translate }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field floatLabel="always" class="w-100">
+                    <input matInput type="text" formControlName="CodigoAbreviacion"
+                        placeholder="{{ 'GLOBAL.codigo_abreviacion' | translate }}" required>
+                    <mat-error
+                        *ngIf="publicTypeForm.get('CodigoAbreviacion')?.hasError('required') && publicTypeForm.get('CodigoAbreviacion')?.touched">
+                        {{ 'calendario.error_dirigido_codigo' | translate }}
+                    </mat-error>
+                </mat-form-field>
             </div>
             <br>
-            <div class="row">
-                <div class="col-6">
-                    <mat-form-field floatLabel="always">
-                        <input matInput type="number" formControlName="NumeroOrden"
-                            placeholder="{{ 'GLOBAL.numero_orden' | translate }}" required>
-                        <mat-error
-                            *ngIf="publicTypeForm.get('NumeroOrden')?.hasError('required') && publicTypeForm.get('NumeroOrden')?.touched">
-                            {{ 'calendario.error_dirigido_orden' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="col">
-                    <mat-checkbox formControlName="Activo">{{ 'GLOBAL.activo' | translate }} </mat-checkbox>
-                </div>
+            <div>
+                <mat-form-field floatLabel="always" class="w-100">
+                    <input matInput type="number" formControlName="NumeroOrden"
+                        placeholder="{{ 'GLOBAL.numero_orden' | translate }}" required>
+                    <mat-error
+                        *ngIf="publicTypeForm.get('NumeroOrden')?.hasError('required') && publicTypeForm.get('NumeroOrden')?.touched">
+                        {{ 'calendario.error_dirigido_orden' | translate }}
+                    </mat-error>
+                </mat-form-field>
+                <mat-checkbox formControlName="Activo" class="w-100">{{ 'GLOBAL.activo' | translate }} </mat-checkbox>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -195,21 +188,21 @@
                 <div class="col-12">
                     <!--   <ng2-smart-table [settings]="publicTable" [source]="responsables" (delete)="onDeletePublic($event)"></ng2-smart-table>-->
                     <div class="mat-elevation-z8">
-                        <table mat-table [dataSource]="responsables" class="demo-table" matSort>
+                        <mat-table [dataSource]="responsables" class="demo-table" matSort>
 
                             <!-- ID Column -->
                             <ng-container matColumnDef="Nombre" sticky>
-                                <th class="text-left" mat-header-cell *matHeaderCellDef mat-sort-header
+                                <mat-header-cell class="text-left" *matHeaderCellDef mat-sort-header
                                     style="width: 90%;">
-                                    {{'calendario.nombre' | translate}} </th>
-                                <td mat-cell *matCellDef="let row"> {{row.Nombre}} </td>
+                                    {{'calendario.nombre' | translate}} </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{row.Nombre}} </mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="Acciones">
-                                <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 90%;">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 90%;">
                                     {{'GLOBAL.acciones' |
-                                    translate}} </th>
-                                <td mat-cell *matCellDef="let row">
+                                    translate}} </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
                                     <button class="buttondetprocess" (click)="onDeletePublic({data:row})"
                                         style="border: none;">
                                         <mat-icon aria-hidden="false"
@@ -217,16 +210,17 @@
                                             fontIcon="delete">
                                         </mat-icon>
                                     </button>
+                                </mat-cell>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
                             <!-- Row shown when there is no matching data. -->
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="4">{{'calendario.sin_procesos' | translate}}</td>
                             </tr>
-                        </table>
+                        </mat-table>
 
 
                     </div>
