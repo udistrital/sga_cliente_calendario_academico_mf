@@ -1,0 +1,121 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+/* For use in src/lib/core/theming/_palette.scss */
+$md-primary: (
+    50 : #e1edf2,
+    100 : #b3d1dd,
+    200 : #81b3c7,
+    300 : #4f95b1,
+    400 : #297ea0,
+    500 : #03678f,
+    600 : #035f87,
+    700 : #02547c,
+    800 : #024a72,
+    900 : #013960,
+    A100 : #90c9ff,
+    A200 : #5db0ff,
+    A400 : #2a97ff,
+    A700 : #118bff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #ffffff,
+    )
+);
+
+/* For use in src/lib/core/theming/_palette.scss */
+$md-accent: (
+    50 : #e3ebf2,
+    100 : #b9cedf,
+    200 : #8aadca,
+    300 : #5b8cb5,
+    400 : #3773a5,
+    500 : #145a95,
+    600 : #12528d,
+    700 : #0e4882,
+    800 : #0b3f78,
+    900 : #062e67,
+    A100 : #97bbff,
+    A200 : #649aff,
+    A400 : #3179ff,
+    A700 : #1868ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+
+/* For use in src/lib/core/theming/_palette.scss */
+$md-warning: (
+    50 : #faf8e7,
+    100 : #f4eec4,
+    200 : #ece29d,
+    300 : #e4d675,
+    400 : #dfce58,
+    500 : #d9c53a,
+    600 : #d5bf34,
+    700 : #cfb82c,
+    800 : #cab025,
+    900 : #c0a318,
+    A100 : #fffdf4,
+    A200 : #fff3c1,
+    A400 : #ffea8e,
+    A700 : #ffe574,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$light-theme: mat.define-light-theme(
+    (
+        color: (
+            primary: mat.define-palette($md-primary, 500),
+            accent: mat.define-palette($md-accent, 500),
+            warn: mat.define-palette($md-warning, 500),
+        ),
+        typography: mat.define-typography-config(
+            $font-family: 'Open Sans',
+        ),
+        desity: 0,
+    )
+);
+
+@include mat.all-component-themes($light-theme);
