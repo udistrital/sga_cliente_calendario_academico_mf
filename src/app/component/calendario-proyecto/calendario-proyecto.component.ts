@@ -3,8 +3,8 @@ import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { NivelFormacion } from 'src/app/models/proyecto_academico/nivel_formacion';
 import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
-import { SgaMidService } from 'src/app/services/sga_mid.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
+import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 
 @Component({
   selector: 'calendario-proyecto',
@@ -23,7 +23,7 @@ export class CalendarioProyectoComponent {
 
   constructor(
     private projectService: ProyectoAcademicoService,
-    private sgaMidService: SgaMidService,
+    private sgaCalendarioMidService: SgaCalendarioMidService,
     private popUpManager: PopUpManager,
     private translate: TranslateService,
   ) {
@@ -63,9 +63,9 @@ export class CalendarioProyectoComponent {
 
   onSelectProject() {
     this.showCalendar = false;
-    this.sgaMidService.get('consulta_calendario_proyecto/' + this.selectedProject.value).subscribe(
+    this.sgaCalendarioMidService.get('calendario-proyecto/' + this.selectedProject.value).subscribe(
       (response:any) => {
-        this.calendarioId = response["CalendarioId"];
+        this.calendarioId = response.data["CalendarioId"];
         this.projectId = this.selectedProject.value
         if (this.calendarioId === "0") {
           this.showCalendar = false;
