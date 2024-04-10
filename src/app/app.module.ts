@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -43,10 +43,12 @@ import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
+import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
+import { environment } from 'src/environments/environment';
 
 
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'http://localhost:4203/assets/i18n/', '.json');
+  return new TranslateHttpLoader(http,  environment.apiUrl + 'assets/i18n/', '.json');
 }
  
 
@@ -93,6 +95,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatExpansionModule,
     MatIconModule,
     HttpClientModule,
+    SpinnerUtilModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
@@ -110,7 +113,7 @@ export function createTranslateLoader(http: HttpClient) {
     ParametrosService,
     EventoService,
     PopUpManager,
-   
+    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

@@ -66,7 +66,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   periodos: any;
   periodosClone: any;
   niveles!: NivelFormacion[];
-  loading: boolean = false;
   editMode: boolean = false;
   uploadMode: boolean = false;
 
@@ -142,7 +141,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   clonarCalendario() {
-    this.loading = true;
     this.calendarClone = new CalendarioClone();
     this.calendarClone = this.calendarFormClone.value;
     this.calendarClone.Id = this.calendar.calendarioId
@@ -151,11 +149,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
         const r = <any>response;
         if (response !== null && r.Data.Code == '404') {
           this.activebutton = true;
-          this.loading = false;
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_clon_error'));
         } else if (response !== null && r.Data.Code == '400') {
           this.activebutton = true;
-          this.loading = false;
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_clon_error'));
         } else {
 
@@ -163,12 +159,10 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           this.activetabsClone = false;
           this.activetabs = true;
           this.calendarCloneOut.emit(this.calendarClone.Id);
-          this.loading = false;
           this.popUpManager.showSuccessAlert(this.translate.instant('calendario.calendario_exito'));
         }
       },
       error => {
-        this.loading = false;
         this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_calendario'));
       },
     );
@@ -224,7 +218,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.editMode = true;
       this.uploadMode = false;
       this.openTabs();
-      this.loading = true;
       this.CalendarIdasfather = this.calendarForEditId;
       this.sgaCalendarioMidService.get('calendario-academico/v2/' + this.calendarForEditId).subscribe(
         (response: any) => {
@@ -287,10 +280,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
               this.dataSource = new MatTableDataSource(this.processes)
               this.datasourceActivity = new MatTableDataSource<Actividad>
 
-            } else {
-              this.loading = false;
             }
-            this.loading = false;
             this.calendarForm.setValue({
               resolucion: this.calendar.resolucion,
               anno: this.calendar.anno,
@@ -314,12 +304,10 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             }
           } else {
             this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-            this.loading = false;
           }
         },
         (error: any) => {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-          this.loading = false;
         },
       );
     }
@@ -343,7 +331,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   loadExtension(IdExt: number) {
-    this.loading = true;
     this.sgaCalendarioMidService.get('calendario-academico/v2/' + IdExt).subscribe(
       (response: any) => {
         if (response != null && response.Success) {
@@ -402,18 +389,13 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             if (!<boolean>response.Data[0].Activo) {
               this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'), this.translate.instant('calendario.extension_inactiva'))
             }
-          } else {
-            this.loading = false;
           }
-          this.loading = false;
         } else {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-          this.loading = false;
         }
       },
       (error: any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
@@ -684,7 +666,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_registrar_calendario'))
         .then(ok => {
           if (ok.value) {
-            this.loading = true;
             if (this.fileResolucion) {
               this.calendar = this.calendarForm.value;
               this.eventoService.get('calendario?query=Activo:true').subscribe(
@@ -694,7 +675,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                     calendarExists = calendarExists || (this.calendar.Nivel === calendar.Nivel && this.calendar.PeriodoId === calendar.PeriodoId);
                   });
                   if (calendarExists) {
-                    this.loading = false;
                     this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_existe'));
                   } else {
                     this.uploadResolutionFile(this.fileResolucion).then(
@@ -717,7 +697,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                             this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_calendario'));
                           },
                         );
-                        this.loading = false;
                       }).catch(error => {
                         this.popUpManager.showErrorToast(this.translate.instant('ERROR.error_subir_documento'));
                       });
@@ -738,7 +717,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_registrar_calendario'))
         .then(ok => {
           if (ok.value) {
-            this.loading = true;
             if (this.fileResolucion) {
               this.calendar = this.calendarForm.value;
               this.uploadResolutionFile(this.fileResolucion).then(
@@ -757,13 +735,11 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                     (response: any) => {
                       this.calendar.calendarioId = response.data['Id'];
                       this.clonarPadre()
-                      this.loading = false;
                     },
                     error => {
                       this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_calendario'));
                     },
                   )
-                  this.loading = false;
                 },
               ).catch(error => {
                 this.popUpManager.showErrorToast(this.translate.instant('ERROR.error_subir_documento'));
@@ -778,7 +754,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   clonarPadre() {
-    this.loading = true;
     this.calendarClone = new CalendarioClone();
     this.calendarClone.Id = this.calendar.calendarioId;
     this.calendarClone.Nivel = this.calendar.Nivel;
@@ -803,7 +778,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           this.popUpManager.showSuccessAlert(this.translate.instant('calendario.calendario_exito'));
           this.popUpManager.showInfoToast(this.translate.instant('calendario.clonar_calendario_fechas'));
         }
-        this.loading = false;
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_calendario'));
@@ -1112,7 +1086,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_extension'),
       this.translate.instant('calendario.formulario_extension')).then(accion => {
         if (accion.value) {
-          this.loading = true;
           console.log("ok enviar...")
           this.newNuxeoService.uploadFiles(files).subscribe(
             (responseNux: any[]) => {
@@ -1143,30 +1116,25 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                           },
                         );
                       }
-                      this.loading = false;
                       this.popUpManager.showSuccessAlert(this.translate.instant('calendario.Extension_calendario_ok'));
                       this.Extension = true;
                       this.loadCalendar();
                       /////////////
                     } else {
-                      this.loading = false;
                       this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                     }
 
                   }, (error) => {
                     console.log("error clone extend: ", error)
-                    this.loading = false;
                     this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                   }
                 );
               } else {
                 console.log("eeror nuxeo")
-                this.loading = false;
                 this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
               }
             }, (errorNux) => {
               console.log("new nuxeo error:", errorNux)
-              this.loading = false;
               this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
             }
           );

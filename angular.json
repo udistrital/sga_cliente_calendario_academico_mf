@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "outputPath": "dist/calendario-academico-mf",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.single-spa.ts",
             "polyfills": [
@@ -37,36 +37,46 @@
               "path": "extra-webpack.config.js",
               "libraryName": "calendario-academico-mf",
               "libraryTarget": "umd"
-            },
-            "deployUrl": "http://localhost:4200/"
+            }
           },
           "configurations": {
             "production": {
-              "budgets": [
+              "optimization":true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
                 {
-                  "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
                 }
               ],
-              "outputHashing": "none"
+              "deployUrl": "https://sgacalendarioacademico.portaloas.udistrital.edu.co/"
             },
             "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true,
-              "outputHashing": "none"
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ],
+              "deployUrl": "https://pruebassgacalendarioacademico.portaloas.udistrital.edu.co/"
+            },
+            "local": {
+              "deployUrl": "http://localhost:4203/"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "local"
         },
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
@@ -78,7 +88,7 @@
               "browserTarget": "calendario-academico-mf:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
