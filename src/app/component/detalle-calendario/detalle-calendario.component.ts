@@ -42,7 +42,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   fileResolucion: any;
   calendarForm!: FormGroup;
   calendarioEvento!: CalendarioEvento;
-  loading: boolean = false;
   responsable!: string;
 
   @Input()
@@ -68,7 +67,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   }
 
   loadSelects(id: any) {
-    this.loading = true;
     this.processes = [];
     this.sgaCalendarioMidService.get('calendario-academico/' + id).subscribe(
       (response: any) => {
@@ -138,15 +136,12 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
               }
             });
           }
-          this.loading = false;
         } else {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-          this.loading = false;
         }
       },
       (error: any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
@@ -315,8 +310,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   }
 
   assignActivity(event: any) {
-    this.loading = true;
-
     this.calendarioEvento = new CalendarioEvento();
     // this.calendarActivity = new ActividadHija();
 
@@ -348,11 +341,9 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
         }
         this.createActivitiesTable();
         this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_hija_exito'));
-        this.loading = false;
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
