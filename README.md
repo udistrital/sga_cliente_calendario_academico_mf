@@ -6,6 +6,7 @@ Cliente para la gestión del calendario académico, parte del Sistema de Gestió
 
 ### Tecnologías Implementadas y Versiones
 
+
 - [Angular](https://angular.io/docs) 16.2.0
   - Incluye Animations, Common, Compiler, Core, Forms, Platform-Browser, Platform-Browser-Dynamic, Router
 - [Angular Material](https://material.angular.io/) 16.2.14
