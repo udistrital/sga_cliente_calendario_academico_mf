@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:single-spa:calendario-academico-mf": "ng build calendario-academico-mf --configuration production",
-    "serve:single-spa:calendario-academico-mf": "ng s --project calendario-academico-mf --disable-host-check --port 4203 --live-reload false"
+    "serve:single-spa:calendario-academico-mf": "ng s --project calendario-academico-mf --disable-host-check --port 4203 --live-reload false",
+    "build:prod": "ng build --progress --configuration=production",
+    "build:test": "ng build --progress --configuration=development"
   },
   "private": true,
   "dependencies": {
