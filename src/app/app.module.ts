@@ -44,9 +44,11 @@ import { DetalleCalendarioComponent } from './component/detalle-calendario/detal
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
 import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
+import { environment } from 'src/environments/environment';
+
 
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'http://localhost:4203/assets/i18n/', '.json');
+  return new TranslateHttpLoader(http,  environment.apiUrl + 'assets/i18n/', '.json');
 }
  
 
