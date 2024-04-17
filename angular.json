@@ -41,20 +41,21 @@
           },
           "configurations": {
             "production": {
-              "optimization":true,
-              "outputHashing": "none",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.production.ts"
-                }
-              ],
-              "deployUrl": "https://sgacalendarioacademico.portaloas.udistrital.edu.co/"
+                "optimization":true,
+                "outputHashing": "none",
+                "sourceMap": false,
+                "namedChunks": false,
+                "aot": true,
+                "extractLicenses": true,
+                "buildOptimizer": true,
+                "fileReplacements": [
+                  {
+                    "replace": "src/environments/environment.ts",
+                    "with": "src/environments/environment.production.ts"
+                  }
+                ],
+                "deployUrl": "https://sgacalendarioacademico.portaloas.udistrital.edu.co/"
+     
             },
             "development": {
               "optimization": true,
@@ -71,13 +72,13 @@
                 }
               ],
               "deployUrl": "https://pruebassgacalendarioacademico.portaloas.udistrital.edu.co/"
-            },
-            "local": {
-              "deployUrl": "http://localhost:4203/"
-            }
-          },
-          "defaultConfiguration": "local"
         },
+        "local": {
+          "deployUrl": "http://localhost:4205/"
+        }
+      },
+      "defaultConfiguration": "local"
+    },
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
@@ -88,7 +89,7 @@
               "browserTarget": "calendario-academico-mf:build:development"
             }
           },
-          "defaultConfiguration": "local"
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

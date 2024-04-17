@@ -4,7 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ImplicitAutenticationService } from './implicit_autentication.service';
 import { AnyService } from './any.service';
-import { decrypt } from 'src/utils/util-encrypt';
 
 const path = environment.TERCEROS_SERVICE;
 
@@ -20,16 +19,13 @@ export class UserService {
 
   constructor(private anyService: AnyService, private autenticationService: ImplicitAutenticationService) {
     if (window.localStorage.getItem('id_token') !== null && window.localStorage.getItem('id_token') !== undefined) {
-       const id_token = window.localStorage.getItem('id_token')!.split('.');
-      const payload = JSON.parse(atob(id_token[1])); 
-    }
-  }
-      /*
-      let DocIdentificacion = null;
+      /* const id_token = window.localStorage.getItem('id_token').split('.');
+      const payload = JSON.parse(atob(id_token[1])); */
+      let DocIdentificacion: string | null = null;
       let CorreoUsuario = null;
       let UsuarioWSO2 = null;
 
-      this.autenticationService.getDocument().then(async (document: string) => {
+      this.autenticationService.getDocument().then(async (document: any) => {
         if (document) {
           DocIdentificacion = document;
         }
@@ -59,10 +55,10 @@ export class UserService {
     }
   }
 
-  private findByDocument(DocIdentificacion, Usuario, Correo){
+  private findByDocument(DocIdentificacion:any, Usuario:any, Correo:any){
     return new Promise<boolean>((resolve, reject) => {
      this.anyService.get(path, 'datos_identificacion?query=Activo:true,Numero:' + DocIdentificacion + '&sortby=FechaCreacion&order=desc')
-      .subscribe((res: any[]) => {
+      .subscribe((res: any) => {
         if (res !== null) {
           if (res.length > 1) {
             let tercero = null;
@@ -107,10 +103,10 @@ export class UserService {
     });
   }
 
-  private findByUserEmail(UserEmail){
+  private findByUserEmail(UserEmail:any){
     return new Promise<boolean>((resolve, reject) => {
     this.anyService.get(path, 'tercero?query=UsuarioWSO2:' + UserEmail)
-      .subscribe(res => {
+      .subscribe((res:any) => {
         if (res !== null) {
           this.user = res[0];
           if (Object.keys(this.user).length !== 0) {
@@ -138,26 +134,25 @@ export class UserService {
   // }
 
   public getPrograma(): number {
-    return parseInt(window.localStorage.getItem('programa'), 10);
+    return parseInt(window.localStorage.getItem('programa')!, 10);
   }
 
   public getUsuario(): string {
-    return window.localStorage.getItem('usuario').toString();
-  }*/
+    return window.localStorage.getItem('usuario')!.toString();
+  }
 
   public getPersonaId(): number {
-    const id = decrypt(window.localStorage.getItem('persona_id'));
-    return parseInt(id!, 10);
+    const id_token = window.localStorage.getItem('user')!;
+    const user = JSON.parse(atob(id_token)); 
+    this.findByUserEmail(user.userService.email)
+    return parseInt(window.localStorage.getItem('persona_id')!, 10);
   }
-/*
 
   public getPeriodo(): number {
-    return parseInt(window.localStorage.getItem('IdPeriodo'), 10)
+    return parseInt(window.localStorage.getItem('IdPeriodo')!, 10)
   }
 
   public getUser() {
     return this.user$.asObservable();
-  }*/
+  }
 }
-
-
