@@ -1,4 +1,3 @@
-<!-- <div [nbSpinner]="loading" nbSpinnerStatus="success" nbSpinnerSize="xxlarge" nbSpinnerMessage="{{ 'GLOBAL.cargando' | translate }}"> -->
 <mat-tab-group [(selectedIndex)]="activetab">
     <mat-tab label="{{ 'calendario.definicion' | translate }}">
         <div class="dinamic-form">
@@ -226,7 +225,7 @@
                                                     fontIcon="edit" class=" icon" disabl>
                                                 </mat-icon>
                                             </button>
-                                            <button [disabled]="view" (click)="deleteProcess($event)"
+                                            <button [disabled]="view" (click)="deleteProcess({data:row})"
                                                 style="border: none; width: 50%;">
                                                 <mat-icon aria-hidden="false"
                                                     title="{{'calendario.tooltip_detalle_proceso' | translate}}"

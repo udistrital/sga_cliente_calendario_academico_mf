@@ -3,8 +3,8 @@ import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { NivelFormacion } from 'src/app/models/proyecto_academico/nivel_formacion';
 import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
-import { SgaMidService } from 'src/app/services/sga_mid.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
+import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 
 @Component({
   selector: 'calendario-proyecto',
@@ -20,11 +20,10 @@ export class CalendarioProyectoComponent {
   calendarioId: string = '';
   projectId: number = 0;
   showCalendar: boolean = false;
-  loading: boolean = false;
 
   constructor(
     private projectService: ProyectoAcademicoService,
-    private sgaMidService: SgaMidService,
+    private sgaCalendarioMidService: SgaCalendarioMidService,
     private popUpManager: PopUpManager,
     private translate: TranslateService,
   ) {
@@ -47,7 +46,6 @@ export class CalendarioProyectoComponent {
   }
 
   onSelectLevel() {
-    this.loading = true;
     this.showCalendar = false;
     this.projectService.get('proyecto_academico_institucion?limit=0&fields=Id,Nombre,NivelFormacionId').subscribe(
       (response:any) => {
@@ -56,21 +54,18 @@ export class CalendarioProyectoComponent {
         } else {
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
         }
-        this.loading = false;
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
 
   onSelectProject() {
-    this.loading = true;
     this.showCalendar = false;
-    this.sgaMidService.get('consulta_calendario_proyecto/' + this.selectedProject.value).subscribe(
+    this.sgaCalendarioMidService.get('calendario-proyecto/' + this.selectedProject.value).subscribe(
       (response:any) => {
-        this.calendarioId = response["CalendarioId"];
+        this.calendarioId = response.data["CalendarioId"];
         this.projectId = this.selectedProject.value
         if (this.calendarioId === "0") {
           this.showCalendar = false;
@@ -78,11 +73,9 @@ export class CalendarioProyectoComponent {
         } else {
           this.showCalendar = true;
         }
-        this.loading = false;
       },
       (error:any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }

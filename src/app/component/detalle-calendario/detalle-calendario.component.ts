@@ -9,7 +9,6 @@ import { Proceso } from 'src/app/models/calendario-academico/proceso';
 import { Calendario } from 'src/app/models/calendario-academico/calendario';
 import { ActividadHija } from 'src/app/models/calendario-academico/actividadHija';
 import { EventoService } from 'src/app/services/evento.service';
-import { SgaMidService } from 'src/app/services/sga_mid.service';
 import { TranslateService } from '@ngx-translate/core';
 import { DocumentoService } from 'src/app/services/documento.service';
 //import { NuxeoService } from 'src/app/services/nuxeo.service';
@@ -19,6 +18,7 @@ import * as moment from 'moment';
 import { Actividad } from 'src/app/models/calendario-academico/actividad';
 import { NewNuxeoService } from 'src/app/services/new_nuxeo.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 
 @Component({
   selector: 'detalle-calendario',
@@ -38,11 +38,10 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   calendar!: Calendario;
   calendarActivity!: ActividadHija;
   //processTable!: LocalDataSource;
-  displayedColumnsActividades: string[] = ["Nombre", "Descripcion", "FechaInicio", "FechaFin","Responsables", "Activo", "Acciones"]
+  displayedColumnsActividades: string[] = ["Nombre", "Descripcion", "FechaInicio", "FechaFin", "Responsables", "Activo", "Acciones"]
   fileResolucion: any;
   calendarForm!: FormGroup;
   calendarioEvento!: CalendarioEvento;
-  loading: boolean = false;
   responsable!: string;
 
   @Input()
@@ -51,7 +50,8 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   projectId: number = 0;
 
   constructor(
-    private sgaMidService: SgaMidService,
+    private sgaCalendarioMidService: SgaCalendarioMidService,
+    private SgaCalendarioMidServide: SgaCalendarioMidService,
     private translate: TranslateService,
     //private nuxeoService: NuxeoService,
     private documentoService: DocumentoService,
@@ -67,12 +67,11 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   }
 
   loadSelects(id: any) {
-    this.loading = true;
     this.processes = [];
-    this.sgaMidService.get('calendario_academico/' + id).subscribe(
+    this.sgaCalendarioMidService.get('calendario-academico/' + id).subscribe(
       (response: any) => {
-        if (response != null && response.Success) {
-          const calendar = response.Data[0];
+        if (response != null && response.success) {
+          const calendar = response.data[0];
           this.calendar = new Calendario();
           this.calendar.Nombre = calendar['Nombre'];
           this.calendar.ListaCalendario = calendar['ListaCalendario'];
@@ -137,15 +136,12 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
               }
             });
           }
-          this.loading = false;
         } else {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-          this.loading = false;
         }
       },
       (error: any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
@@ -290,7 +286,7 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
             activityPut['FechaFin'] = activity.Actividad.FechaFin;
             this.eventoService.put('calendario_evento', activityPut).subscribe(
               response => {
-                this.sgaMidService.put('crear_actividad_calendario/update', { Id: event.data.actividadId, resp: activity.responsable }).subscribe(
+                this.SgaCalendarioMidServide.put('actividad-calendario/calendario/actividad/', { Id: event.data.actividadId, resp: activity.responsable }).subscribe(
                   response => {
                     this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
                     this.loadSelects(this.calendar.calendarioId);
@@ -314,8 +310,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   }
 
   assignActivity(event: any) {
-    this.loading = true;
-
     this.calendarioEvento = new CalendarioEvento();
     // this.calendarActivity = new ActividadHija();
 
@@ -347,11 +341,9 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
         }
         this.createActivitiesTable();
         this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_hija_exito'));
-        this.loading = false;
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }
