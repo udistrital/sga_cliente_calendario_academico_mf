@@ -1,3 +1,6 @@
+<div [class.loader-div]="loading">
+  <mat-spinner *ngIf="loading" diameter="100" color="primary"></mat-spinner>
+</div>
 <mat-card class="mat-card">
   <mat-card-header>
     <mat-card-title><b> {{ 'calendario.administración_calendario_proyecto' | translate }} </b></mat-card-title>
