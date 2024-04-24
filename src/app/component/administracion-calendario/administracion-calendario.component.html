@@ -1,6 +1,6 @@
-<div [class.loader-div]="loading">
+<!-- <div [class.loader-div]="loading">
   <mat-spinner *ngIf="loading" diameter="100" color="primary"></mat-spinner>
-</div>
+</div> -->
 <mat-card class="mat-card">
   <mat-card-header>
     <mat-card-title><b> {{ 'calendario.administración_calendario_proyecto' | translate }} </b></mat-card-title>
@@ -115,11 +115,30 @@
                 <!-- Aquí va el contenido de actividades -->
 
                 <div class="search-container p-5">
+                  <div style="margin-right: 20px;">
+                    <button mat-button (click)="openDialog(miDialogo, process)" class="btn boton-primary">Ver Calendario</button>
+                  </div>
+
                   <input matInput (keyup)="applyFilterActividades($event, process.actividades, i)"
                     placeholder="{{'GLOBAL.buscar'| translate}}" #inputActividades>
                   <mat-icon class="icon-search" matPrefix>search</mat-icon>
                 </div>
 
+
+                <!-- Modal del calendario -->
+                <ng-template #miDialogo let-dialogo>
+                  <div>
+                    <full-calendar [options]="calendarOptions"></full-calendar>
+                  </div>
+                </ng-template>
+
+                <!-- Modal del calendario -->
+                <ng-template #calendarActividad let-dialogo>
+                  <div>
+                    <full-calendar [options]="calendarOptions"></full-calendar>
+                  </div>
+                </ng-template>
+                
                 <div class="mat-elevation-z8">
                   <table mat-table [dataSource]="process.actividades  " matSort>
 
@@ -159,13 +178,17 @@
                     <ng-container matColumnDef="Acciones">
                       <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'GLOBAL.acciones' | translate}} </th>
                       <td mat-cell *matCellDef="let row">
-                        <button (click)="onAction({action: 'edit', data:row}, process.actividades)"
-                          style="width: 50%; border: none;">
+                        <button style="width: 33%; border: none;" (click)="onAction( {action: 'calendar', data:row, dialog:calendarActividad}, process.actividades)">
+                          <mat-icon aria-hidden="false" title="{{'calendario.tooltip_ver_calendario' | translate}}"
+                            fontIcon="calendar_today">
+                          </mat-icon>
+                        </button>
+                        <button style="width: 33%; border: none;" (click)="onAction({action: 'edit', data:row}, process.actividades)">
                           <mat-icon aria-hidden="false" title="{{'calendario.tooltip_editar_actividad' | translate}}"
                             fontIcon="edit_outline">
                           </mat-icon>
                         </button>
-                        <button style="width: 50%; border: none;" (click)="onAction( {action: 'disable', }, process ) ">
+                        <button style="width: 33%; border: none;" (click)="onAction( {action: 'disable', }, process ) ">
                           <mat-icon aria-hidden="false" title="{{'calendario.tooltip_estado_actividad' | translate}}"
                             fontIcon="lock">
                           </mat-icon>

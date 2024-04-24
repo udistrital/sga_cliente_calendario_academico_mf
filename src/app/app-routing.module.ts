@@ -20,15 +20,9 @@ import { CalendarioProyectoComponent } from './component/calendario-proyecto/cal
   //canActivate: [AuthGuard],
 },
 {
-  path: 'list-calendario-academico',
-  component: ListCalendarioAcademicoComponent,
+  path: 'calendario-proyecto',
+  component: CalendarioProyectoComponent,
   //canActivate: [AuthGuard],
-},
-{
-
-path: 'calendario-proyecto',
-component: CalendarioProyectoComponent,
-//canActivate: [AuthGuard],
 }
  
 ];
