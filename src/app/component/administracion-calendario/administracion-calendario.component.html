@@ -170,9 +170,9 @@
                     </ng-container>
 
                     <ng-container matColumnDef="Activo">
-                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> {{'calendario.estado' |
-                        translate}} </th>
-                      <td mat-cell *matCellDef="let row"> {{row.Activo}} </td>
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%;"> 
+                        {{'calendario.estado' | translate}} </th>
+                      <td mat-cell *matCellDef="let row"> {{row.Activo ? 'Activo' : 'Inactivo'}} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Acciones">

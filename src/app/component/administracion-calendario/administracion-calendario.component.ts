@@ -543,77 +543,7 @@ export class AdministracionCalendarioComponent {
                         (resp: any) => {
                           this.periodo_calendario = resp.Data.Nombre;
                           this.Calendario_academico = response.data[0].Nombre
-                          // const processes: any[] = response.data[0].proceso;
-                          const processes = [{
-                            Proceso: "Proceso 1",
-                            Actividades: [{
-                              TipoEventoId: { 
-                                Id: 1,
-                                Descripcion: "Proceso 1",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 1",
-                              Descripcion: "Descripcion 1",
-                              DependenciaId: "",
-                              FechaInicio: "2024-04-01",
-                              FechaFin: "2024-05-20",
-                              Activo: true,
-                              Responsable: "Responsable 1"
-                            },
-                            {
-                              TipoEventoId: { 
-                                Id: 2,
-                                Descripcion: "Proceso 1",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 2",
-                              Descripcion: "Descripcion 2",
-                              DependenciaId: "",                              
-                              FechaInicio: "2024-04-01",
-                              FechaFin: "2024-05-20",
-                              Activo: true,
-                              Responsable: "Responsable 2"
-                            }]
-                          },
-                          {
-                            Proceso: "Proceso 2",
-                            Actividades: [{
-                              TipoEventoId: { 
-                                Id: 3,
-                                Descripcion: "Proceso 2",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 3",
-                              Descripcion: "Descripcion 3",
-                              DependenciaId: "",
-                              FechaInicio: "2024-06-01",
-                              FechaFin: "2024-06-20",
-                              Activo: true,
-                              Responsable: "Responsable 3"
-                            },
-                            {
-                              TipoEventoId: { 
-                                Id: 4,
-                                Descripcion: "Proceso 2",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 4",
-                              Descripcion: "Descripcion 4",
-                              DependenciaId: "",                              
-                              FechaInicio: "2024-06-01",
-                              FechaFin: "2024-06-20",
-                              Activo: true,
-                              Responsable: "Responsable 4"
-                            }]
-                          }]
+                          const processes: any[] = response.data[0].proceso;
                           if (processes !== null) {
                             processes.forEach(element => {
                               if (Object.keys(element).length !== 0) {
