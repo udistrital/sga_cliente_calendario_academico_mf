@@ -75,7 +75,7 @@ steps:
     - push
 
 - name: nodejs_release
-  image: node:16.20.2
+  image: node:lts-bullseye
   commands:
   - node --version
   - npm i
@@ -87,7 +87,7 @@ steps:
     - push
 
 - name: nodejs_master
-  image: node:16.20.2
+  image: node:lts-bullseye
   commands:
   - node --version
   - npm i

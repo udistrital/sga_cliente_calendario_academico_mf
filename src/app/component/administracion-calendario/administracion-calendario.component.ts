@@ -13,8 +13,9 @@ import { UserService } from '../../services/users.service';
 import { ParametrosService } from '../../services/parametros.service';
 import { ImplicitAutenticationService } from '../../services/implicit_autentication.service';
 //Material
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import {MatButtonModule} from '@angular/material/button';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 //Traductor
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 //componente etc
@@ -27,6 +28,11 @@ import { MatSort } from '@angular/material/sort';
 import { filter } from 'rxjs';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 import { SgaAdmisionesMidService } from 'src/app/services/sga_admisiones_mid.service';
+//Calendario
+import { CalendarOptions } from '@fullcalendar/core';
+import multiMonthPlugin from '@fullcalendar/multimonth';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import esLocale from '@fullcalendar/core/locales/es';
 
 
 
@@ -35,7 +41,8 @@ import { SgaAdmisionesMidService } from 'src/app/services/sga_admisiones_mid.ser
   templateUrl: './administracion-calendario.component.html',
   styleUrls: ['./administracion-calendario.component.scss']
 })
-export class AdministracionCalendarioComponent implements OnInit {
+
+export class AdministracionCalendarioComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -44,6 +51,19 @@ export class AdministracionCalendarioComponent implements OnInit {
   activitiesSettings: any;
 
   processes: Proceso[] = [];
+  misEventos: { title: string, start: string, end: string, color: string }[] = [];
+  actividad: { title: string, start: string, end: string }[] = [];
+  misColores = ['#007bff', '#006400', '#808000', '#800000', '#500050', '#804000'];  // Tonos oscuros de azul, verde, amarillo, rojo, morado, naranja
+  calendarOptions: CalendarOptions = {
+    timeZone: 'America/Bogota',
+    locale: esLocale,
+    fixedWeekCount: false,
+    showNonCurrentDates: false,
+    plugins: [],
+    initialView: '',
+    events: []
+  };
+
 
   userId: number = 0;
   DependenciaID: number = 0;
@@ -90,6 +110,45 @@ export class AdministracionCalendarioComponent implements OnInit {
     });
   }
 
+  openDialog(template: TemplateRef<any>, process: any) {
+    this.misEventos = [];
+
+    for (let i = 0; i < process.actividades.filteredData.length; i++) {
+      let evento = {
+        title: process.actividades.filteredData[i].Nombre,
+        start: process.actividades.filteredData[i].FechaInicio.split('-').reverse().join('-'),
+        end: process.actividades.filteredData[i].FechaFin.split('-').reverse().join('-'),
+        color: this.generarColorAleatorio(),
+      }
+      this.misEventos.push(evento);
+    }
+
+    const dialogRef = this.dialog.open(template, { width: '1000px', height: '800px' });
+    this.calendarOptions = {
+      customButtons: {
+        cerrar: {
+          text: 'Cerrar',
+          click:  () => {
+            dialogRef.close();
+          }
+        }
+      },
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'cerrar'
+      },
+      timeZone: 'America/Bogota',
+      fixedWeekCount: false,
+      showNonCurrentDates: false,
+      locale: esLocale,
+      plugins: [multiMonthPlugin],
+      initialView: 'multiMonthYear',
+      events: this.misEventos
+    };
+    // this.dialog.open(template, { width: '1000px', height: '800px' });
+  }
+
 
   ngOnInit() {
     this.dataSource = new MatTableDataSource<Proceso>();
@@ -113,10 +172,8 @@ export class AdministracionCalendarioComponent implements OnInit {
             this.getInfoPrograma(this.DependenciaID);
           }, (err: any) => {
             if (err) {
-              console.log('error en el contructor X(')
               this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'), this.translate.instant('admision.multiple_vinculacion') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             } else {
-              console.log('error en el contructor X(')
               this.popUpManager.showErrorAlert(this.translate.instant('admision.no_vinculacion_no_rol') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             }
           })
@@ -201,6 +258,12 @@ export class AdministracionCalendarioComponent implements OnInit {
         columnTitle: this.translate.instant('GLOBAL.acciones'),
         custom: [
           {
+            name: 'calendar',
+            title: '<i class="nb-calendar" title="' +
+              this.translate.instant('calendario.tooltip_ver_calendario') +
+              '"></i>',
+          },
+          {
             name: 'edit',
             title: '<i class="nb-edit" title="' +
               this.translate.instant('calendario.tooltip_editar_actividad') +
@@ -221,7 +284,6 @@ export class AdministracionCalendarioComponent implements OnInit {
 
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -250,11 +312,13 @@ export class AdministracionCalendarioComponent implements OnInit {
       case 'disable':
         this.disableActivity(event, process);
         break;
+      case 'calendar':
+        this.calendarioActividad(event, process);
+        break;
     }
   }
 
   viewProcess(event: any, process: any) {
-    console.log(event)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
     activityConfig.height = '370px';
@@ -265,9 +329,43 @@ export class AdministracionCalendarioComponent implements OnInit {
     });
   }
 
+  calendarioActividad(event: any, process: any) {
+    this.actividad = [
+      {
+        title: event.data.Nombre,
+        start: event.data.FechaInicio.split('-').reverse().join('-'),
+        end: event.data.FechaFin.split('-').reverse().join('-'),
+      }
+    ];
+
+    const dialogRef = this.dialog.open(event.dialog, { width: '700px', height: '580px' });
+    this.calendarOptions = {
+      customButtons: {
+        cerrar: {
+          text: 'Cerrar',
+          click:  () => {
+            dialogRef.close();
+          }
+        }
+      },
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'cerrar'
+      },
+      timeZone: 'America/Bogota',
+      initialDate: event.data.FechaInicio.split('-').reverse().join('-'),
+      fixedWeekCount: false,
+      showNonCurrentDates: false,
+      locale: esLocale,
+      plugins: [dayGridPlugin],
+      initialView: 'dayGridMonth',
+      events: this.actividad
+    };
+    // this.dialog.open(event.dialog, { width: '700px', height: '580px' });
+  }
+
   editActivity(event: any, process: any) {
-    console.log(event)
-    console.log(process)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '600px';
@@ -349,7 +447,6 @@ export class AdministracionCalendarioComponent implements OnInit {
         //(response: ProyectoAcademicoInstitucion[]) => {
         (response: any) => {
           this.ProyectosFull = response;
-          console.log(this.ProyectosFull)
         },
         (error) => {
           this.ProyectosFull = [];
@@ -425,9 +522,7 @@ export class AdministracionCalendarioComponent implements OnInit {
             this.periodicidad = res_recurrencia;
             this.sgaCalendarioMidService.get('calendario-proyecto/' + DependenciaId).subscribe(
               (resp_calendar_project: any) => {
-                console.log(resp_calendar_project)
                 this.idCalendario = resp_calendar_project.data["CalendarioId"];
-                console.log(resp_calendar_project.data["CalendarioId"])
                 if (this.idCalendario > 0) {
                   this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.data["CalendarioId"]).subscribe(
                     (response: any) => {
@@ -435,7 +530,77 @@ export class AdministracionCalendarioComponent implements OnInit {
                         (resp: any) => {
                           this.periodo_calendario = resp.Data.Nombre;
                           this.Calendario_academico = response.data[0].Nombre
-                          const processes: any[] = response.data[0].proceso;
+                          // const processes: any[] = response.data[0].proceso;
+                          const processes = [{
+                            Proceso: "Proceso 1",
+                            Actividades: [{
+                              TipoEventoId: { 
+                                Id: 1,
+                                Descripcion: "Proceso 1",
+                                TipoRecurrenciaId: {
+                                  Id: 1,
+                                }
+                              },
+                              Nombre: "Actividad 1",
+                              Descripcion: "Descripcion 1",
+                              DependenciaId: "",
+                              FechaInicio: "2024-04-01",
+                              FechaFin: "2024-05-20",
+                              Activo: true,
+                              Responsable: "Responsable 1"
+                            },
+                            {
+                              TipoEventoId: { 
+                                Id: 2,
+                                Descripcion: "Proceso 1",
+                                TipoRecurrenciaId: {
+                                  Id: 1,
+                                }
+                              },
+                              Nombre: "Actividad 2",
+                              Descripcion: "Descripcion 2",
+                              DependenciaId: "",                              
+                              FechaInicio: "2024-04-01",
+                              FechaFin: "2024-05-20",
+                              Activo: true,
+                              Responsable: "Responsable 2"
+                            }]
+                          },
+                          {
+                            Proceso: "Proceso 2",
+                            Actividades: [{
+                              TipoEventoId: { 
+                                Id: 3,
+                                Descripcion: "Proceso 2",
+                                TipoRecurrenciaId: {
+                                  Id: 1,
+                                }
+                              },
+                              Nombre: "Actividad 3",
+                              Descripcion: "Descripcion 3",
+                              DependenciaId: "",
+                              FechaInicio: "2024-06-01",
+                              FechaFin: "2024-06-20",
+                              Activo: true,
+                              Responsable: "Responsable 3"
+                            },
+                            {
+                              TipoEventoId: { 
+                                Id: 4,
+                                Descripcion: "Proceso 2",
+                                TipoRecurrenciaId: {
+                                  Id: 1,
+                                }
+                              },
+                              Nombre: "Actividad 4",
+                              Descripcion: "Descripcion 4",
+                              DependenciaId: "",                              
+                              FechaInicio: "2024-06-01",
+                              FechaFin: "2024-06-20",
+                              Activo: true,
+                              Responsable: "Responsable 4"
+                            }]
+                          }]
                           if (processes !== null) {
                             processes.forEach(element => {
                               if (Object.keys(element).length !== 0) {
@@ -558,5 +723,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     return listDeps.fechas.find((p: any) => p.Id == DepId)
   }
 
+  generarColorAleatorio() {
+    let indiceAleatorio = Math.floor(Math.random() * this.misColores.length);
+    return this.misColores[indiceAleatorio];
+  }
 
 }

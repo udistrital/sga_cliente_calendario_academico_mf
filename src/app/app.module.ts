@@ -43,8 +43,12 @@ import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
+import { SgaAdmisionesMidService } from './services/sga_admisiones_mid.service';
 import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
 import { environment } from 'src/environments/environment';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -96,6 +100,9 @@ export function createTranslateLoader(http: HttpClient) {
     MatIconModule,
     HttpClientModule,
     SpinnerUtilModule,
+    FullCalendarModule,
+    MatDividerModule,
+    MatButtonModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
@@ -106,6 +113,7 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   providers: [
     SgaCalendarioMidService,
+    SgaAdmisionesMidService,
     MatSnackBar,
     HttpErrorManager,
     DocumentoService,

@@ -63,7 +63,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.data = []
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
-        console.log(response)
         const r = <any>response;
         if (response !== null && r.status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
@@ -222,7 +221,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   }
 
   onEdit(event: any) {
-    console.log(event.editable)
     this.view = event.editable
     this.activateTab(event.data.Id, false, 1); // ID del calendario seleccionado para edición
   }
