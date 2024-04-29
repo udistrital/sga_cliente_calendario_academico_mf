@@ -5,11 +5,7 @@
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <mat-spinner *ngIf="loading" diameter="50" color="primary"></mat-spinner>
-    <ng-container
-      *ngIf="!loading; else loadingContent"
-      style="padding: 0px 2rem"
-    >
+    <ng-container>
       <mat-tab-group
         [(selectedIndex)]="activetab"
         (selectedTabChange)="tabChanged($event)"
@@ -256,8 +252,4 @@
       </mat-tab-group>
     </ng-container>
   </mat-card-content>
-
-  <ng-template #loadingContent>
-    <mat-card-content>{{ "GLOBAL.cargando" | translate }}</mat-card-content>
-  </ng-template>
 </mat-card>

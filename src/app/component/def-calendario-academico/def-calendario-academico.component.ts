@@ -118,7 +118,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     private popUpManager: PopUpManager,
     private newNuxeoService: NewNuxeoService,
   ) {
-    console.log(this.view)
     this.calendarActivity = new ActividadHija();
     this.calendarioEvento = new CalendarioEvento();
     this.processes = [];
@@ -136,7 +135,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   ngOnInit() {
-    console.log(this.view)
     this.createCalendarForm();
   }
 
@@ -222,7 +220,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.sgaCalendarioMidService.get('calendario-academico/v2/' + this.calendarForEditId).subscribe(
         (response: any) => {
           if (response != null && response.success) {
-            console.log(response)
             const calendar = response.data[0];
             this.calendar = new Calendario();
             this.calendar.calendarioId = parseInt(calendar['Id']);
@@ -297,7 +294,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             } else {
               this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'), this.translate.instant('calendario.calendario_tiene_extension'))
               this.activetab = 1;
-              console.log(this.ExtensionList)
               this.ExtensionList.sort((a, b) => (a.Id < b.Id) ? 1 : -1)
               this.selCalendar = this.ExtensionList[0].Id;
               this.loadExtension(this.ExtensionList[0].Id);
@@ -315,7 +311,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
 
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -334,7 +329,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     this.sgaCalendarioMidService.get('calendario-academico/v2/' + IdExt).subscribe(
       (response: any) => {
         if (response != null && response.Success) {
-          console.log("calendario extension:", response.data)
           this.proyectosParticulares = JSON.parse(response.data[0].DependenciaParticularId);
           this.projects = this.proyectos.filter(proyecto => this.filterProject(this.proyectosParticulares.proyectos, proyecto.Id));
           this.calendarFormExtend.patchValue({
@@ -379,7 +373,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                     }
                   });
                   this.processesExt.push(loadedProcess);
-                  console.log(this.processesExt)
                   this.datasourceExtension = new MatTableDataSource(this.processesExt)
                 }
               }
@@ -410,14 +403,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       Nivel: '',
       fileResolucion: ['', Validators.required],
     })
-    console.log(this.view)
-    // if (this.view) {
-    //   this.calendarForm.enable()
-    // } else {
-    //   this.calendarForm.disable();
-    // }
-
-
   }
 
   createCalendarFormClone() {
@@ -623,17 +608,15 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     activityConfig.width = '600px';
     activityConfig.height = '370px';
     activityConfig.data = { calendar: this.calendar, activity: event.data, dependencias: this.projects, vista: "select" };
-    console.log(activityConfig)
+   
     const newActivity = this.dialog.open(EdicionActividadesProgramasComponent, activityConfig);
     newActivity.afterClosed().subscribe((DepsEdit: any) => {
-      console.log(DepsEdit)
       if (DepsEdit != undefined) {
         this.eventoService.get('calendario_evento/' + event.data.actividadId).subscribe(
           (respGet: any) => {
             respGet.DependenciaId = JSON.stringify(DepsEdit.UpdateDependencias)
             this.eventoService.put('calendario_evento', respGet).subscribe(
               respPut => {
-                console.log(respPut)
                 this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
                 this.loadCalendar();
               }, error => {
@@ -840,7 +823,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   editProcess(event: any) {
-    console.log(event)
     const processConfig = new MatDialogConfig();
     processConfig.width = '800px';
     processConfig.height = '400px';
@@ -873,7 +855,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   deleteProcess(event: any) {
-    console.log(event)
     this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_inactivar_proceso')).then(
       willDelete => {
         if (willDelete.value) {
@@ -901,7 +882,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   addActivity(event: any, process: Proceso) {
-    console.log(process)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '700px';
@@ -914,7 +894,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             let actividad: Actividad = new Actividad();
             actividad = activity.Actividad;
             actividad.actividadId = response.data['Id'];
-            console.log(actividad.actividadId)
             actividad.responsables = activity.responsable;
             actividad.FechaInicio = moment(actividad.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
             actividad.FechaFin = moment(actividad.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
@@ -922,7 +901,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             if (event) {
               event.source.load(process.actividades.data);
             } else {
-              console.log('Esperemos haber cómo lo resolvemos ! ');
               this.loadCalendar();
             }
             this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_exito'));
@@ -1079,17 +1057,12 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
 
   extendCalendar(event: any) {
     event.preventDefault();
-    console.log("extend calendar")
-    console.log(this.calendarFormExtend)
     var files = [this.fileResolucionExt];
-    console.log(files)
     this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_extension'),
       this.translate.instant('calendario.formulario_extension')).then(accion => {
         if (accion.value) {
-          console.log("ok enviar...")
           this.newNuxeoService.uploadFiles(files).subscribe(
             (responseNux: any[]) => {
-              console.log("nuxeo resp:", responseNux)
               if (responseNux[0].Status == "200") {
                 this.popUpManager.showInfoToast(this.translate.instant('calendario.archivo_extension_saved'));
                 var bodyPost = {
@@ -1099,10 +1072,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                 };
                 this.sgaCalendarioMidService.post('clonar-calendario/extension', bodyPost).subscribe(
                   (resp: any) => {
-                    console.log(resp)
                     if (resp.status == 200) {
                       if (this.Ext_Extension) {
-                        console.log("deshabilit ext org..")
                         this.sgaCalendarioMidService.put('calendario-academico/calendario/academico/' + this.selCalendar + "/inhabilitar", JSON.stringify({ 'id': this.selCalendar })).subscribe(
                           (response: any) => {
                             if (response.status != 200) {
@@ -1125,16 +1096,13 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                     }
 
                   }, (error) => {
-                    console.log("error clone extend: ", error)
                     this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
                   }
                 );
               } else {
-                console.log("eeror nuxeo")
                 this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
               }
             }, (errorNux) => {
-              console.log("new nuxeo error:", errorNux)
               this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
             }
           );
@@ -1143,7 +1111,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   prepareNewExtension() {
-    console.log("this new extension")
     this.calendarFormExtend.patchValue({
       resolucion: '',
       anno: '',
@@ -1183,10 +1150,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   downloadFileExt(id_documento: any) {
-    console.log(id_documento)
     this.newNuxeoService.get([{ Id: id_documento }]).subscribe(
       response => {
-        console.log(response)
         const filesResponse = <any>response;
         const url = filesResponse[0].url;
         window.open(url);
