@@ -32,9 +32,8 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   calendarForEditId: number = 0;
   calendarForNew: boolean = false;
   niveles!: NivelFormacion[];
-  loading: boolean = false;
-  displayedColumns: string[] = ['Nombre', 'Periodo_Académico', "Tipo_de_dependencia", "Estado", "Acciones"];
-  displayedColumnsTable: string[] = ['Nombre', "Dirigido"];
+  displayedColumns: string[] = ['Nombre', 'Periodo_Académico', "Tipo_de_dependencia", "Estado", "Acciones" ];
+  displayedColumnsTable: string[] = ['Nombre', "Dirigido" ];
   dataSource!: MatTableDataSource<any>;
   view!: boolean
 
@@ -61,7 +60,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loading = true;
     this.data = []
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
@@ -90,11 +88,9 @@ export class ListCalendarioAcademicoComponent implements OnInit {
           }, 300);
 
         }
-        this.loading = false;
       },
       (error: any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.loading = false;
       },
     );
   }

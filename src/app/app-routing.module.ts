@@ -9,26 +9,20 @@ import { DetalleCalendarioComponent } from './component/detalle-calendario/detal
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 
  const routes: Routes = [
-  /*{
+  {
     path: 'list-calendario-academico',
     component: ListCalendarioAcademicoComponent,
     //canActivate: [AuthGuard],
-},*/
+},
 {
   path: 'administracion-calendario',
   component: AdministracionCalendarioComponent,
   //canActivate: [AuthGuard],
 },
 {
-  path: 'list-calendario-academico',
-  component: ListCalendarioAcademicoComponent,
+  path: 'calendario-proyecto',
+  component: CalendarioProyectoComponent,
   //canActivate: [AuthGuard],
-},
-{
-
-path: 'calendario-proyecto',
-component: CalendarioProyectoComponent,
-//canActivate: [AuthGuard],
 }
  
 ];
