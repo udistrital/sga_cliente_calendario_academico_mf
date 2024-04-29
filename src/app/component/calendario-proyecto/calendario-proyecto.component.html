@@ -1,37 +1,46 @@
-<div class="row">
-    <div class="col">
-      <mat-card >
-        <fieldset [ngClass]="{'fieldseter':true} ">
-          <legend>
-            {{ "calendario.buscar_calendario" | translate }}
-          </legend>
-          <mat-card-content>
-            <div class="row">
-              <div class="col-12">
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      {{ "calendario.buscar_calendario" | translate }}
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="form-grid2">
+      <div class="form-col1">
+        <mat-form-field style="width: 100%">
+          <mat-select
+            [formControl]="selectedLevel"
+            placeholder="{{ 'calendario.para' | translate }}"
+            (selectionChange)="onSelectLevel()"
+          >
+            <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">{{
+              nivel.Nombre
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="form-col1">
+        <mat-form-field style="width: 100%">
+          <mat-select
+            [formControl]="selectedProject"
+            placeholder="{{ 'oferta.proyecto' | translate }}"
+            (selectionChange)="onSelectProject()"
+          >
+            <mat-option *ngFor="let project of projects" [value]="project.Id">{{
+              project.Nombre
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
 
-                <mat-form-field style="width: 100%;">
-                    <mat-select [formControl]="selectedLevel" placeholder="{{ 'calendario.para' | translate }}" (selectionChange)="onSelectLevel()">
-                        <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field style="width: 100%;">
-                    <mat-select [formControl]="selectedProject" placeholder="{{ 'oferta.proyecto' | translate }}" (selectionChange)="onSelectProject()">
-                        <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                
-              </div>
-            </div>
-
-            <div class="row" *ngIf="showCalendar">
-                <div class="col-12">
-                    <mat-card>
-                         <detalle-calendario [calendarForProject]="calendarioId" [projectId]="projectId"></detalle-calendario> 
-                    </mat-card>
-                </div>
-            </div>
-          </mat-card-content>
-        </fieldset>
+    <div *ngIf="showCalendar" class="margin-y">
+      <mat-card>
+        <detalle-calendario
+          [calendarForProject]="calendarioId"
+          [projectId]="projectId"
+        ></detalle-calendario>
       </mat-card>
     </div>
-</div>
+  </mat-card-content>
+</mat-card>

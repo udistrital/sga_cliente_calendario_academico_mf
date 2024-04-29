@@ -124,9 +124,6 @@ export class AdministracionCalendarioComponent {
     }
 
     const dialogRef = this.dialog.open(template, { width: '1000px', height: '800px' });
-
-    
-    console.log(process)
     this.calendarOptions = {
       customButtons: {
         cerrar: {
@@ -175,10 +172,8 @@ export class AdministracionCalendarioComponent {
             this.getInfoPrograma(this.DependenciaID);
           }, (err: any) => {
             if (err) {
-              console.log('error en el contructor X(')
               this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'), this.translate.instant('admision.multiple_vinculacion') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             } else {
-              console.log('error en el contructor X(')
               this.popUpManager.showErrorAlert(this.translate.instant('admision.no_vinculacion_no_rol') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             }
           })
@@ -289,7 +284,6 @@ export class AdministracionCalendarioComponent {
 
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -325,7 +319,6 @@ export class AdministracionCalendarioComponent {
   }
 
   viewProcess(event: any, process: any) {
-    console.log(event)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
     activityConfig.height = '370px';
@@ -337,7 +330,6 @@ export class AdministracionCalendarioComponent {
   }
 
   calendarioActividad(event: any, process: any) {
-    console.log(event.data)
     this.actividad = [
       {
         title: event.data.Nombre,
@@ -374,8 +366,6 @@ export class AdministracionCalendarioComponent {
   }
 
   editActivity(event: any, process: any) {
-    console.log(event)
-    console.log(process)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '600px';
@@ -457,7 +447,6 @@ export class AdministracionCalendarioComponent {
         //(response: ProyectoAcademicoInstitucion[]) => {
         (response: any) => {
           this.ProyectosFull = response;
-          console.log(this.ProyectosFull)
         },
         (error) => {
           this.ProyectosFull = [];
@@ -533,9 +522,7 @@ export class AdministracionCalendarioComponent {
             this.periodicidad = res_recurrencia;
             this.sgaCalendarioMidService.get('calendario-proyecto/' + DependenciaId).subscribe(
               (resp_calendar_project: any) => {
-                console.log(resp_calendar_project)
                 this.idCalendario = resp_calendar_project.data["CalendarioId"];
-                console.log(resp_calendar_project.data["CalendarioId"])
                 if (this.idCalendario > 0) {
                   this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.data["CalendarioId"]).subscribe(
                     (response: any) => {

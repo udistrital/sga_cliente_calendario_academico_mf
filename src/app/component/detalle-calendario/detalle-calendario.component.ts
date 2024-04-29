@@ -355,7 +355,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
         key: id_documento,
       },
     ];
-    console.log("new nux")
     this.newNuxeoService.get(filesToGet).subscribe(
       response => {
         const filesResponse = <any>response;

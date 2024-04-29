@@ -9,7 +9,7 @@ export let FORM_PERIODO = {
 
     {
         etiqueta: 'input',
-        claseGrid: 'col-6',
+        claseGrid: 'form-col2',
         nombre: 'Year',
         label_i18n: 'ano',
         placeholder_i18n: 'ano',
@@ -20,7 +20,7 @@ export let FORM_PERIODO = {
     },
     {
         etiqueta: 'input',
-        claseGrid: 'col-6',
+        claseGrid: 'form-col2',
         nombre: 'Ciclo',
         label_i18n: 'periodo',
         placeholder_i18n: 'periodo',
@@ -31,7 +31,7 @@ export let FORM_PERIODO = {
     },
     {
         etiqueta: 'input',
-        claseGrid: 'col-6',
+        claseGrid: 'form-col1',
         nombre: 'InicioVigencia',
         label_i18n: 'fecha_inicio',
         placeholder_i18n: 'fecha_inicio',
@@ -40,7 +40,7 @@ export let FORM_PERIODO = {
     },
     {
         etiqueta: 'input',
-        claseGrid: 'col-6',
+        claseGrid: 'form-col1',
         nombre: 'FinVigencia',
         label_i18n: 'fecha_fin',
         placeholder_i18n: 'fecha_fin',

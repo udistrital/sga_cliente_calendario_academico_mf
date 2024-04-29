@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { RequestManager } from '../managers/requestManager';
 
-@Injectable()
+@Injectable(
+    {providedIn: 'root'}
+)
 export class SgaAdmisionesMidService {
 
     constructor(private requestManager: RequestManager) {
