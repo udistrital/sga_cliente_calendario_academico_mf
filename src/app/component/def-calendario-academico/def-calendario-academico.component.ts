@@ -219,8 +219,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.CalendarIdasfather = this.calendarForEditId;
       this.sgaCalendarioMidService.get('calendario-academico/v2/' + this.calendarForEditId).subscribe(
         (response: any) => {
-          if (response != null && response.success) {
-            const calendar = response.data[0];
+          if (response != null && response.Success) {
+            const calendar = response.Data[0];
             this.calendar = new Calendario();
             this.calendar.calendarioId = parseInt(calendar['Id']);
             this.calendar.DocumentoId = calendar['resolucion']['Id'];
@@ -329,21 +329,21 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     this.sgaCalendarioMidService.get('calendario-academico/v2/' + IdExt).subscribe(
       (response: any) => {
         if (response != null && response.Success) {
-          this.proyectosParticulares = JSON.parse(response.data[0].DependenciaParticularId);
+          this.proyectosParticulares = JSON.parse(response.Data[0].DependenciaParticularId);
           this.projects = this.proyectos.filter(proyecto => this.filterProject(this.proyectosParticulares.proyectos, proyecto.Id));
           this.calendarFormExtend.patchValue({
-            Nivel: response.data[0].Nivel,
-            PeriodoId: response.data[0].PeriodoId,
-            resolucion: response.data[0].resolucionExt.Resolucion,
-            anno: response.data[0].resolucionExt.Anno,
+            Nivel: response.Data[0].Nivel,
+            PeriodoId: response.Data[0].PeriodoId,
+            resolucion: response.Data[0].resolucionExt.Resolucion,
+            anno: response.Data[0].resolucionExt.Anno,
             fileResolucion: "",
             selProyectos: this.proyectosParticulares.proyectos,
           })
-          this.fileExtId = response.data[0].resolucionExt.Id;
+          this.fileExtId = response.Data[0].resolucionExt.Id;
 
           this.processesExt = [];
           this.activitiesExt = [];
-          const calendarExt = response.data[0];
+          const calendarExt = response.Data[0];
           const processes: any[] = calendarExt['proceso'];
           if (processes !== null) {
             processes.forEach(element => {
@@ -716,7 +716,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                   this.calendar.CalendarioPadreId = { Id: this.calendarForEditId };
                   this.sgaCalendarioMidService.post('calendario-academico/padre', this.calendar).subscribe(
                     (response: any) => {
-                      this.calendar.calendarioId = response.data['Id'];
+                      this.calendar.calendarioId = response.Data['Id'];
                       this.clonarPadre()
                     },
                     error => {
@@ -893,7 +893,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           (response: any) => {
             let actividad: Actividad = new Actividad();
             actividad = activity.Actividad;
-            actividad.actividadId = response.data['Id'];
+            actividad.actividadId = response.Data['Id'];
             actividad.responsables = activity.responsable;
             actividad.FechaInicio = moment(actividad.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
             actividad.FechaFin = moment(actividad.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
@@ -1072,11 +1072,11 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                 };
                 this.sgaCalendarioMidService.post('clonar-calendario/extension', bodyPost).subscribe(
                   (resp: any) => {
-                    if (resp.status == 200) {
+                    if (resp.Status == 200) {
                       if (this.Ext_Extension) {
                         this.sgaCalendarioMidService.put('calendario-academico/calendario/academico/' + this.selCalendar + "/inhabilitar", JSON.stringify({ 'id': this.selCalendar })).subscribe(
                           (response: any) => {
-                            if (response.status != 200) {
+                            if (response.Status != 200) {
                               this.popUpManager.showErrorToast(this.translate.instant('calendario.calendario_no_inhabilitado'));
                             } else {
                               this.popUpManager.showInfoToast(this.translate.instant('calendario.calendario_inhabilitado'));
