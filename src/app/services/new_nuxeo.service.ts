@@ -145,7 +145,7 @@ export class NewNuxeoService {
                 file: await this.fileToBase64(file.file)
             }]
 
-            this.anyService.post(environment.NUXEO_SERVICE, '/document/uploadAnyFormat', sendFileData)
+            this.anyService.post(environment.NUXEO_SERVICE, 'document/uploadAnyFormat', sendFileData)
                 .subscribe((dataResponse) => {
                     documentos.push(dataResponse);
                     if (documentos.length === files.length) {

@@ -47,11 +47,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     private popUpManager: PopUpManager,
     private sgaCalendarioMidService: SgaCalendarioMidService
   ) {
-    //this.dataSource = new LocalDataSource();
-    this.createTable();
-    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
-      this.createTable();
-    });
     this.nivel_load()
   }
   recargarDespuesClon(newItem: any) {
@@ -64,6 +59,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
         const r = <any>response;
+        console.log(r)
         if (response !== null && r.status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
@@ -104,84 +100,14 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     }
   }
 
-  createTable() {
-    this.settings = {
-      columns: {
-        Nombre: {
-          title: this.translate.instant('calendario.nombre'),
-          width: '25%',
-          editable: false,
-        },
-        Periodo: {
-          title: this.translate.instant('calendario.periodo'),
-          width: '15%',
-          editable: false,
-        },
-        Dependencia: {
-          title: this.translate.instant('calendario.dependencia'),
-          width: '15%',
-          editable: false,
-        },
-        Estado: {
-          title: this.translate.instant('calendario.estado'),
-          width: '15%',
-          editable: false,
-        },
-      },
-      mode: 'external',
-      actions: {
-        edit: false,
-        delete: false,
-        position: 'right',
-        columnTitle: this.translate.instant('GLOBAL.acciones'),
-        custom: [
-          {
-            name: 'assign',
-            title: '<i class="nb-compose" title="' +
-              this.translate.instant('calendario.tooltip_asignar_proyecto') +
-              '"></i>',
-          },
-          {
-            name: 'clone',
-            title: '<i class="nb-plus-circled" title="' +
-              this.translate.instant('calendario.tooltip_clonar') +
-              '"></i>',
-          },
-          {
-            name: 'view',
-            title: '<i class="nb-home" title="' +
-              this.translate.instant('calendario.tooltip_detalle') +
-              '"></i>',
-          },
-          {
-            name: 'edit',
-            title: '<i class="nb-edit" title="' +
-              this.translate.instant('calendario.tooltip_editar') +
-              '"></i>',
-          },
-          {
-            name: 'delete',
-            title: '<i class="nb-trash" title="' +
-              this.translate.instant('calendario.tooltip_inactivar') +
-              '" ></i>',
-          },
-        ],
-      },
-      add: {
-        addButtonContent:
-          '<i class="nb-plus" title="' +
-          this.translate.instant('calendario.tooltip_crear') +
-          '"></i>',
-      },
-    };
-
-  }
 
   nivel_load() {
     this.proyectoService.get('nivel_formacion?limit=0').subscribe(
       // (response: NivelFormacion[]) => {
       (response: any) => {
-        this.niveles = response.filter((nivel: any) => nivel.NivelFormacionPadreId === null)
+        const nombresFiltrados = ["Pregrado", "Posgrado", "Doctorado"];
+        this.niveles = nombresFiltrados.flatMap((nombre:any) => response.filter((item:any) => item.Nombre === nombre));
+      
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));

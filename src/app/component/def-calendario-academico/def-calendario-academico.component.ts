@@ -68,6 +68,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   niveles!: NivelFormacion[];
   editMode: boolean = false;
   uploadMode: boolean = false;
+  nivelSeleccionado: any
 
   activetab: number = 0;
   proyectos!: any[];
@@ -123,15 +124,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     this.processes = [];
     this.processesExt = [];
     this.loadSelects()
-    // this.createCalendarForm();
     this.createCalendarFormClone();
     this.createCalendarFormExtend();
-    this.createProcessTable();
-    this.createActivitiesTable();
-    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
-      this.createProcessTable();
-      this.createActivitiesTable();
-    });
   }
 
   ngOnInit() {
@@ -428,19 +422,10 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   loadSelects() {
-    this.parametrosService.get('periodo?query=CodigoAbreviacion:PA&query=Activo:true&sortby=Id&order=desc&limit=0').subscribe(
-      (res: any) => {
-        this.periodos = res['Data'];
-      },
-      error => {
-        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.periodos = [{ Id: 15, Nombre: '2019-3' }]
-      });
-
     this.proyectoService.get('nivel_formacion?limit=0').subscribe(
-      //(response: NivelFormacion[]) => {
       (response: any) => {
-        this.niveles = response.filter((nivel: any) => nivel.NivelFormacionPadreId === null)
+        const nombresFiltrados = ["Pregrado", "Posgrado", "Doctorado"];
+        this.niveles = nombresFiltrados.flatMap((nombre:any) => response.filter((item:any) => item.Nombre === nombre));
       },
       error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
@@ -457,6 +442,24 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     );
   }
 
+  cargarPeriodosAcademicos(){
+    //este codigo se asiganara depende del nivel, el 8 es el id de doctorado
+    let codigo = "PA"
+    if(this.nivelSeleccionado == 8){
+      codigo = "VG"
+    }
+
+    this.parametrosService.get('periodo?query=CodigoAbreviacion:'+codigo+'&query=Activo:true&sortby=Id&order=desc&limit=0').subscribe(
+      (res: any) => {
+        this.periodos = res['Data'];
+      },
+      error => {
+        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
+      });
+
+    
+  }
+
   loadSelectsClone() {
     this.parametrosService.get('periodo?query=CodigoAbreviacion:PA&query=Activo:true&sortby=Id&order=desc&limit=0').subscribe(
       (res: any) => {
@@ -466,124 +469,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
         this.periodosClone = [{ Id: 15, Nombre: '2019-3' }]
       });
-  }
-
-  createProcessTable() {
-    this.processSettings = {
-      columns: {
-        Nombre: {
-          title: this.translate.instant('calendario.nombre'),
-          width: '20%',
-          editable: false,
-        },
-        Descripcion: {
-          title: this.translate.instant('GLOBAL.descripcion'),
-          width: '80%',
-          editable: false,
-        },
-      },
-      mode: 'external',
-      actions: {
-        position: 'right',
-        columnTitle: this.translate.instant('GLOBAL.acciones'),
-      },
-      add: {
-        addButtonContent:
-          '<i class="nb-plus" title="' +
-          this.translate.instant('calendario.tooltip_crear_proceso') +
-          '"></i>',
-      },
-      edit: {
-        editButtonContent: '<i class="nb-edit" title="' + this.translate.instant('calendario.tooltip_editar_proceso') + '"></i>',
-      },
-      delete: {
-        deleteButtonContent: '<i class="nb-trash" title="' + this.translate.instant('calendario.tooltip_eliminar_proceso') + '"></i>',
-        confirmDelete: true,
-      },
-      noDataMessage: this.translate.instant('calendario.sin_procesos'),
-    }
-  }
-
-  createActivitiesTable() {
-    this.activitiesSettings = {
-      columns: {
-        Nombre: {
-          title: this.translate.instant('calendario.nombre'),
-          witdh: '20%',
-          editable: false,
-        },
-        Descripcion: {
-          title: this.translate.instant('GLOBAL.descripcion'),
-          witdh: '20%',
-          editable: false,
-        },
-        FechaInicio: {
-          title: this.translate.instant('calendario.fecha_inicio'),
-          witdh: '20%',
-          editable: false,
-        },
-        FechaFin: {
-          title: this.translate.instant('calendario.fecha_fin'),
-          witdh: '20%',
-          editable: false,
-        },
-        Activo: {
-          title: this.translate.instant('calendario.estado'),
-          witdh: '20%',
-          editable: false,
-          valuePrepareFunction: (value: boolean) =>
-            value
-              ? this.translate.instant('GLOBAL.activo')
-              : this.translate.instant('GLOBAL.inactivo'),
-        },
-      },
-      mode: 'external',
-      actions: {
-        edit: false,
-        delete: false,
-        position: 'right',
-        columnTitle: this.translate.instant('GLOBAL.acciones'),
-        custom: [
-          {
-            name: 'edit',
-            title: '<i class="nb-edit" title="' +
-              this.translate.instant('calendario.tooltip_editar_actividad') +
-              '"></i>',
-          },
-          {
-            name: 'delete',
-            title: '<i class="nb-trash" title="' +
-              this.translate.instant('calendario.tooltip_eliminar_actividad') +
-              '" ></i>',
-          },
-          {
-            name: 'select',
-            title: '<i class="nb-checkmark" title="' +
-              this.translate.instant('calendario.tooltip_seleccionar_proyectos') +
-              '"></i>',
-          },
-          {
-            name: 'view',
-            title: '<i class="nb-search" title="' +
-              this.translate.instant('calendario.tooltip_detalle_actividad') +
-              '"></i>',
-          },
-        ],
-      },
-      add: {
-        addButtonContent:
-          '<i class="nb-plus" title="' +
-          this.translate.instant('calendario.tooltip_crear_actividad') +
-          '"></i>',
-      },
-      /* edit: {
-        editButtonContent: '<i class="nb-edit" title="' + this.translate.instant('calendario.tooltip_editar_actividad') + '"></i>',
-      },
-      delete: {
-        deleteButtonContent: '<i class="nb-trash" title="' + this.translate.instant('calendario.tooltip_eliminar_actividad') + '"></i>',
-      }, */
-      noDataMessage: this.translate.instant('calendario.sin_actividades'),
-    };
   }
 
   onAction(event: any, process: any) {
@@ -651,6 +536,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           if (ok.value) {
             if (this.fileResolucion) {
               this.calendar = this.calendarForm.value;
+              console.log(this.calendar)
               this.eventoService.get('calendario?query=Activo:true').subscribe(
                 (response: Calendario[]) => {
                   let calendarExists = false;
@@ -669,6 +555,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                         this.calendar.Nombre += this.periodos.filter((periodo: any) => periodo.Id === this.calendar.PeriodoId)[0].Nombre;
                         this.calendar.Nombre += ' ' + this.niveles.filter((nivel: any) => nivel.Id === this.calendar.Nivel)[0].Nombre;
                         this.calendar['DependenciaParticularId'] = '{}';
+                        console.log(this.calendar)
                         this.eventoService.post('calendario', this.calendar).subscribe(
                           (response: any) => {
                             this.calendar.calendarioId = response['Id'];
