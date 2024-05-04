@@ -70,8 +70,8 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
     this.processes = [];
     this.sgaCalendarioMidService.get('calendario-academico/' + id).subscribe(
       (response: any) => {
-        if (response != null && response.success) {
-          const calendar = response.data[0];
+        if (response != null && response.Success) {
+          const calendar = response.Data[0];
           this.calendar = new Calendario();
           this.calendar.Nombre = calendar['Nombre'];
           this.calendar.ListaCalendario = calendar['ListaCalendario'];

@@ -64,13 +64,13 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
         const r = <any>response;
-        if (response !== null && r.status == 404) {
+        if (response !== null && r.Status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
-        } else if (response !== null && r.status == 400) {
+        } else if (response !== null && r.Status == 400) {
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
         } else {
-          response.data.map((calendar: any) => {
+          response.Data.map((calendar: any) => {
             this.data.push({
               Id: calendar.Id,
               Nombre: calendar.Nombre,
@@ -231,7 +231,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
         if (willDelete.value) {
           this.sgaCalendarioMidService.put('calendario-academico/calendario/academico/' + event.data.Id + '/inhabilitar', JSON.stringify({ 'id': event.data.Id })).subscribe(
             (response: any) => {
-              if (response.status != 200) {
+              if (response.Status != 200) {
                 this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_no_inhabilitado'));
               } else {
                 this.popUpManager.showSuccessAlert(this.translate.instant('calendario.calendario_inhabilitado'));
