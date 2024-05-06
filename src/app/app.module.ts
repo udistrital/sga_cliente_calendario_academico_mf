@@ -47,6 +47,8 @@ import { SgaAdmisionesMidService } from './services/sga_admisiones_mid.service';
 import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
 import { environment } from 'src/environments/environment';
 import { FullCalendarModule } from '@fullcalendar/angular';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -99,6 +101,8 @@ export function createTranslateLoader(http: HttpClient) {
     HttpClientModule,
     SpinnerUtilModule,
     FullCalendarModule,
+    MatDividerModule,
+    MatButtonModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,

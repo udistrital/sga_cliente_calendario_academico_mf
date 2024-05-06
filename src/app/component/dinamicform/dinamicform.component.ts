@@ -186,13 +186,6 @@ export class DinamicformComponent implements OnInit, OnChanges {
   }
 
   preview(url:any, title:any, message:any) {
-    /* const left = (screen.width / 2) - (w / 2);
-    const top = (screen.height / 2) - (h / 2);
-    let prev = window.open(url, title, 'toolbar=no,' +
-      'location=no, directories=no, status=no, menubar=no,' +
-      'scrollbars=no, resizable=no, copyhistory=no, ' +
-      'width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-    prev.document.title = title; */
     const dialogDoc = new MatDialogConfig();
     dialogDoc.width = '80vw';
     dialogDoc.height = '90vh';

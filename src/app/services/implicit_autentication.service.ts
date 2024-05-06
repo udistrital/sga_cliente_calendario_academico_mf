@@ -25,7 +25,6 @@ export class ImplicitAutenticationService {
  
     constructor(){
         const user:any = localStorage.getItem('user');
-        console.log(user);
         this.userSubject.next(JSON.parse(atob(user)));
     }
  
@@ -38,7 +37,6 @@ export class ImplicitAutenticationService {
     public getRole() {
         const rolePromise = new Promise((resolve, reject) => {
             this.user$.subscribe((data: any) => {
-                console.log("user data:",data)
                 const { user, userService } = data;
                 const roleUser = typeof user.role !== 'undefined' ? user.role : [];
                 const roleUserService = typeof userService.role !== 'undefined' ? userService.role : [];
