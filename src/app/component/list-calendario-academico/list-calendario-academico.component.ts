@@ -59,7 +59,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
         const r = <any>response;
-        console.log(r)
         if (response !== null && r.status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
@@ -229,7 +228,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   }
 
   activateTab(calendarId = 0, calendarState = false, tab = 0) {
-
+    console.log(calendarId)
     this.activetab = tab;
     this.calendarForEditId = calendarId;
     this.calendarForNew = calendarState;

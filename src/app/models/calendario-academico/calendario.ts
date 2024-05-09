@@ -14,4 +14,5 @@ export class Calendario {
     calendarioId!: number;
     ListaCalendario!: any[];
     Id!: number;
+    MultiplePeriodoId!: string;
 }

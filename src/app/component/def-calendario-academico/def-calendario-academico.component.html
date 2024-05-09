@@ -10,7 +10,8 @@
                 <mat-form-field style="width: 100%" floatLabel="always">
                   <mat-label>*{{ "calendario.para" | translate }} </mat-label>
                   <mat-select formControlName="Nivel" placeholder="Pregrado/Posgrado" required [disabled]="view"
-                    [(ngModel)]="nivelSeleccionado" (selectionChange)="cargarPeriodosAcademicos()">
+                    [(ngModel)]="nivelSeleccionado"
+                    (selectionChange)="cambiarSelectPeriodoSegunNivelElegido(nivelSeleccionado)">
                     <mat-option>--Seleccionar--</mat-option>
                     <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">
                       {{ nivel.Nombre }}
@@ -28,13 +29,20 @@
                 <mat-form-field style="width: 100%" floatLabel="always">
                   <mat-label>*{{ "calendario.periodo" | translate }}:
                   </mat-label>
-                  <mat-select formControlName="PeriodoId" placeholder="2020-I, 2020-II, 2020-III" required
-                    [disabled]="view">
-                    <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-select *ngIf="!selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view">
+                    <mat-option value="" disabled>--Seleccionar--</mat-option>
                     <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
                       {{ periodo.Nombre }}
                     </mat-option>
                   </mat-select>
+                  <mat-select *ngIf="selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view" multiple>
+                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
+                      {{ periodo.Nombre }}
+                    </mat-option>
+                  </mat-select>
+
                   <mat-error *ngIf="
                       calendarForm.get('PeriodoId').hasError('required') &&
                       calendarForm.get('PeriodoId').touched
