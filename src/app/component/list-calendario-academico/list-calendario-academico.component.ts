@@ -154,7 +154,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
         if (willDelete.value) {
           this.sgaCalendarioMidService.put('calendario-academico/calendario/academico/' + event.data.Id + '/inhabilitar', JSON.stringify({ 'id': event.data.Id })).subscribe(
             (response: any) => {
-              if (response.status != 200) {
+              if (response.Status != 200) {
                 this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_no_inhabilitado'));
               } else {
                 this.popUpManager.showSuccessAlert(this.translate.instant('calendario.calendario_inhabilitado'));
