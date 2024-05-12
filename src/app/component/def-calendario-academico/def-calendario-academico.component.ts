@@ -185,16 +185,23 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           this.calendar.DocumentoId = calendar['DocumentoId'];
           this.calendar.Nivel = calendar['Nivel'];
           this.calendar.Activo = calendar['Activo'];
-          this.calendar.PeriodoId = calendar['PeriodoId'];
 
           this.cambiarSelectPeriodoSegunNivel(this.calendar.Nivel);
 
-          this.calendarForm.setValue({
-            resolucion: null,
-            anno: null,
+          if (this.selectMultipleNivel) {
+            this.calendar.PeriodoId = JSON.parse(calendar['MultiplePeriodoId']).map(Number);
+          } else {
+            this.calendar.PeriodoId = calendar['PeriodoId'];
+          }
+
+          console.log(this.calendar)
+          this.calendarForm.patchValue({
+            resolucion: this.calendar.resolucion,
+            anno: this.calendar.anno,
+            //segun el nivel, puede ser multiple o no
             PeriodoId: this.calendar.PeriodoId,
             Nivel: this.calendar.Nivel,
-            fileResolucion: null,
+            fileResolucion: '',
           });
         },
         (error: any) => {
@@ -447,17 +454,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   loadSelects() {
-    this.parametrosService.get('periodo?query=CodigoAbreviacion:PA&query=Activo:true&sortby=Id&order=desc&limit=0').subscribe(
-      (res: any) => {
-        this.periodos = ordenarPorPropiedad(res.Data, "Nombre", -1);
-      },
-      error => {
-        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-        this.periodos = [{ Id: 15, Nombre: '2019-3' }]
-      });
-
     this.proyectoService.get('nivel_formacion?limit=0').subscribe(
-      //(response: NivelFormacion[]) => {
       (response: any) => {
         const nombresFiltrados = ["Pregrado", "Posgrado", "Doctorado"];
         this.niveles = nombresFiltrados.flatMap((nombre: any) => response.filter((item: any) => item.Nombre === nombre));
@@ -466,6 +463,14 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       },
     );
+    this.parametrosService.get('periodo?query=CodigoAbreviacion:PA&query=Activo:true&sortby=Id&order=desc&limit=0').subscribe(
+      (res: any) => {
+        this.periodos = ordenarPorPropiedad(res.Data, "Nombre", -1);
+      },
+      error => {
+        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
+        this.periodos = [{ Id: 15, Nombre: '2019-3' }]
+      });
 
     this.proyectoService.get('proyecto_academico_institucion?fields=Id,Nombre&limit=0').subscribe(
       res => {
@@ -490,8 +495,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
 
   cambiarSelectPeriodoSegunNivel(nivelSeleccionado: any) {
     const idNivelDoctorado = this.niveles.find(nivel => nivel.Nombre === "Doctorado")!.Id;
-
-
     if (idNivelDoctorado == nivelSeleccionado) {
       this.selectMultipleNivel = true;
       return
@@ -660,6 +663,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                   } else {
                     this.calendar.Nombre += this.periodos.filter((periodo: any) => periodo.Id === this.calendar.PeriodoId)[0].Nombre;
                   }
+                  console.log(this.calendar.MultiplePeriodoId)
                   this.calendar.Nombre += ' ' + this.niveles.filter((nivel: any) => nivel.Id === this.calendar.Nivel)[0].Nombre;
                   this.calendar.AplicacionId = 0;
                   this.calendar.FechaCreacion = momentTimezone.tz(this.calendar.FechaCreacion, 'America/Bogota').format('YYYY-MM-DD HH:mm');
@@ -688,18 +692,17 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   clonarPadre() {
-    this.calendar = this.calendarForm.value;
-    console.log(this.calendar)
     this.calendarClone = new CalendarioClone();
     this.calendarClone.Id = this.calendar.calendarioId;
     this.calendarClone.Nivel = this.calendar.Nivel;
     this.calendarClone.IdPadre = { Id: this.calendarForEditId };
     if(this.selectMultipleNivel){
-      this.calendarClone.PeriodoId = this.calendar.MultiplePeriodoId;
+      this.calendarClone.MultiplePeriodoId = JSON.stringify(this.calendar.MultiplePeriodoId);
+      this.calendarClone.PeriodoId = 0;
     }else{
       this.calendarClone.PeriodoId = this.calendar.PeriodoId;
     }
-    
+
     this.sgaCalendarioMidService.post('clonar-calendario/padre', this.calendarClone).subscribe(
       (response: any) => {
         console.log(response)

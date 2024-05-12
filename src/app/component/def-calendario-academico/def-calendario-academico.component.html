@@ -37,8 +37,8 @@
                     </mat-option>
                   </mat-select>
                   <mat-select *ngIf="selectMultipleNivel" formControlName="PeriodoId"
-                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view" multiple>
-                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
+                    placeholder="2020-I, 2020-II, 2020-III" required multiple>
+                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id" [disabled]="view">
                       {{ periodo.Nombre }}
                     </mat-option>
                   </mat-select>
@@ -541,8 +541,8 @@
                     </mat-option>
                   </mat-select>
                   <mat-select *ngIf="selectMultipleNivel" formControlName="PeriodoId"
-                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view" multiple>
-                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
+                    placeholder="2020-I, 2020-II, 2020-III" required multiple>
+                    <mat-option *ngFor="let periodo of periodos" [disabled]="view" [value]="periodo.Id">
                       {{ periodo.Nombre }}
                     </mat-option>
                   </mat-select>
