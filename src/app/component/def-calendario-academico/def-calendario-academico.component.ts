@@ -187,6 +187,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           this.calendar.Activo = calendar['Activo'];
           this.calendar.PeriodoId = calendar['PeriodoId'];
 
+          this.cambiarSelectPeriodoSegunNivel(this.calendar.Nivel);
+
           this.calendarForm.setValue({
             resolucion: null,
             anno: null,
@@ -224,10 +226,20 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             this.calendar.anno = calendar['resolucion']['Anno'];
             this.calendar.Nivel = calendar['Nivel'];
             this.calendar.Activo = calendar['Activo'];
-            this.calendar.PeriodoId = calendar['PeriodoId'];
             this.fileResolucion = calendar['resolucion']['Nombre'];
             this.projects = this.proyectos.filter(proyecto => this.filterProject(JSON.parse(calendar['DependenciaId']).proyectos, proyecto.Id));
             this.Extension = calendar['ExistenExtensiones'];
+
+
+            this.cambiarSelectPeriodoSegunNivel(this.calendar.Nivel);
+
+            if (this.selectMultipleNivel) {
+              this.calendar.PeriodoId = JSON.parse(calendar['MultiplePeriodoId']).map(Number);
+            } else {
+              this.calendar.PeriodoId = calendar['PeriodoId'];
+            }
+
+
             if (this.Extension) {
               this.ExtensionList = calendar['ListaExtension'];
               if (this.ExtensionList.length > 1) {
@@ -274,13 +286,15 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
               this.datasourceActivity = new MatTableDataSource<Actividad>
 
             }
-            this.calendarForm.setValue({
+            this.calendarForm.patchValue({
               resolucion: this.calendar.resolucion,
               anno: this.calendar.anno,
+              //segun el nivel, puede ser multiple o no
               PeriodoId: this.calendar.PeriodoId,
               Nivel: this.calendar.Nivel,
               fileResolucion: '',
             });
+
             if (!this.Extension) {
               this.calendarFormExtend.patchValue({
                 Nivel: this.calendarForm.controls.Nivel.value,
@@ -327,9 +341,18 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
         if (response != null && response.Success) {
           this.proyectosParticulares = JSON.parse(response.Data[0].DependenciaParticularId);
           this.projects = this.proyectos.filter(proyecto => this.filterProject(this.proyectosParticulares.proyectos, proyecto.Id));
+          this.cambiarSelectPeriodoSegunNivel(response.Data[0].Nivel);
+
+          let periodo
+          if (this.selectMultipleNivel) {
+            periodo = JSON.parse(response.Data[0]['MultiplePeriodoId']).map(Number);
+          } else {
+            periodo = response.Data[0]['PeriodoId'];
+          }
+
           this.calendarFormExtend.patchValue({
             Nivel: response.Data[0].Nivel,
-            PeriodoId: response.Data[0].PeriodoId,
+            PeriodoId: periodo,
             resolucion: response.Data[0].resolucionExt.Resolucion,
             anno: response.Data[0].resolucionExt.Anno,
             fileResolucion: "",
@@ -465,9 +488,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       });
   }
 
-  cambiarSelectPeriodoSegunNivelElegido(nivelSeleccionado: any) {
-    const nivelDoctorado = this.niveles.filter((nivel) => nivel.Nombre == "Doctorado");
-    const idNivelDoctorado = nivelDoctorado[0].Id
+  cambiarSelectPeriodoSegunNivel(nivelSeleccionado: any) {
+    const idNivelDoctorado = this.niveles.find(nivel => nivel.Nombre === "Doctorado")!.Id;
+
 
     if (idNivelDoctorado == nivelSeleccionado) {
       this.selectMultipleNivel = true;
@@ -544,13 +567,13 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
               this.eventoService.get('calendario?query=Activo:true').subscribe(
                 (response: Calendario[]) => {
                   let calendarExists = false;
-                  if(this.selectMultipleNivel == true){
+                  if (this.selectMultipleNivel == true) {
                     response.forEach(calendar => {
                       let stringSet = new Set(calendar.MultiplePeriodoId.split(",").map(Number));
-                      const sameElements: boolean = this.calendar.PeriodoId.length === stringSet.size && this.calendar.PeriodoId.every((element:any) => stringSet.has(element));
+                      const sameElements: boolean = this.calendar.PeriodoId.length === stringSet.size && this.calendar.PeriodoId.every((element: any) => stringSet.has(element));
                       calendarExists = calendarExists || sameElements
-                    }); 
-                  }else{
+                    });
+                  } else {
                     response.forEach(calendar => {
                       calendarExists = calendarExists || (this.calendar.Nivel === calendar.Nivel && this.calendar.PeriodoId === calendar.PeriodoId);
                     });
@@ -565,23 +588,23 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                         this.calendar.Activo = true;
                         this.calendar['DependenciaParticularId'] = '{}';
                         this.calendar.Nombre = "Calendario Académico ";
-                        if(this.selectMultipleNivel == true){
+                        if (this.selectMultipleNivel == true) {
                           // filtra por periodos y solo se queda con la vigencia's
                           const vigenciaS = new Set(this.periodos
                             .filter((periodo: any) => this.calendar.PeriodoId.includes(periodo.Id))
                             .map((periodo: any) => periodo.Nombre.replace(/-\d+/, ''))
                             .sort());
 
-                            this.calendar.Nombre += Array.from(vigenciaS).join(', ');
-                            this.calendar.MultiplePeriodoId = JSON.stringify(this.calendar.PeriodoId);
-                            this.calendar.PeriodoId = 0
+                          this.calendar.Nombre += Array.from(vigenciaS).join(', ');
+                          this.calendar.MultiplePeriodoId = JSON.stringify(this.calendar.PeriodoId);
+                          this.calendar.PeriodoId = 0
 
-                        }else{
+                        } else {
                           this.calendar.Nombre += this.periodos.filter((periodo: any) => periodo.Id === this.calendar.PeriodoId)[0].Nombre;
                         }
                         this.calendar.Nombre += ' ' + this.niveles.filter((nivel: any) => nivel.Id === this.calendar.Nivel)[0].Nombre;
-                        console.log(this.calendar)
-                      
+
+
                         this.eventoService.post('calendario', this.calendar).subscribe(
                           (response: any) => {
                             this.calendar.calendarioId = response['Id'];
@@ -621,9 +644,23 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                   this.calendar.DocumentoId = fileID;
                   this.calendar.DependenciaId = '{}';
                   this.calendar.Activo = true;
-                  this.calendar.Nombre = this.translate.instant('calendario.calendario_academico') + ' ';
-                  this.calendar.Nombre += this.periodos.filter((periodo: any) => periodo.Id === this.calendar.PeriodoId)[0].Nombre;
-                  this.calendar.Nombre += ' ' + this.niveles.filter(nivel => nivel.Id === this.calendar.Nivel)[0].Nombre;
+
+                  this.calendar.Nombre = "Calendario Académico ";
+                  if (this.selectMultipleNivel == true) {
+                    // filtra por periodos y solo se queda con la vigencia's
+                    const vigenciaS = new Set(this.periodos
+                      .filter((periodo: any) => this.calendar.PeriodoId.includes(periodo.Id))
+                      .map((periodo: any) => periodo.Nombre.replace(/-\d+/, ''))
+                      .sort());
+
+                    this.calendar.Nombre += Array.from(vigenciaS).join(', ');
+                    this.calendar.MultiplePeriodoId = JSON.stringify(this.calendar.PeriodoId);
+                    this.calendar.PeriodoId = 0
+
+                  } else {
+                    this.calendar.Nombre += this.periodos.filter((periodo: any) => periodo.Id === this.calendar.PeriodoId)[0].Nombre;
+                  }
+                  this.calendar.Nombre += ' ' + this.niveles.filter((nivel: any) => nivel.Id === this.calendar.Nivel)[0].Nombre;
                   this.calendar.AplicacionId = 0;
                   this.calendar.FechaCreacion = momentTimezone.tz(this.calendar.FechaCreacion, 'America/Bogota').format('YYYY-MM-DD HH:mm');
                   this.calendar.FechaModificacion = momentTimezone.tz(this.calendar.FechaModificacion, 'America/Bogota').format('YYYY-MM-DD HH:mm');
@@ -651,22 +688,30 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   clonarPadre() {
+    this.calendar = this.calendarForm.value;
+    console.log(this.calendar)
     this.calendarClone = new CalendarioClone();
     this.calendarClone.Id = this.calendar.calendarioId;
     this.calendarClone.Nivel = this.calendar.Nivel;
-    this.calendarClone.PeriodoId = this.calendar.PeriodoId;
     this.calendarClone.IdPadre = { Id: this.calendarForEditId };
-
+    if(this.selectMultipleNivel){
+      this.calendarClone.PeriodoId = this.calendar.MultiplePeriodoId;
+    }else{
+      this.calendarClone.PeriodoId = this.calendar.PeriodoId;
+    }
+    
     this.sgaCalendarioMidService.post('clonar-calendario/padre', this.calendarClone).subscribe(
       (response: any) => {
-        if (response != null && response.Response.Code == '404') {
+        console.log(response)
+
+        if (response != null && response.Status == '404') {
           this.activebutton = true;
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_clon_error'));
-        } else if (response != null && response.Response.Code == '400') {
+        } else if (response != null && response.Status == '400') {
           this.activebutton = true;
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.calendario_clon_error'));
         } else {
-          this.calendarClone.Id = response.Response.Body[1].Id;
+          this.calendarClone.Id = response.Data.Id;
           this.activebutton = false;
           this.activetabsClone = false;
           this.activetabs = true;

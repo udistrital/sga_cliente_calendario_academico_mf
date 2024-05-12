@@ -28,7 +28,6 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   ngOnInit() {
     this.projectService.get('proyecto_academico_institucion?limit=0&query=Activo:true').subscribe(
       response => {
-        console.log(response)
           this.projects = (<any[]><unknown>response).filter(
           proyecto => this.filtrarProyecto(proyecto),
         );
@@ -44,7 +43,6 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   }
 
   filtrarProyecto(proyecto:any):any {
-    console.log(this.dat.data)
     if (this.dat.data.Dependencia === proyecto['NivelFormacionId']['Nombre']) {
       return true
     }

@@ -59,13 +59,13 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
       (response: any) => {
         const r = <any>response;
-        if (response !== null && r.status == 404) {
+        if (response !== null && r.Status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
-        } else if (response !== null && r.status == 400) {
+        } else if (response !== null && r.Status == 400) {
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
         } else {
-          response.data.map((calendar: any) => {
+          response.Data.map((calendar: any) => {
             this.data.push({
               Id: calendar.Id,
               Nombre: calendar.Nombre,
@@ -140,8 +140,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   }
 
   onUpdate(event: any) {
-
-
     this.activateTab(event.data.Id, true, 1);
   }
 
@@ -217,8 +215,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     } else {
       // this.activetab = true;
     }
-
-
   }
 
   tabChanged(tabChangeEvent: MatTabChangeEvent): void {
@@ -228,7 +224,6 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   }
 
   activateTab(calendarId = 0, calendarState = false, tab = 0) {
-    console.log(calendarId)
     this.activetab = tab;
     this.calendarForEditId = calendarId;
     this.calendarForNew = calendarState;
