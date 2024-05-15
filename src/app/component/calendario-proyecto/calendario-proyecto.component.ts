@@ -65,7 +65,7 @@ export class CalendarioProyectoComponent {
     this.showCalendar = false;
     this.sgaCalendarioMidService.get('calendario-proyecto/' + this.selectedProject.value).subscribe(
       (response:any) => {
-        this.calendarioId = response.data["CalendarioId"];
+        this.calendarioId = response.Data["CalendarioId"];
         this.projectId = this.selectedProject.value
         if (this.calendarioId === "0") {
           this.showCalendar = false;
