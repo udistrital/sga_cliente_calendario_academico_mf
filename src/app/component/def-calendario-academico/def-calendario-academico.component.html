@@ -3,79 +3,57 @@
     <mat-card>
       <mat-card-content>
         <div>
-          <form
-            novalidate
-            [formGroup]="calendarForm"
-            #fform="ngForm"
-            (ngSubmit)="createCalendar($event)"
-            class="form-horizontal"
-          >
+          <form novalidate [formGroup]="calendarForm" #fform="ngForm" (ngSubmit)="createCalendar($event)"
+            class="form-horizontal">
             <div class="form-grid2">
               <div class="form-col1">
                 <mat-form-field style="width: 100%" floatLabel="always">
                   <mat-label>*{{ "calendario.para" | translate }} </mat-label>
-                  <mat-select
-                    formControlName="Nivel"
-                    placeholder="Pregrado/Posgrado"
-                    required
-                    [disabled]="view"
-                  >
+                  <mat-select formControlName="Nivel" placeholder="Pregrado/Posgrado" required [disabled]="view"
+                    [(ngModel)]="nivelSeleccionado"
+                    (selectionChange)="cambiarSelectPeriodoSegunNivel(nivelSeleccionado)">
                     <mat-option>--Seleccionar--</mat-option>
-                    <mat-option
-                      *ngFor="let nivel of niveles"
-                      [value]="nivel.Id"
-                    >
+                    <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">
                       {{ nivel.Nombre }}
                     </mat-option>
                   </mat-select>
-                  <mat-error
-                    *ngIf="
+                  <mat-error *ngIf="
                       calendarForm.get('Nivel').hasError('required') &&
                       calendarForm.get('Nivel').touched
-                    "
-                  >
+                    ">
                     {{ "calendario.error_select_para" | translate }}
                   </mat-error>
                 </mat-form-field>
               </div>
               <div class="form-col1">
                 <mat-form-field style="width: 100%" floatLabel="always">
-                  <mat-label
-                    >*{{ "calendario.periodo" | translate }}:
+                  <mat-label>*{{ "calendario.periodo" | translate }}:
                   </mat-label>
-                  <mat-select
-                    formControlName="PeriodoId"
-                    placeholder="2020-I, 2020-II, 2020-III"
-                    required
-                    [disabled]="view"
-                  >
-                    <mat-option value="">--Seleccionar--</mat-option>
-                    <mat-option
-                      *ngFor="let periodo of periodos"
-                      [value]="periodo.Id"
-                    >
+                  <mat-select *ngIf="!selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view">
+                    <mat-option value="" disabled>--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
                       {{ periodo.Nombre }}
                     </mat-option>
                   </mat-select>
-                  <mat-error
-                    *ngIf="
+                  <mat-select *ngIf="selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required multiple>
+                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id" [disabled]="view">
+                      {{ periodo.Nombre }}
+                    </mat-option>
+                  </mat-select>
+
+                  <mat-error *ngIf="
                       calendarForm.get('PeriodoId').hasError('required') &&
                       calendarForm.get('PeriodoId').touched
-                    "
-                  >
+                    ">
                     {{ "calendario.error_select_periodo" | translate }}
                   </mat-error>
                 </mat-form-field>
               </div>
             </div>
             <div class="container-bottons" *ngIf="!view">
-              <button
-                mat-flat-button
-                color="accent"
-                type="button"
-                (click)="addPeriod()"
-                [disabled]="view"
-              >
+              <button mat-flat-button color="accent" type="button" (click)="addPeriod()" [disabled]="view">
                 {{ "calendario.agregar_periodo" | translate }}
               </button>
             </div>
@@ -91,46 +69,28 @@
                 <div class="form-grid2">
                   <div class="form-col1">
                     <mat-form-field class="form-field">
-                      <input
-                        matInput
-                        type="number"
-                        formControlName="resolucion"
-                        placeholder="{{
+                      <input matInput type="number" formControlName="resolucion" placeholder="{{
                           'calendario.numero_resolucion' | translate
-                        }} "
-                        required
-                      />
-                      <mat-error
-                        *ngIf="
+                        }} " required />
+                      <mat-error *ngIf="
                           calendarForm.get('resolucion').hasError('required') &&
                           calendarForm.get('resolucion').touched
-                        "
-                      >
+                        ">
                         {{ "calendario.error_resolucion" | translate }}
                       </mat-error>
                     </mat-form-field>
                   </div>
                   <div class="form-col1">
                     <mat-form-field class="form-field">
-                      <input
-                        matInput
-                        type="text"
-                        formControlName="anno"
-                        minlength="4"
-                        maxlength="4"
-                        pattern="^[0-9]*$"
+                      <input matInput type="text" formControlName="anno" minlength="4" maxlength="4" pattern="^[0-9]*$"
                         placeholder="{{
                           'calendario.anno_resolucion' | translate
-                        }} "
-                        required
-                      />
-                      <mat-error
-                        *ngIf="
+                        }} " required />
+                      <mat-error *ngIf="
                           calendarForm.get('anno').hasError('required') &&
                           calendarForm.get('anno').touched &&
                           calendarForm.get('anno').hasError('pattern')
-                        "
-                      >
+                        ">
                         {{ "calendario.error_anno" | translate }}
                       </mat-error>
                     </mat-form-field>
@@ -141,43 +101,25 @@
                 </div>
                 <div class="margin-y">
                   <div *ngIf="uploadMode">
-                    <button
-                      mat-flat-button
-                      color="accent"
-                      type="button"
-                      (click)="fileInput.click()"
-                      title="{{ 'calendario.subir_resolucion' | translate }}"
-                    >
+                    <button mat-flat-button color="accent" type="button" (click)="fileInput.click()"
+                      title="{{ 'calendario.subir_resolucion' | translate }}">
                       <mat-icon fontIcon="attach_file"></mat-icon>
-                      <input
-                        formControlName="fileResolucion"
-                        #fileInput
-                        type="file"
-                        (change)="onInputFileResolucion($event)"
-                        style="display: none"
-                        accept="application/pdf"
-                        data-max-size="5120"
-                      />
+                      <input formControlName="fileResolucion" #fileInput type="file"
+                        (change)="onInputFileResolucion($event)" style="display: none" accept="application/pdf"
+                        data-max-size="5120" />
                     </button>
                     <mat-error *ngIf="!fileResolucion">{{
                       "ERROR.no_documento" | translate
-                    }}</mat-error>
-                    <label style="margin-left: 1em" *ngIf="fileResolucion"
-                      >{{ "GLOBAL.archivo_seleccionado" | translate }}:
-                      {{ fileResolucion.file.name }}</label
-                    >
+                      }}</mat-error>
+                    <label style="margin-left: 1em" *ngIf="fileResolucion">{{ "GLOBAL.archivo_seleccionado" | translate
+                      }}:
+                      {{ fileResolucion.file.name }}</label>
                   </div>
                   <div *ngIf="editMode">
-                    <button
-                      mat-flat-button
-                      color="accent"
-                      type="button"
-                      (click)="downloadFile(calendar.DocumentoId)"
+                    <button mat-flat-button color="accent" type="button" (click)="downloadFile(calendar.DocumentoId)"
                       title="{{
                         'calendario.descargar_resolucion' | translate
-                      }}"
-                      *ngIf="!view"
-                    >
+                      }}" *ngIf="!view">
                       <mat-icon fontIcon="cloud_download"></mat-icon>
                     </button>
                   </div>
@@ -185,13 +127,8 @@
               </mat-card-content>
             </mat-card>
             <!-- //VOLVER  !createdCalendar -->
-            <div class="row" *ngIf="createdCalendar">
-              <button
-                mat-flat-button
-                color="accent"
-                type="submit"
-                [disabled]="calendarForm.invalid"
-              >
+            <div class="row" *ngIf="!createdCalendar">
+              <button mat-flat-button color="accent" type="submit" [disabled]="calendarForm.invalid">
                 {{ "GLOBAL.guardar" | translate }}
               </button>
             </div>
@@ -208,30 +145,15 @@
                   {{ "calendario.procesos_descripcion" | translate }}
                 </p>
                 <div class="container-bottons">
-                  <button
-                    mat-flat-button
-                    color="accent"
-                    type="button"
-                    (click)="openTabsClone()"
-                  >
+                  <button mat-flat-button color="accent" type="button" (click)="openTabsClone()">
                     {{ "calendario.procesos_copiar" | translate }}
                   </button>
-                  <button
-                    mat-flat-button
-                    color="accent"
-                    type="button"
-                    (click)="openTabs()"
-                  >
+                  <button mat-flat-button color="accent" type="button" (click)="openTabs()">
                     {{ "calendario.procesos_definir" | translate }}
                   </button>
                 </div>
               </div>
-              <form
-                novalidate
-                [formGroup]="calendarFormClone"
-                #fform="ngForm"
-                *ngIf="activetabsClone"
-              >
+              <form novalidate [formGroup]="calendarFormClone" #fform="ngForm" *ngIf="activetabsClone">
                 <div class="margin-y">
                   <p>
                     {{ "calendario.clonar_calendario_nombre" | translate }}
@@ -239,60 +161,40 @@
                   <div class="form-grid2">
                     <div class="form-col1">
                       <mat-form-field style="width: 100%" floatLabel="always">
-                        <mat-label
-                          >*{{ "calendario.para" | translate }}
+                        <mat-label>*{{ "calendario.para" | translate }}
                         </mat-label>
-                        <mat-select
-                          formControlName="NivelClone"
-                          placeholder="Pregrado/Posgrado"
-                          required
-                        >
+                        <mat-select formControlName="NivelClone" placeholder="Pregrado/Posgrado" required>
                           <mat-option>--Seleccionar--</mat-option>
-                          <mat-option
-                            *ngFor="let nivelClone of niveles"
-                            [value]="nivelClone.Id"
-                          >
+                          <mat-option *ngFor="let nivelClone of niveles" [value]="nivelClone.Id">
                             {{ nivelClone.Nombre }}
                           </mat-option>
                         </mat-select>
-                        <mat-error
-                          *ngIf="
+                        <mat-error *ngIf="
                             calendarFormClone
                               .get('NivelClone')
                               ?.hasError('required') &&
                             calendarFormClone.get('NivelClone')?.touched
-                          "
-                        >
+                          ">
                           {{ "calendario.error_select_para" | translate }}
                         </mat-error>
                       </mat-form-field>
                     </div>
                     <div class="form-col1">
                       <mat-form-field style="width: 100%" floatLabel="always">
-                        <mat-label
-                          >*{{ "calendario.periodo" | translate }}:
+                        <mat-label>*{{ "calendario.periodo" | translate }}:
                         </mat-label>
-                        <mat-select
-                          formControlName="PeriodoIdClone"
-                          placeholder="2020-I, 2020-II, 2020-III"
-                          required
-                        >
+                        <mat-select formControlName="PeriodoIdClone" placeholder="2020-I, 2020-II, 2020-III" required>
                           <mat-option>--Seleccionar--</mat-option>
-                          <mat-option
-                            *ngFor="let periodoClone of periodosClone"
-                            [value]="periodoClone.Id"
-                          >
+                          <mat-option *ngFor="let periodoClone of periodosClone" [value]="periodoClone.Id">
                             {{ periodoClone.Nombre }}
                           </mat-option>
                         </mat-select>
-                        <mat-error
-                          *ngIf="
+                        <mat-error *ngIf="
                             calendarFormClone
                               .get('PeriodoIdClone')
                               ?.hasError('required') &&
                             calendarFormClone.get('PeriodoIdClone')?.touched
-                          "
-                        >
+                          ">
                           {{ "calendario.error_select_periodo" | translate }}
                         </mat-error>
                       </mat-form-field>
@@ -300,13 +202,8 @@
                   </div>
                   <div class="form-grid2">
                     <div class="form-col2">
-                      <button
-                        class="form-field"
-                        mat-flat-button
-                        color="accent"
-                        type="button"
-                        (click)="clonarCalendario()"
-                      >
+                      <button class="form-field" mat-flat-button color="accent" type="button"
+                        (click)="clonarCalendario()">
                         {{ "calendario.clonar_calendario" | translate }}
                       </button>
                     </div>
@@ -319,60 +216,39 @@
                     <mat-card>
                       <mat-card-content>
                         <!-- BUSCANDO Y BOTON -->
-                        <div
-                          style="
+                        <div style="
                             display: flex;
                             justify-content: space-between;
                             flex-wrap: wrap;
-                          "
-                        >
-                          <div
-                            class=""
-                            style="
+                          ">
+                          <div class="" style="
                               display: flex;
                               flex: 1;
                               justify-content: flex-end;
                               margin-right: 1em;
-                            "
-                          >
+                            ">
                             <mat-form-field class="form-field">
                               <mat-label>{{
                                 "GLOBAL.buscar" | translate
-                              }}</mat-label>
-                              <input
-                                matInput
-                                type="text"
-                                (keyup)="applyFilterProces($event)"
-                                placeholder="{{ 'GLOBAL.buscar' | translate }}"
-                                #input
-                              />
+                                }}</mat-label>
+                              <input matInput type="text" (keyup)="applyFilterProces($event)"
+                                placeholder="{{ 'GLOBAL.buscar' | translate }}" #input />
                             </mat-form-field>
                           </div>
-                          <div
-                            style="
+                          <div style="
                               display: flex;
                               justify-content: flex-start;
                               align-items: center;
                               margin: 0px 0px;
                               margin-bottom: 1.3em;
-                            "
-                          >
-                            <button
-                              mat-flat-button
-                              style="height: 100%"
-                              color="accent"
-                              type="button"
-                              (click)="addProcess($event)"
-                              *ngIf="!view"
-                            >
-                              <mat-icon
-                                style="vertical-align: middle"
-                                fontIcon="add"
-                              >
+                            ">
+                            <button mat-flat-button style="height: 100%" color="accent" type="button"
+                              (click)="addProcess($event)" *ngIf="!view">
+                              <mat-icon style="vertical-align: middle" fontIcon="add">
                               </mat-icon>
                               <label>{{
                                 "calendario.tooltip_crear_proceso" | translate
-                              }}</label>
+                                }}</label>
                             </button>
                           </div>
                         </div>
@@ -382,12 +258,7 @@
                           <table mat-table [dataSource]="dataSource" matSort>
                             <!-- ID Column -->
                             <ng-container matColumnDef="Nombre" sticky>
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "calendario.nombre" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
@@ -396,12 +267,7 @@
                             </ng-container>
                             <!-- Progress Column -->
                             <ng-container matColumnDef="Descripcion">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 80%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 80%">
                                 {{ "GLOBAL.descripcion" | translate }}
                               </th>
 
@@ -411,56 +277,30 @@
                             </ng-container>
 
                             <ng-container matColumnDef="Acciones">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header>
                                 {{ "GLOBAL.acciones" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
-                                <button
-                                  mat-icon-button
-                                  color="accent"
-                                  (click)="editProcess({ data: row })"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    title="{{
+                                <button mat-icon-button color="accent" (click)="editProcess({ data: row })">
+                                  <mat-icon aria-hidden="false" title="{{
                                       'calendario.tooltip_detalle_proceso'
                                         | translate
-                                    }}"
-                                    fontIcon="edit"
-                                  ></mat-icon>
+                                    }}" fontIcon="edit"></mat-icon>
                                 </button>
 
-                                <button
-                                  mat-icon-button
-                                  color="accent"
-                                  [disabled]="view"
-                                  (click)="deleteProcess({ data: row })"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    title="{{
+                                <button mat-icon-button color="accent" [disabled]="view"
+                                  (click)="deleteProcess({ data: row })">
+                                  <mat-icon aria-hidden="false" title="{{
                                       'calendario.tooltip_detalle_proceso'
                                         | translate
-                                    }}"
-                                    fontIcon="delete"
-                                    class="icon"
-                                  >
+                                    }}" fontIcon="delete" class="icon">
                                   </mat-icon>
-                                </button></td
-                            ></ng-container>
+                                </button>
+                              </td>
+                            </ng-container>
 
-                            <tr
-                              mat-header-row
-                              *matHeaderRowDef="displayedColumns"
-                            ></tr>
-                            <tr
-                              mat-row
-                              *matRowDef="let row; columns: displayedColumns"
-                            ></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
                             <!-- Row shown when there is no matching data. -->
                             <tr class="mat-row" *matNoDataRow>
@@ -476,80 +316,48 @@
 
                   <mat-tab label="{{ 'calendario.actividades' | translate }}">
                     <mat-accordion>
-                      <mat-expansion-panel
-                        *ngFor="let process of processes; index as i"
-                      >
+                      <mat-expansion-panel *ngFor="let process of processes; index as i">
                         <mat-expansion-panel-header>
                           <mat-panel-title>
                             {{ process.Nombre }}
                           </mat-panel-title>
                         </mat-expansion-panel-header>
-                        <div
-                          style="
+                        <div style="
                             display: grid;
                             grid-template-columns: 1fr 1fr;
                             margin: 20px 0px;
-                          "
-                        >
-                          <div
-                            style="
+                          ">
+                          <div style="
                               display: flex;
                               justify-content: flex-start;
                               margin: 0px 0px;
-                            "
-                          >
-                            <button
-                              class="boton-primary"
-                              type="button"
-                              (click)="addActivity($event, process)"
-                              *ngIf="!view"
-                            >
-                              <mat-icon
-                                style="vertical-align: middle"
-                                fontIcon="add"
-                              >
+                            ">
+                            <button class="boton-primary" type="button" (click)="addActivity($event, process)"
+                              *ngIf="!view">
+                              <mat-icon style="vertical-align: middle" fontIcon="add">
                               </mat-icon>
                               <label>{{
                                 "calendario.tooltip_crear_actividad" | translate
-                              }}</label>
+                                }}</label>
                             </button>
                           </div>
 
-                          <div
-                            class="search-container"
-                            style="display: flex; justify-content: flex-end"
-                          >
-                            <input
-                              matInput
-                              (keyup)="
+                          <div class="search-container" style="display: flex; justify-content: flex-end">
+                            <input matInput (keyup)="
                                 applyFilterActividades(
                                   $event,
                                   process.actividades,
                                   i
                                 )
-                              "
-                              placeholder="{{ 'GLOBAL.buscar' | translate }}"
-                              #inputActividades
-                            />
-                            <mat-icon class="icon-search" matPrefix
-                              >search</mat-icon
-                            >
+                              " placeholder="{{ 'GLOBAL.buscar' | translate }}" #inputActividades />
+                            <mat-icon class="icon-search" matPrefix>search</mat-icon>
                           </div>
                         </div>
                         <div class="mat-elevation-z8">
-                          <table
-                            mat-table
-                            [dataSource]="process.actividades"
-                            matSort
-                          >
+                          <table mat-table [dataSource]="process.actividades" matSort>
                             <!-- ID Column -->
                             <ng-container matColumnDef="Nombre">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "calendario.nombre" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
@@ -559,12 +367,7 @@
 
                             <!-- Progress Column -->
                             <ng-container matColumnDef="Descripcion">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "GLOBAL.descripcion" | translate }}
                               </th>
 
@@ -574,12 +377,7 @@
                             </ng-container>
 
                             <ng-container matColumnDef="FechaInicio">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "calendario.fecha_inicio" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
@@ -588,12 +386,7 @@
                             </ng-container>
 
                             <ng-container matColumnDef="FechaFin">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "calendario.fecha_fin" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
@@ -602,12 +395,7 @@
                             </ng-container>
 
                             <ng-container matColumnDef="Activo">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "calendario.estado" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
@@ -616,118 +404,71 @@
                             </ng-container>
 
                             <ng-container matColumnDef="Acciones">
-                              <th
-                                mat-header-cell
-                                *matHeaderCellDef
-                                mat-sort-header
-                                style="width: 20%"
-                              >
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                 {{ "GLOBAL.acciones" | translate }}
                               </th>
                               <td mat-cell *matCellDef="let row">
-                                <button
-                                  (click)="
+                                <button (click)="
                                     onAction(
                                       { action: 'edit', data: row },
                                       process.actividades
                                     )
-                                  "
-                                  style="width: 25%; border: none"
-                                  class="icon"
-                                  title="{{
+                                  " style="width: 25%; border: none" class="icon" title="{{
                                     'calendario.tooltip_editar_actividad'
                                       | translate
-                                  }}"
-                                  [disabled]="view"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    fontIcon="edit_outline"
-                                  ></mat-icon>
+                                  }}" [disabled]="view">
+                                  <mat-icon aria-hidden="false" fontIcon="edit_outline"></mat-icon>
                                 </button>
-                                <button
-                                  (click)="
+                                <button (click)="
                                     onAction(
                                       { action: 'delete', data: row },
                                       process
                                     )
-                                  "
-                                  style="width: 25%; border: none"
-                                  class="icon"
-                                  title="{{
+                                  " style="width: 25%; border: none" class="icon" title="{{
                                     'calendario.tooltip_eliminar_actividad'
                                       | translate
-                                  }}"
-                                  [disabled]="view"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    fontIcon="delete"
-                                  >
+                                  }}" [disabled]="view">
+                                  <mat-icon aria-hidden="false" fontIcon="delete">
                                   </mat-icon>
                                 </button>
-                                <button
-                                  (click)="
+                                <button (click)="
                                     onAction(
                                       { action: 'select', data: row },
                                       process.actividades
                                     )
-                                  "
-                                  style="width: 25%; border: none"
-                                  class="icon"
-                                  title="{{
+                                  " style="width: 25%; border: none" class="icon" title="{{
                                     'calendario.tooltip_seleccionar_proyectos'
                                       | translate
-                                  }}"
-                                  [disabled]="view"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    fontIcon="check"
-                                  >
+                                  }}" [disabled]="view">
+                                  <mat-icon aria-hidden="false" fontIcon="check">
                                   </mat-icon>
                                 </button>
-                                <button
-                                  (click)="
+                                <button (click)="
                                     onAction(
                                       { action: 'view', data: row },
                                       process.actividades
                                     )
-                                  "
-                                  style="width: 25%; border: none"
-                                  class="icon"
-                                  title="{{
+                                  " style="width: 25%; border: none" class="icon" title="{{
                                     'calendario.tooltip_detalle_actividad'
                                       | translate
-                                  }}"
-                                  [disabled]="view"
-                                >
-                                  <mat-icon
-                                    aria-hidden="false"
-                                    fontIcon="search"
-                                  >
+                                  }}" [disabled]="view">
+                                  <mat-icon aria-hidden="false" fontIcon="search">
                                   </mat-icon>
                                 </button>
                               </td>
                             </ng-container>
 
-                            <tr
-                              mat-header-row
-                              *matHeaderRowDef="displayedColumnsActividades"
-                            ></tr>
-                            <tr
-                              mat-row
-                              *matRowDef="
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsActividades"></tr>
+                            <tr mat-row *matRowDef="
                                 let row;
                                 columns: displayedColumnsActividades
-                              "
-                            ></tr>
+                              "></tr>
 
                             <!-- Row shown when there is no matching data. -->
                             <tr class="mat-row" *matNoDataRow>
                               <td class="mat-cell" colspan="4">
                                 No data matching the filter "{{
-                                  inputActividades.value
+                                inputActividades.value
                                 }}"
                               </td>
                             </tr>
@@ -759,50 +500,32 @@
             <mat-label>
               {{ "calendario.seleccione_version_calendario" | translate }}
             </mat-label>
-            <mat-select
-              placeholder="{{
+            <mat-select placeholder="{{
                 'calendario.seleccione_version_calendario' | translate
-              }}"
-              [(value)]="selCalendar"
-            >
-              <mat-option
-                *ngFor="let Calendar of ExtensionList"
-                (click)="loadExtension(Calendar.Id)"
-                [value]="Calendar.Id"
-              >
+              }}" [(value)]="selCalendar">
+              <mat-option *ngFor="let Calendar of ExtensionList" (click)="loadExtension(Calendar.Id)"
+                [value]="Calendar.Id">
                 {{ Calendar.Nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </ng-container>
-        <form
-          novalidate
-          [formGroup]="calendarFormExtend"
-          #fform="ngForm"
-          (ngSubmit)="extendCalendar($event)"
-          class="form-horizontal"
-        >
+        <form novalidate [formGroup]="calendarFormExtend" #fform="ngForm" (ngSubmit)="extendCalendar($event)"
+          class="form-horizontal">
           <div class="form-grid2">
             <div class="form-col1">
               <mat-form-field style="width: 100%" floatLabel="always">
                 <mat-label>*{{ "calendario.para" | translate }} </mat-label>
-                <mat-select
-                  formControlName="Nivel"
-                  placeholder="Pregrado/Posgrado"
-                  required
-                  [disabled]="view"
-                >
+                <mat-select formControlName="Nivel" placeholder="Pregrado/Posgrado" required [disabled]="view">
                   <mat-option>--Seleccionar--</mat-option>
                   <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">
                     {{ nivel.Nombre }}
                   </mat-option>
                 </mat-select>
-                <mat-error
-                  *ngIf="
+                <mat-error *ngIf="
                     calendarFormExtend.get('Nivel').hasError('required') &&
                     calendarFormExtend.get('Nivel').touched
-                  "
-                >
+                  ">
                   {{ "calendario.error_select_para" | translate }}
                 </mat-error>
               </mat-form-field>
@@ -810,26 +533,23 @@
             <div class="form-col1">
               <mat-form-field style="width: 100%" floatLabel="always">
                 <mat-label>*{{ "calendario.periodo" | translate }}: </mat-label>
-                <mat-select
-                  formControlName="PeriodoId"
-                  placeholder="2020-I, 2020-II, 2020-III"
-                  required
-                  [disabled]="view"
-                >
-                  <mat-option value="">--Seleccionar--</mat-option>
-                  <mat-option
-                    *ngFor="let periodo of periodos"
-                    [value]="periodo.Id"
-                  >
-                    {{ periodo.Nombre }}
-                  </mat-option>
-                </mat-select>
-                <mat-error
-                  *ngIf="
+                <mat-select *ngIf="!selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required [disabled]="view">
+                    <mat-option value="" disabled>--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
+                      {{ periodo.Nombre }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-select *ngIf="selectMultipleNivel" formControlName="PeriodoId"
+                    placeholder="2020-I, 2020-II, 2020-III" required multiple>
+                    <mat-option *ngFor="let periodo of periodos" [disabled]="view" [value]="periodo.Id">
+                      {{ periodo.Nombre }}
+                    </mat-option>
+                  </mat-select>
+                <mat-error *ngIf="
                     calendarFormExtend.get('PeriodoId').hasError('required') &&
                     calendarFormExtend.get('PeriodoId').touched
-                  "
-                >
+                  ">
                   {{ "calendario.error_select_periodo" | translate }}
                 </mat-error>
               </mat-form-field>
@@ -846,48 +566,30 @@
               <div class="form-grid2">
                 <div class="form-col1">
                   <mat-form-field class="form-field">
-                    <input
-                      matInput
-                      type="number"
-                      formControlName="resolucion"
-                      placeholder="{{
+                    <input matInput type="number" formControlName="resolucion" placeholder="{{
                         'calendario.numero_resolucion' | translate
-                      }} "
-                      required
-                    />
-                    <mat-error
-                      *ngIf="
+                      }} " required />
+                    <mat-error *ngIf="
                         calendarFormExtend
                           .get('resolucion')
                           .hasError('required') &&
                         calendarFormExtend.get('resolucion').touched
-                      "
-                    >
+                      ">
                       {{ "calendario.error_resolucion" | translate }}
                     </mat-error>
                   </mat-form-field>
                 </div>
                 <div class="form-col1">
                   <mat-form-field class="form-field">
-                    <input
-                      matInput
-                      type="text"
-                      formControlName="anno"
-                      minlength="4"
-                      maxlength="4"
-                      pattern="^[0-9]*$"
+                    <input matInput type="text" formControlName="anno" minlength="4" maxlength="4" pattern="^[0-9]*$"
                       placeholder="{{
                         'calendario.anno_resolucion' | translate
-                      }} "
-                      required
-                    />
-                    <mat-error
-                      *ngIf="
+                      }} " required />
+                    <mat-error *ngIf="
                         calendarFormExtend.get('anno').hasError('required') &&
                         calendarFormExtend.get('anno').touched &&
                         calendarForm.get('anno').hasError('pattern')
-                      "
-                    >
+                      ">
                       {{ "calendario.error_anno" | translate }}
                     </mat-error>
                   </mat-form-field>
@@ -897,47 +599,25 @@
                 {{ "calendario.etiqueta_documento" | translate }}
               </p>
               <div *ngIf="!Extension">
-                <button
-                  mat-flat-button
-                  color="accent"
-                  type="button"
-                  (click)="fileInput.click()"
-                  title="{{ 'calendario.subir_resolucion' | translate }}"
-                  *ngIf="!view"
-                >
+                <button mat-flat-button color="accent" type="button" (click)="fileInput.click()"
+                  title="{{ 'calendario.subir_resolucion' | translate }}" *ngIf="!view">
                   <mat-icon fontIcon="attach_file"></mat-icon>
-                  <input
-                    formControlName="fileResolucion"
-                    #fileInput
-                    type="file"
-                    (change)="onInputFileResolucionExt($event)"
-                    style="display: none"
-                    accept="application/pdf"
-                    data-max-size="5120"
-                  />
+                  <input formControlName="fileResolucion" #fileInput type="file"
+                    (change)="onInputFileResolucionExt($event)" style="display: none" accept="application/pdf"
+                    data-max-size="5120" />
                 </button>
-                <mat-error
-                  *ngIf="
+                <mat-error *ngIf="
                     calendarFormExtend
                       .get('fileResolucion')
                       .hasError('required')
-                  "
-                  >{{ "ERROR.no_documento" | translate }}</mat-error
-                >
-                <label *ngIf="fileResolucionExt" style="margin-left: 1em"
-                  >{{ "GLOBAL.archivo_seleccionado" | translate }}:
-                  {{ fileResolucionExt.file.name }}</label
-                >
+                  ">{{ "ERROR.no_documento" | translate }}</mat-error>
+                <label *ngIf="fileResolucionExt" style="margin-left: 1em">{{ "GLOBAL.archivo_seleccionado" | translate
+                  }}:
+                  {{ fileResolucionExt.file.name }}</label>
               </div>
               <div *ngIf="Extension">
-                <button
-                  mat-flat-button
-                  color="accent"
-                  type="button"
-                  (click)="downloadFileExt(fileExtId)"
-                  title="{{ 'calendario.descargar_resolucion' | translate }}"
-                  *ngIf="!view"
-                >
+                <button mat-flat-button color="accent" type="button" (click)="downloadFileExt(fileExtId)"
+                  title="{{ 'calendario.descargar_resolucion' | translate }}" *ngIf="!view">
                   <mat-icon fontIcon="cloud_download"></mat-icon>
                 </button>
               </div>
@@ -959,24 +639,16 @@
               <mat-form-field style="width: 100%">
                 <mat-label>{{
                   "calendario.seleccione_proyecto" | translate
-                }}</mat-label>
-                <mat-select
-                  formControlName="selProyectos"
-                  [disabled]="
+                  }}</mat-label>
+                <mat-select formControlName="selProyectos" [disabled]="
                     calendarFormExtend
                       .get('fileResolucion')
                       .hasError('required') && !Extension
-                  "
-                  multiple
-                  [disabled]="view"
-                >
+                  " multiple [disabled]="view">
                   <mat-option value="0" disabled>{{
                     "calendario.seleccione_proyecto" | translate
-                  }}</mat-option>
-                  <mat-option
-                    *ngFor="let project of projects"
-                    [value]="project.Id"
-                    >{{ project.Nombre }}
+                    }}</mat-option>
+                  <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -996,74 +668,43 @@
                     <mat-tab label="{{ 'calendario.procesos' | translate }}">
                       <mat-card>
                         <mat-card-content>
-                          <div
-                            style="
+                          <div style="
                               display: flex;
                               flex-wrap: wrap;
                               gap: 1rem;
                               margin-top: 1em;
-                            "
-                          >
-                            <div
-                              class="search-container"
-                              style="display: flex; flex: 1"
-                            >
+                            ">
+                            <div class="search-container" style="display: flex; flex: 1">
                               <mat-form-field style="width: 100%">
                                 <mat-label>{{
                                   "GLOBAL.buscar" | translate
-                                }}</mat-label>
-                                <input
-                                  matInput
-                                  (keyup)="applyFilterProces($event)"
-                                  placeholder="{{
+                                  }}</mat-label>
+                                <input matInput (keyup)="applyFilterProces($event)" placeholder="{{
                                     'GLOBAL.buscar' | translate
-                                  }}"
-                                  #input
-                                />
+                                  }}" #input />
                               </mat-form-field>
                             </div>
-                            <div
-                              style="
+                            <div style="
                                 display: flex;
                                 margin-bottom: 1.3em;
-                              "
-                            >
-                              <button
-                                style="height: 100%"
-                                mat-flat-button
-                                color="accent"
-                                type="button"
-                                (click)="addProcess($event)"
-                                *ngIf="!view"
-                              >
-                                <mat-icon
-                                  style="vertical-align: middle"
-                                  fontIcon="add"
-                                >
+                              ">
+                              <button style="height: 100%" mat-flat-button color="accent" type="button"
+                                (click)="addProcess($event)" *ngIf="!view">
+                                <mat-icon style="vertical-align: middle" fontIcon="add">
                                 </mat-icon>
                                 <label>{{
                                   "calendario.tooltip_crear_proceso" | translate
-                                }}</label>
+                                  }}</label>
                               </button>
                             </div>
                           </div>
 
                           <div class="mat-elevation-z8 table" (custom)="onAction($event, null)">
-                            <table
-                              mat-table
-                              [dataSource]="dataSource"
-                              class="demo-table"
-                              matSort
-                            >
+                            <table mat-table [dataSource]="dataSource" class="demo-table" matSort>
                               <!-- ID Column -->
                               <ng-container matColumnDef="Nombre" sticky>
-                                <th
-                                  [style]="{ 'text-align': 'left' }"
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                  style="width: 20%"
-                                >
+                                <th [style]="{ 'text-align': 'left' }" mat-header-cell *matHeaderCellDef mat-sort-header
+                                  style="width: 20%">
                                   {{ "calendario.nombre" | translate }}
                                 </th>
                                 <td mat-cell *matCellDef="let row">
@@ -1072,12 +713,7 @@
                               </ng-container>
                               <!-- Progress Column -->
                               <ng-container matColumnDef="Descripcion">
-                                <th
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                  style="width: 80%"
-                                >
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 80%">
                                   {{ "GLOBAL.descripcion" | translate }}
                                 </th>
 
@@ -1087,61 +723,35 @@
                               </ng-container>
 
                               <ng-container matColumnDef="Acciones">
-                                <th
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                >
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>
                                   {{ "GLOBAL.acciones" | translate }}
                                 </th>
                                 <td mat-cell *matCellDef="let row">
-                                  <button
-                                    mat-icon-button
-                                    color="accent"
-                                    (click)="editProcess({ data: row })"
-                                    [disabled]="view"
-                                  >
-                                    <mat-icon
-                                      aria-hidden="false"
-                                      title="{{
+                                  <button mat-icon-button color="accent" (click)="editProcess({ data: row })"
+                                    [disabled]="view">
+                                    <mat-icon aria-hidden="false" title="{{
                                         'calendario.tooltip_detalle_proceso'
                                           | translate
-                                      }}"
-                                      fontIcon="edit"
-                                    >
+                                      }}" fontIcon="edit">
                                     </mat-icon>
                                   </button>
-                                  <button
-                                    mat-icon-button
-                                    color="accent"
-                                    (click)="
+                                  <button mat-icon-button color="accent" (click)="
                                       onAction(
                                         { action: 'view', data: row },
                                         null
                                       )
-                                    "
-                                    [disabled]="view"
-                                  >
-                                    <mat-icon
-                                      aria-hidden="false"
-                                      title="{{
+                                    " [disabled]="view">
+                                    <mat-icon aria-hidden="false" title="{{
                                         'calendario.tooltip_detalle_proceso'
                                           | translate
-                                      }}"
-                                      fontIcon="delete"
-                                    >
+                                      }}" fontIcon="delete">
                                     </mat-icon>
-                                  </button></td
-                              ></ng-container>
+                                  </button>
+                                </td>
+                              </ng-container>
 
-                              <tr
-                                mat-header-row
-                                *matHeaderRowDef="displayedColumns"
-                              ></tr>
-                              <tr
-                                mat-row
-                                *matRowDef="let row; columns: displayedColumns"
-                              ></tr>
+                              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
                               <!-- Row shown when there is no matching data. -->
                               <tr class="mat-row" *matNoDataRow>
@@ -1156,9 +766,7 @@
                     </mat-tab>
                     <mat-tab label="{{ 'calendario.actividades' | translate }}">
                       <mat-accordion>
-                        <mat-expansion-panel
-                          *ngFor="let process of processes; index as i"
-                        >
+                        <mat-expansion-panel *ngFor="let process of processes; index as i">
                           <mat-expansion-panel-header>
                             <mat-panel-title>
                               {{ process.Nombre }}
@@ -1167,30 +775,20 @@
                           <mat-card class="margin-y">
                             <mat-card-content>
                               <div style="display: flex; flex-wrap: wrap">
-                                <div
-                                  style="
+                                <div style="
                                     display: flex;
                                     margin-bottom: 1.3 em;
                                     height: 100%;
                                     gap: 1 em;
-                                  "
-                                >
-                                  <button
-                                    mat-flat-button
-                                    color="accent"
-                                    type="button"
-                                    (click)="addActivity($event, process)"
-                                    *ngIf="!view"
-                                  >
-                                    <mat-icon
-                                      style="vertical-align: middle"
-                                      fontIcon="add"
-                                    >
+                                  ">
+                                  <button mat-flat-button color="accent" type="button"
+                                    (click)="addActivity($event, process)" *ngIf="!view">
+                                    <mat-icon style="vertical-align: middle" fontIcon="add">
                                     </mat-icon>
                                     <label>{{
                                       "calendario.tooltip_crear_actividad"
-                                        | translate
-                                    }}</label>
+                                      | translate
+                                      }}</label>
                                   </button>
                                 </div>
 
@@ -1198,38 +796,24 @@
                                   <mat-form-field style="width: 100%">
                                     <mat-label>{{
                                       "GLOBAL.buscar" | translate
-                                    }}</mat-label>
-                                    <input
-                                      matInput
-                                      (keyup)="
+                                      }}</mat-label>
+                                    <input matInput (keyup)="
                                         applyFilterActividades(
                                           $event,
                                           process.actividades,
                                           i
                                         )
-                                      "
-                                      placeholder="{{
+                                      " placeholder="{{
                                         'GLOBAL.buscar' | translate
-                                      }}"
-                                      #inputActividades
-                                    />
+                                      }}" #inputActividades />
                                   </mat-form-field>
                                 </div>
                               </div>
                               <div class="mat-elevation-z8 table">
-                                <table
-                                  mat-table
-                                  [dataSource]="process.actividades"
-                                  matSort
-                                >
+                                <table mat-table [dataSource]="process.actividades" matSort>
                                   <!-- ID Column -->
                                   <ng-container matColumnDef="Nombre">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.nombre" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1239,12 +823,7 @@
 
                                   <!-- Progress Column -->
                                   <ng-container matColumnDef="Descripcion">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "GLOBAL.descripcion" | translate }}
                                     </th>
 
@@ -1254,14 +833,9 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="FechaInicio">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{
-                                        "calendario.fecha_inicio" | translate
+                                      "calendario.fecha_inicio" | translate
                                       }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1270,12 +844,7 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="FechaFin">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.fecha_fin" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1284,12 +853,7 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="Activo">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.estado" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1298,115 +862,69 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="Acciones">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "GLOBAL.acciones" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'edit', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        mat-icon-button
-                                        color="accent"
-                                        title="{{
+                                        " mat-icon-button color="accent" title="{{
                                           'calendario.tooltip_editar_actividad'
                                             | translate
-                                        }}"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="edit_outline"
-                                        ></mat-icon>
+                                        }}" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="edit_outline"></mat-icon>
                                       </button>
-                                      <button
-                                        (click)="onAction( {action: 'disable', }, process )"
-                                        mat-icon-button
-                                        color="warn"
-                                        title="{{
+                                      <button (click)="onAction( {action: 'disable', }, process )" mat-icon-button
+                                        color="warn" title="{{
                                           'calendario.tooltip_eliminar_actividad'
                                             | translate
-                                        }}"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="delete"
-                                        >
+                                        }}" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="delete">
                                         </mat-icon>
                                       </button>
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'select', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        mat-icon-button
-                                        color="accent"
-                                        title="{{
+                                        " mat-icon-button color="accent" title="{{
                                           'calendario.tooltip_seleccionar_proyectos'
                                             | translate
-                                        }}"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="check"
-                                        >
+                                        }}" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="check">
                                         </mat-icon>
                                       </button>
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'view', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        mat-icon-button
-                                        color="accent"
-                                        title="{{
+                                        " mat-icon-button color="accent" title="{{
                                           'calendario.tooltip_detalle_actividad'
                                             | translate
-                                        }}"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="search"
-                                        >
+                                        }}" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="search">
                                         </mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
 
-                                  <tr
-                                    mat-header-row
-                                    *matHeaderRowDef="
+                                  <tr mat-header-row *matHeaderRowDef="
                                       displayedColumnsActividades
-                                    "
-                                  ></tr>
-                                  <tr
-                                    mat-row
-                                    *matRowDef="
+                                    "></tr>
+                                  <tr mat-row *matRowDef="
                                       let row;
                                       columns: displayedColumnsActividades
-                                    "
-                                  ></tr>
+                                    "></tr>
 
                                   <!-- Row shown when there is no matching data. -->
                                   <tr class="mat-row" *matNoDataRow>
                                     <td class="mat-cell" colspan="4">
                                       No data matching the filter "{{
-                                        inputActividades.value
+                                      inputActividades.value
                                       }}"
                                     </td>
                                   </tr>
@@ -1426,70 +944,41 @@
                     <mat-tab label="{{ 'calendario.procesos' | translate }}">
                       <mat-card>
                         <mat-card-content>
-                          <div
-                            style="
+                          <div style="
                               display: flex;
                               flex-wrap: wrap;
                               gap: 1rem;
                               margin-top: 1em;
-                            "
-                          >
-                            <div
-                              class="search-container"
-                              style="display: flex; flex: 1"
-                            >
+                            ">
+                            <div class="search-container" style="display: flex; flex: 1">
                               <mat-form-field style="width: 100%">
                                 <mat-label>{{
                                   "GLOBAL.buscar" | translate
-                                }}</mat-label>
-                                <input
-                                  matInput
-                                  (keyup)="applyFilterProces($event)"
-                                  placeholder="{{
+                                  }}</mat-label>
+                                <input matInput (keyup)="applyFilterProces($event)" placeholder="{{
                                     'GLOBAL.buscar' | translate
-                                  }}"
-                                  #input
-                                />
+                                  }}" #input />
                               </mat-form-field>
                             </div>
 
                             <div style="display: flex; margin-bottom: 1.3 em">
-                              <button
-                                mat-flat-button
-                                color="accent"
-                                style="height: 100%"
-                                type="button"
-                                (click)="addProcess($event)"
-                                *ngIf="!view"
-                              >
-                                <mat-icon
-                                  style="vertical-align: middle"
-                                  fontIcon="add"
-                                >
+                              <button mat-flat-button color="accent" style="height: 100%" type="button"
+                                (click)="addProcess($event)" *ngIf="!view">
+                                <mat-icon style="vertical-align: middle" fontIcon="add">
                                 </mat-icon>
                                 <label>{{
                                   "calendario.tooltip_crear_proceso" | translate
-                                }}</label>
+                                  }}</label>
                               </button>
                             </div>
                           </div>
 
                           <div class="mat-elevation-z8 table" (custom)="onAction($event, null)">
-                            <table
-                              mat-table
-                              [dataSource]="datasourceExtension"
-                              class="demo-table"
-                              matSort
-                            >
+                            <table mat-table [dataSource]="datasourceExtension" class="demo-table" matSort>
                               <!-- ID Column -->
                               <ng-container matColumnDef="Nombre" sticky>
-                                <th
-                                  class="text-left"
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                  style="width: 20%"
-                                >
+                                <th class="text-left" mat-header-cell *matHeaderCellDef mat-sort-header
+                                  style="width: 20%">
                                   {{ "calendario.nombre" | translate }}
                                 </th>
                                 <td mat-cell *matCellDef="let row">
@@ -1498,12 +987,7 @@
                               </ng-container>
                               <!-- Progress Column -->
                               <ng-container matColumnDef="Descripcion">
-                                <th
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                  style="width: 80%"
-                                >
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 80%">
                                   {{ "GLOBAL.descripcion" | translate }}
                                 </th>
 
@@ -1513,56 +997,31 @@
                               </ng-container>
 
                               <ng-container matColumnDef="Acciones">
-                                <th
-                                  mat-header-cell
-                                  *matHeaderCellDef
-                                  mat-sort-header
-                                >
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>
                                   {{ "GLOBAL.acciones" | translate }}
                                 </th>
                                 <td mat-cell *matCellDef="let row">
-                                  <button
-                                    mat-icon-button
-                                    color="accent"
-                                    (click)="editProcess({ data: row })"
-                                    [disabled]="view"
-                                  >
-                                    <mat-icon
-                                      aria-hidden="false"
-                                      fontIcon="edit"
-                                    >
+                                  <button mat-icon-button color="accent" (click)="editProcess({ data: row })"
+                                    [disabled]="view">
+                                    <mat-icon aria-hidden="false" fontIcon="edit">
                                     </mat-icon>
                                   </button>
-                                  <button
-                                    mat-icon-button
-                                    color="accent"
-                                    (click)="deleteProcess($event)"
-                                    style="border: none"
-                                    [disabled]="view"
-                                  >
-                                    <mat-icon
-                                      aria-hidden="false"
-                                      title="{{
+                                  <button mat-icon-button color="accent" (click)="deleteProcess($event)"
+                                    style="border: none" [disabled]="view">
+                                    <mat-icon aria-hidden="false" title="{{
                                         'calendario.tooltip_detalle_proceso'
                                           | translate
-                                      }}"
-                                      fontIcon="delete"
-                                    >
+                                      }}" fontIcon="delete">
                                     </mat-icon>
-                                  </button></td
-                              ></ng-container>
+                                  </button>
+                                </td>
+                              </ng-container>
 
-                              <tr
-                                mat-header-row
-                                *matHeaderRowDef="displayedColumnsExtension"
-                              ></tr>
-                              <tr
-                                mat-row
-                                *matRowDef="
+                              <tr mat-header-row *matHeaderRowDef="displayedColumnsExtension"></tr>
+                              <tr mat-row *matRowDef="
                                   let row;
                                   columns: displayedColumnsExtension
-                                "
-                              ></tr>
+                                "></tr>
 
                               <!-- Row shown when there is no matching data. -->
                               <tr class="mat-row" *matNoDataRow>
@@ -1577,9 +1036,7 @@
                     </mat-tab>
                     <mat-tab label="{{ 'calendario.actividades' | translate }}">
                       <mat-accordion>
-                        <mat-expansion-panel
-                          *ngFor="let process of processesExt; index as i"
-                        >
+                        <mat-expansion-panel *ngFor="let process of processesExt; index as i">
                           <mat-expansion-panel-header>
                             <mat-panel-title>
                               {{ process.Nombre }}
@@ -1588,34 +1045,21 @@
 
                           <mat-card>
                             <mat-card-content>
-                              <div
-                                style="
+                              <div style="
                                   display: flex;
                                   flex-wrap: wrap;
                                   gap: 1 em;
                                   margin-top: 1 rem;
-                                "
-                              >
-                                <div
-                                  style="display: flex; margin-bottom: 1.3 em"
-                                  (click)="addActivity($event, process)"
-                                  *ngIf="!view"
-                                >
-                                  <button
-                                    mat-flat-button
-                                    color="accent"
-                                    style="height: 100%"
-                                    type="button"
-                                  >
-                                    <mat-icon
-                                      style="vertical-align: middle"
-                                      fontIcon="add"
-                                    >
+                                ">
+                                <div style="display: flex; margin-bottom: 1.3 em" (click)="addActivity($event, process)"
+                                  *ngIf="!view">
+                                  <button mat-flat-button color="accent" style="height: 100%" type="button">
+                                    <mat-icon style="vertical-align: middle" fontIcon="add">
                                     </mat-icon>
                                     <label>{{
                                       "calendario.tooltip_crear_actividad"
-                                        | translate
-                                    }}</label>
+                                      | translate
+                                      }}</label>
                                   </button>
                                 </div>
 
@@ -1623,39 +1067,25 @@
                                   <mat-form-field style="width: 100%">
                                     <mat-label>{{
                                       "GLOBAL.buscar" | translate
-                                    }}</mat-label>
-                                    <input
-                                      matInput
-                                      (keyup)="
+                                      }}</mat-label>
+                                    <input matInput (keyup)="
                                         applyFilterActividades(
                                           $event,
                                           process.actividades,
                                           i
                                         )
-                                      "
-                                      placeholder="{{
+                                      " placeholder="{{
                                         'GLOBAL.buscar' | translate
-                                      }}"
-                                      #inputActividades
-                                    />
+                                      }}" #inputActividades />
                                   </mat-form-field>
                                 </div>
                               </div>
 
                               <div class="mat-elevation-z8 table">
-                                <table
-                                  mat-table
-                                  [dataSource]="process.actividades"
-                                  matSort
-                                >
+                                <table mat-table [dataSource]="process.actividades" matSort>
                                   <!-- ID Column -->
                                   <ng-container matColumnDef="Nombre">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.nombre" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1665,12 +1095,7 @@
 
                                   <!-- Progress Column -->
                                   <ng-container matColumnDef="Descripcion">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "GLOBAL.descripcion" | translate }}
                                     </th>
 
@@ -1680,14 +1105,9 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="FechaInicio">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{
-                                        "calendario.fecha_inicio" | translate
+                                      "calendario.fecha_inicio" | translate
                                       }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1696,12 +1116,7 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="FechaFin">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.fecha_fin" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1710,12 +1125,7 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="Activo">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "calendario.estado" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
@@ -1724,116 +1134,69 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="Acciones">
-                                    <th
-                                      mat-header-cell
-                                      *matHeaderCellDef
-                                      mat-sort-header
-                                      style="width: 20%"
-                                    >
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 20%">
                                       {{ "GLOBAL.acciones" | translate }}
                                     </th>
                                     <td mat-cell *matCellDef="let row">
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'edit', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        title="{{
+                                        " title="{{
                                           'calendario.tooltip_editar_actividad'
                                             | translate
-                                        }}"
-                                        mat-icon-button
-                                        color="accent"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="edit_outline"
-                                        >
+                                        }}" mat-icon-button color="accent" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="edit_outline">
                                         </mat-icon>
                                       </button>
-                                      <button
-                                        (click)="onAction( {action: 'disable', }, process )"
-                                        title="{{
+                                      <button (click)="onAction( {action: 'disable', }, process )" title="{{
                                           'calendario.tooltip_eliminar_actividad'
                                             | translate
-                                        }}"
-                                        mat-icon-button
-                                        color="warn"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="delete"
-                                        >
+                                        }}" mat-icon-button color="warn" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="delete">
                                         </mat-icon>
                                       </button>
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'select', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        title="{{
+                                        " title="{{
                                           'calendario.tooltip_seleccionar_proyectos'
                                             | translate
-                                        }}"
-                                        mat-icon-button
-                                        color="accent"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="check"
-                                        >
+                                        }}" mat-icon-button color="accent" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="check">
                                         </mat-icon>
                                       </button>
-                                      <button
-                                        (click)="
+                                      <button (click)="
                                           onAction(
                                             { action: 'view', data: row },
                                             process.actividades
                                           )
-                                        "
-                                        title="{{
+                                        " title="{{
                                           'calendario.tooltip_detalle_actividad'
                                             | translate
-                                        }}"
-                                        mat-icon-button
-                                        color="accent"
-                                        [disabled]="view"
-                                      >
-                                        <mat-icon
-                                          aria-hidden="false"
-                                          fontIcon="search"
-                                        >
+                                        }}" mat-icon-button color="accent" [disabled]="view">
+                                        <mat-icon aria-hidden="false" fontIcon="search">
                                         </mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
 
-                                  <tr
-                                    mat-header-row
-                                    *matHeaderRowDef="
+                                  <tr mat-header-row *matHeaderRowDef="
                                       displayedColumnsActividades
-                                    "
-                                  ></tr>
-                                  <tr
-                                    mat-row
-                                    *matRowDef="
+                                    "></tr>
+                                  <tr mat-row *matRowDef="
                                       let row;
                                       columns: displayedColumnsActividades
-                                    "
-                                  ></tr>
+                                    "></tr>
 
                                   <!-- Row shown when there is no matching data. -->
                                   <tr class="mat-row" *matNoDataRow>
                                     <td class="mat-cell" colspan="4">
                                       No data matching the filter "{{
-                                        inputActividades.value
+                                      inputActividades.value
                                       }}"
                                     </td>
                                   </tr>
@@ -1853,25 +1216,14 @@
           <div class="form-grid2 margin-y">
             <div class="form-col2">
               <ng-container *ngIf="!Extension">
-                <button style="width: 100%;"
-                  class="float-center boton-primary"
-                  mat-flat-button
-                  color="accent"
-                  type="submit"
-                  [disabled]="calendarFormExtend.invalid"
-                >
+                <button style="width: 100%;" class="float-center boton-primary" mat-flat-button color="accent"
+                  type="submit" [disabled]="calendarFormExtend.invalid">
                   {{ "GLOBAL.guardar" | translate }}
                 </button>
               </ng-container>
               <ng-container *ngIf="Extension">
-                <button
-                  class="float-center boton-primary"
-                  mat-flat-button
-                  color="accent"
-                  style="width: 100%;"
-                  type="button"
-                  (click)="prepareNewExtension()"
-                >
+                <button class="float-center boton-primary" mat-flat-button color="accent" style="width: 100%;"
+                  type="button" (click)="prepareNewExtension()">
                   {{ "calendario.add_extension_extension" | translate }}
                 </button>
               </ng-container>

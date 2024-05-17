@@ -10,17 +10,17 @@ import { CalendarioProyectoComponent } from './component/calendario-proyecto/cal
 
  const routes: Routes = [
   {
-    path: 'list-calendario-academico',
+    path: 'lista',
     component: ListCalendarioAcademicoComponent,
     //canActivate: [AuthGuard],
 },
 {
-  path: 'administracion-calendario',
+  path: 'administracion',
   component: AdministracionCalendarioComponent,
   //canActivate: [AuthGuard],
 },
 {
-  path: 'calendario-proyecto',
+  path: 'buscar-por-proyecto',
   component: CalendarioProyectoComponent,
   //canActivate: [AuthGuard],
 }
