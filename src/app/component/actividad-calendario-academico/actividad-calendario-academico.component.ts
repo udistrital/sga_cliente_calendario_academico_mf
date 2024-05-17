@@ -8,6 +8,7 @@ import { EventoService } from 'src/app/services/evento.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import * as moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
+import { forkJoin, range } from 'rxjs';
 // import { LocalDataSource } from 'ng2-smart-table';
 
 @Component({
@@ -124,10 +125,21 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     })
   }
 
-  fetchSelectData(period: any) {
-    this.parametrosService.get('periodo/' + period).subscribe(
-      (response: any) => this.period = response['Data']['Nombre'],
-    );
+  fetchSelectData(periodo: any) {
+    //si tiene multiple periodo
+    if (Array.isArray(periodo)) {
+      const observables = periodo.map(p => this.parametrosService.get(`periodo/${p}`));
+      forkJoin(observables).subscribe((responses: any[]) => {
+        const periodos = responses.map(res => res['Data']['Nombre']);
+        periodos.sort();
+        this.period = periodos.join(', ');
+      });
+
+    } else {
+      this.parametrosService.get('periodo/' + periodo).subscribe(
+        (response: any) => this.period = response['Data']['Nombre'],
+      );
+    }
     this.updateSelect();
   }
 

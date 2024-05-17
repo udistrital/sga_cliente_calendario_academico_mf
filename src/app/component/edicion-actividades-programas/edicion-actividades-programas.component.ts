@@ -58,12 +58,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     public dialogRef: MatDialogRef<EdicionActividadesProgramasComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-   // this.dataSource = new LocalDataSource();
-   // this.dataSource2 = new LocalDataSource();
-    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
-      this.createTable();
-      this.createTable2();
-    })
     this.vista = this.data.vista;
     if(this.vista == "select"){
       this.select_proyectos_act = true;
@@ -108,7 +102,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     }
 
     if(this.actividad_detalle_proyectos){
-      this.createTable();
       this.actividad = this.data.activity.Nombre;
       this.descripcion_actividad = this.data.activity.Descripcion;
       let deps = this.data.activity.DependenciaId;
@@ -143,7 +136,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.descripcion_actividad = this.data.activity.Descripcion;
       this.fecha_inicio_org = this.data.activity.FechaInicioOrg;
       this.fecha_fin_org = this.data.activity.FechaFinOrg;
-      this.createTable2();
       this.ActivityEditor.patchValue({
         fecha_inicio_org: moment(this.fecha_inicio_org,"DD-MM-YYYY").toDate(),
         fecha_fin_org: moment(this.fecha_fin_org,"DD-MM-YYYY").toDate(),
@@ -178,57 +170,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.dialogRef.close({UpdateDependencias: this.data.activity.DependenciaId})
     }
   }
-
-  createTable() {
-    this.settings = {
-      columns: {
-        ProyectoCurricular: {
-          title: this.translate.instant('calendario.proyecto_curricular'),
-          editable: false,
-          width: '40%',
-          filter: false,
-        },
-        FechaInicio: {
-          title: this.translate.instant('calendario.fecha_inicio'),
-          editable: false,
-          width: '20%',
-          filter: false,
-        },
-        FechaFin: {
-          title: this.translate.instant('calendario.fecha_fin'),
-          editable: false,
-          width: '20%',
-          filter: false,
-        },
-        FechaEdicion: {
-          title: this.translate.instant('calendario.fecha_edicion'),
-          editable: false,
-          width: '20%',
-          filter: false,
-        },
-      },
-      mode: 'external',
-      actions: false,
-      noDataMessage: this.translate.instant('calendario.sin_proyectos_actividades')
-    };
-  }
-
-  createTable2(){
-    this.settings2 ={
-      columns: {
-        Nombre: {
-          title: this.translate.instant('GLOBAL.nombre'),
-          editable: false,
-          width: '40%',
-          filter: false,
-        },
-      },
-      mode: 'external',
-      actions: false,
-      noDataMessage: this.translate.instant('calendario.sin_responsables')
-    };
-  }
-
   
 
   buildJSONdeps(OrgDeps: any, NewSelect: Number[]) {

@@ -83,13 +83,15 @@
 
 export const environment = {
   production: false,
-  apiUrl: "http://localhost:4203/",
+  apiUrl: "http://localhost:4203/", 
   NUXEO_SERVICE: "http://pruebasapi2.intranetoas.udistrital.edu.co:8199/v1/",
   TERCEROS_SERVICE: "http://pruebasapi.intranetoas.udistrital.edu.co:8121/v1/",
   DOCUMENTO_SERVICE: "http://pruebasapi.intranetoas.udistrital.edu.co:8094/v1/",
-  EVENTO_SERVICE: "http://pruebasapi2.intranetoas.udistrital.edu.co:8107/v1/",
+  // EVENTO_SERVICE: "http://pruebasapi2.intranetoas.udistrital.edu.co:8107/v1/",
+  EVENTO_SERVICE: "http://localhost:8081/v1/",
   PROYECTO_ACADEMICO_SERVICE: "http://pruebasapi.intranetoas.udistrital.edu.co:8116/v1/",
   SGA_MID_SERVICE: "http://pruebasapi.intranetoas.udistrital.edu.co:8119/v1/",
   PARAMETROS_SERVICE: "http://pruebasapi.intranetoas.udistrital.edu.co:8510/v1/",
-  CALENDARIO_MID_SERVICE: "http://pruebasapi2.intranetoas.udistrital.edu.co:8545/v1/"
+  // CALENDARIO_MID_SERVICE: "http://pruebasapi2.intranetoas.udistrital.edu.co:8545/v1/",
+  CALENDARIO_MID_SERVICE: "http://localhost:8098/v1/"
 };
