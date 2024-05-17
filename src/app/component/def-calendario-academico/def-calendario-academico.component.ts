@@ -31,6 +31,7 @@ import { MatSort } from '@angular/material/sort';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 import { ordenarPorPropiedad } from 'src/utils/listas';
 
+
 @Component({
   selector: 'def-calendario-academico',
   templateUrl: './def-calendario-academico.component.html',
