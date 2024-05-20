@@ -493,7 +493,7 @@ export class AdministracionCalendarioComponent {
       this.sgaAdmsionesMidService.get('admision/dependencia_vinculacion_tercero/' + this.userId)
         .subscribe(
           (respDependencia: any) => {
-            const dependencias = <Number[]>respDependencia.data.DependenciaId;
+            const dependencias = <Number[]>respDependencia.Data.DependenciaId;
             if (dependencias.length == 1) {
               resolve(dependencias[0])
             } else {
@@ -522,21 +522,21 @@ export class AdministracionCalendarioComponent {
             this.periodicidad = res_recurrencia;
             this.sgaCalendarioMidService.get('calendario-proyecto/' + DependenciaId).subscribe(
               (resp_calendar_project: any) => {
-                this.idCalendario = resp_calendar_project.data["CalendarioId"];
+                this.idCalendario = resp_calendar_project.Data["CalendarioId"];
                 if (this.idCalendario > 0) {
-                  this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.data["CalendarioId"]).subscribe(
+                  this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.Data["CalendarioId"]).subscribe(
                     (response: any) => {
-                      this.parametrosService.get('periodo/' + response.data[0].PeriodoId).subscribe(
+                      this.parametrosService.get('periodo/' + response.Data[0].PeriodoId).subscribe(
                         (resp: any) => {
                           this.periodo_calendario = resp.Data.Nombre;
-                          this.Calendario_academico = response.data[0].Nombre
-                          const processes: any[] = response.data[0].proceso;
+                          this.Calendario_academico = response.Data[0].Nombre
+                          const processes: any[] = response.Data[0].proceso;
                           if (processes !== null) {
                             processes.forEach(element => {
                               if (Object.keys(element).length !== 0) {
                                 const loadedProcess: Proceso = new Proceso();
                                 loadedProcess.Nombre = element['Proceso'];
-                                loadedProcess.CalendarioId = { Id: response.data[0].Id };
+                                loadedProcess.CalendarioId = { Id: response.Data[0].Id };
                                 loadedProcess.actividades = new MatTableDataSource<Actividad>;
                                 const activities: any[] = element['Actividades']
                                 if (activities !== null) {
@@ -583,7 +583,7 @@ export class AdministracionCalendarioComponent {
                               }
                             });
                           }
-                          if (<boolean>response.data[0].AplicaExtension) {
+                          if (<boolean>response.Data[0].AplicaExtension) {
 
                             this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'), this.translate.instant('calendario.calendario_tiene_extension'));
                           }
