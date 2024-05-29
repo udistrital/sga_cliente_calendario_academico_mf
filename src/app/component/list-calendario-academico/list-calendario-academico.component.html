@@ -23,16 +23,16 @@
 
               <div style="display: grid; grid-template-columns: 1fr 1fr; margin:  20px 0px;">
                 <div style=" display: flex; justify-content: flex-start; margin: 0px 0px;" (click)="onCreate($event)">
-                    <button class="boton-primary" type="button">
-                        <mat-icon style="vertical-align: middle;" fontIcon="add"> </mat-icon>
-                        <label>{{'calendario.tooltip_crear_proceso' | translate}}</label>
-                    </button>
+                  <button class="boton-primary" type="button">
+                    <mat-icon style="vertical-align: middle;" fontIcon="add"> </mat-icon>
+                    <label>{{'calendario.tooltip_crear_proceso' | translate}}</label>
+                  </button>
                 </div>
 
                 <div class="search-container" style=" display: flex; justify-content: flex-end; ">
-                    <input  matInput (keyup)="applyFilterProces($event)"
-                        placeholder="{{'GLOBAL.buscar'| translate}}" #input>
-                    <mat-icon class="icon-search" matPrefix>search</mat-icon>
+                  <input matInput (keyup)="applyFilterProces($event)" placeholder="{{'GLOBAL.buscar'| translate}}"
+                    #input>
+                  <mat-icon class="icon-search" matPrefix>search</mat-icon>
                 </div>
               </div>
 
@@ -71,41 +71,32 @@
                   <ng-container matColumnDef="Acciones">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'GLOBAL.acciones' | translate}} </th>
                     <td mat-cell *matCellDef="let row">
-                        <mat-icon aria-hidden="false" title="{{'calendario.tooltip_asignar_proyecto' | translate}}"
-                          fontIcon="description"
-                          style="border:none; width: 20%;"
-                          (click)="onAction({action:'assign', data: row})"
-                          class="icon">
-                        </mat-icon>
+                      <mat-icon aria-hidden="false" title="{{'calendario.tooltip_asignar_proyecto' | translate}}"
+                        fontIcon="description" style="border:none; width: 20%;"
+                        (click)="onAction({action:'assign', data: row})" class="icon">
+                      </mat-icon>
 
 
-                        <mat-icon aria-hidden="false" title="{{'calendario.tooltip_clonar' | translate}}"
-                          fontIcon="add_circle"
-                          style="border:none; width: 20%;"
-                           (click)="onAction({action:'clone', data: row,})"
-                           class="icon">
-                        </mat-icon>
+                      <mat-icon aria-hidden="false" title="{{'calendario.tooltip_clonar' | translate}}"
+                        fontIcon="add_circle" style="border:none; width: 20%;"
+                        (click)="onAction({action:'clone', data: row,})" class="icon">
+                      </mat-icon>
 
 
-                        <mat-icon aria-hidden="false" title="{{'calendario.tooltip_detalle' | translate}}"
-                          fontIcon="home"
-                          style="border:none; width: 20%;"
-                           (click)="onAction({action:'edit', data: row, editable:true})"
-                           class="icon">
-                        </mat-icon>
+                      <mat-icon aria-hidden="false" title="{{'calendario.tooltip_detalle' | translate}}" fontIcon="home"
+                        style="border:none; width: 20%;" (click)="onAction({action:'edit', data: row, editable:true})"
+                        class="icon">
+                      </mat-icon>
 
 
-                        <mat-icon aria-hidden="false" title="{{'calendario.tooltip_editar' | translate}}"
-                          fontIcon="edit"
-                          style="border:none; width: 20%;" 
-                          (click)="onAction({action:'edit', data: row, editable:false})"
-                          class="icon">
-                        </mat-icon>
-                        <mat-icon aria-hidden="false" title="{{'calendario.tooltip_inactivar' | translate}}"
-                          fontIcon="delete"
-                          style="border:none; width: 20%;" 
-                          (click)="onAction({action:'delete', data:row})">
-                        </mat-icon>
+                      <mat-icon aria-hidden="false" title="{{'calendario.tooltip_editar' | translate}}" fontIcon="edit"
+                        style="border:none; width: 20%;" (click)="onAction({action:'edit', data: row, editable:false})"
+                        class="icon">
+                      </mat-icon>
+                      <mat-icon aria-hidden="false" title="{{'calendario.tooltip_inactivar' | translate}}"
+                        fontIcon="delete" style="border:none; width: 20%;"
+                        (click)="onAction({action:'delete', data:row})">
+                      </mat-icon>
 
                   </ng-container>
 
@@ -125,8 +116,8 @@
             </mat-tab>
             <mat-tab label="{{ 'GLOBAL.formulario' | translate }}">
               <br />
-              <def-calendario-academico [view]="view" [calendarForEditId]="calendarForEditId" [calendarForNew]="calendarForNew"
-                (calendarCloneOut)="recargarDespuesClon($event)">
+              <def-calendario-academico [view]="view" [calendarForEditId]="calendarForEditId"
+                [calendarForNew]="calendarForNew" (calendarCloneOut)="recargarDespuesClon($event)">
               </def-calendario-academico>
 
               <br />

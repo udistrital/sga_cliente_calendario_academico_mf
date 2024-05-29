@@ -9,7 +9,7 @@
                             <mat-label>*{{ 'calendario.para' | translate }} </mat-label>
                             <mat-select formControlName="Nivel" placeholder="Pregrado/Posgrado" required
                                 [disabled]="view">
-                                <mat-option>--Seleccionar--</mat-option>
+                                <mat-option>--{{ 'GLOBAL.seleccionar' | translate }}--</mat-option>
                                 <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">
                                     {{ nivel.Nombre }}
                                 </mat-option>
@@ -27,7 +27,7 @@
                             <mat-label>*{{ 'calendario.periodo' | translate }}: </mat-label>
                             <mat-select formControlName="PeriodoId" placeholder="2020-I, 2020-II, 2020-III" required
                                 [disabled]="view">
-                                <mat-option value="">--Seleccionar--</mat-option>
+                                <mat-option value="">--{{ 'GLOBAL.seleccionar' | translate }}--</mat-option>
                                 <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
                                     {{ periodo.Nombre }}
                                 </mat-option>
@@ -136,7 +136,7 @@
                                 <mat-form-field style="width: 100%;" floatLabel="always">
                                     <mat-label>*{{ 'calendario.para' | translate }} </mat-label>
                                     <mat-select formControlName="NivelClone" placeholder="Pregrado/Posgrado" required>
-                                        <mat-option>--Seleccionar--</mat-option>
+                                        <mat-option>--{{ 'GLOBAL.seleccionar' | translate }}--</mat-option>
                                         <mat-option *ngFor="let nivelClone of niveles" [value]="nivelClone.Id">
                                             {{ nivelClone.Nombre }}
                                         </mat-option>
@@ -155,7 +155,7 @@
                                     <mat-label>*{{ 'calendario.periodo' | translate }}: </mat-label>
                                     <mat-select formControlName="PeriodoIdClone" placeholder="2020-I, 2020-II, 2020-III"
                                         required>
-                                        <mat-option>--Seleccionar--</mat-option>
+                                        <mat-option>--{{ 'GLOBAL.seleccionar' | translate }}r--</mat-option>
                                         <mat-option *ngFor="let periodoClone of periodosClone"
                                             [value]="periodoClone.Id">
                                             {{ periodoClone.Nombre }}
@@ -364,7 +364,7 @@
 
                                             <!-- Row shown when there is no matching data. -->
                                             <tr class="mat-row" *matNoDataRow>
-                                                <td class="mat-cell" colspan="4">No data matching the filter
+                                                <td class="mat-cell" colspan="4">{{'ERROR.sin_informacion_en'| translate}}
                                                     "{{inputActividades.value}}"</td>
                                             </tr>
                                         </table>
@@ -405,7 +405,7 @@
                     <mat-form-field style="width: 100%;" floatLabel="always">
                         <mat-label>*{{ 'calendario.para' | translate }} </mat-label>
                         <mat-select formControlName="Nivel" placeholder="Pregrado/Posgrado" required [disabled]="view">
-                            <mat-option>--Seleccionar--</mat-option>
+                            <mat-option>--{{ 'GLOBAL.seleccionar' | translate }}--</mat-option>
                             <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">
                                 {{ nivel.Nombre }}
                             </mat-option>
@@ -423,7 +423,7 @@
                         <mat-label>*{{ 'calendario.periodo' | translate }}: </mat-label>
                         <mat-select formControlName="PeriodoId" placeholder="2020-I, 2020-II, 2020-III" required
                             [disabled]="view">
-                            <mat-option value="">--Seleccionar--</mat-option>
+                            <mat-option value="">--{{ 'GLOBAL.seleccionar' | translate }}--</mat-option>
                             <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">
                                 {{ periodo.Nombre }}
                             </mat-option>
