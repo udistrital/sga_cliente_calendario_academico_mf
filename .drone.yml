@@ -74,6 +74,18 @@ steps:
     event:
     - push
 
+- name: nodejs_develop
+  image: node:lts-bullseye
+  commands:
+  - node --version
+  - npm i
+  - npm run build
+  when:
+    branch:
+    - develop
+    event:
+    - push     
+
 - name: nodejs_release
   image: node:lts-bullseye
   commands:
@@ -85,7 +97,7 @@ steps:
     - release/*
     event:
     - push
-
+   
 - name: nodejs_master
   image: node:lts-bullseye
   commands:
