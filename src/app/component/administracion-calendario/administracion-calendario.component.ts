@@ -124,9 +124,6 @@ export class AdministracionCalendarioComponent {
     }
 
     const dialogRef = this.dialog.open(template, { width: '1000px', height: '800px' });
-
-    
-    console.log(process)
     this.calendarOptions = {
       customButtons: {
         cerrar: {
@@ -175,10 +172,8 @@ export class AdministracionCalendarioComponent {
             this.getInfoPrograma(this.DependenciaID);
           }, (err: any) => {
             if (err) {
-              console.log('error en el contructor X(')
               this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'), this.translate.instant('admision.multiple_vinculacion') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             } else {
-              console.log('error en el contructor X(')
               this.popUpManager.showErrorAlert(this.translate.instant('admision.no_vinculacion_no_rol') + ". " + this.translate.instant('GLOBAL.comunicar_OAS_error'));
             }
           })
@@ -289,7 +284,6 @@ export class AdministracionCalendarioComponent {
 
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -325,7 +319,6 @@ export class AdministracionCalendarioComponent {
   }
 
   viewProcess(event: any, process: any) {
-    console.log(event)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
     activityConfig.height = '370px';
@@ -337,7 +330,6 @@ export class AdministracionCalendarioComponent {
   }
 
   calendarioActividad(event: any, process: any) {
-    console.log(event.data)
     this.actividad = [
       {
         title: event.data.Nombre,
@@ -374,8 +366,6 @@ export class AdministracionCalendarioComponent {
   }
 
   editActivity(event: any, process: any) {
-    console.log(event)
-    console.log(process)
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '600px';
@@ -457,7 +447,6 @@ export class AdministracionCalendarioComponent {
         //(response: ProyectoAcademicoInstitucion[]) => {
         (response: any) => {
           this.ProyectosFull = response;
-          console.log(this.ProyectosFull)
         },
         (error) => {
           this.ProyectosFull = [];
@@ -504,7 +493,7 @@ export class AdministracionCalendarioComponent {
       this.sgaAdmsionesMidService.get('admision/dependencia_vinculacion_tercero/' + this.userId)
         .subscribe(
           (respDependencia: any) => {
-            const dependencias = <Number[]>respDependencia.data.DependenciaId;
+            const dependencias = <Number[]>respDependencia.Data.DependenciaId;
             if (dependencias.length == 1) {
               resolve(dependencias[0])
             } else {
@@ -533,93 +522,21 @@ export class AdministracionCalendarioComponent {
             this.periodicidad = res_recurrencia;
             this.sgaCalendarioMidService.get('calendario-proyecto/' + DependenciaId).subscribe(
               (resp_calendar_project: any) => {
-                console.log(resp_calendar_project)
-                this.idCalendario = resp_calendar_project.data["CalendarioId"];
-                console.log(resp_calendar_project.data["CalendarioId"])
+                this.idCalendario = resp_calendar_project.Data["CalendarioId"];
                 if (this.idCalendario > 0) {
-                  this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.data["CalendarioId"]).subscribe(
+                  this.sgaCalendarioMidService.get('calendario-academico/v2/' + resp_calendar_project.Data["CalendarioId"]).subscribe(
                     (response: any) => {
-                      this.parametrosService.get('periodo/' + response.data[0].PeriodoId).subscribe(
+                      this.parametrosService.get('periodo/' + response.Data[0].PeriodoId).subscribe(
                         (resp: any) => {
                           this.periodo_calendario = resp.Data.Nombre;
-                          this.Calendario_academico = response.data[0].Nombre
-                          // const processes: any[] = response.data[0].proceso;
-                          const processes = [{
-                            Proceso: "Proceso 1",
-                            Actividades: [{
-                              TipoEventoId: { 
-                                Id: 1,
-                                Descripcion: "Proceso 1",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 1",
-                              Descripcion: "Descripcion 1",
-                              DependenciaId: "",
-                              FechaInicio: "2024-04-01",
-                              FechaFin: "2024-05-20",
-                              Activo: true,
-                              Responsable: "Responsable 1"
-                            },
-                            {
-                              TipoEventoId: { 
-                                Id: 2,
-                                Descripcion: "Proceso 1",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 2",
-                              Descripcion: "Descripcion 2",
-                              DependenciaId: "",                              
-                              FechaInicio: "2024-04-01",
-                              FechaFin: "2024-05-20",
-                              Activo: true,
-                              Responsable: "Responsable 2"
-                            }]
-                          },
-                          {
-                            Proceso: "Proceso 2",
-                            Actividades: [{
-                              TipoEventoId: { 
-                                Id: 3,
-                                Descripcion: "Proceso 2",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 3",
-                              Descripcion: "Descripcion 3",
-                              DependenciaId: "",
-                              FechaInicio: "2024-06-01",
-                              FechaFin: "2024-06-20",
-                              Activo: true,
-                              Responsable: "Responsable 3"
-                            },
-                            {
-                              TipoEventoId: { 
-                                Id: 4,
-                                Descripcion: "Proceso 2",
-                                TipoRecurrenciaId: {
-                                  Id: 1,
-                                }
-                              },
-                              Nombre: "Actividad 4",
-                              Descripcion: "Descripcion 4",
-                              DependenciaId: "",                              
-                              FechaInicio: "2024-06-01",
-                              FechaFin: "2024-06-20",
-                              Activo: true,
-                              Responsable: "Responsable 4"
-                            }]
-                          }]
+                          this.Calendario_academico = response.Data[0].Nombre
+                          const processes: any[] = response.Data[0].proceso;
                           if (processes !== null) {
                             processes.forEach(element => {
                               if (Object.keys(element).length !== 0) {
                                 const loadedProcess: Proceso = new Proceso();
                                 loadedProcess.Nombre = element['Proceso'];
-                                loadedProcess.CalendarioId = { Id: response.data[0].Id };
+                                loadedProcess.CalendarioId = { Id: response.Data[0].Id };
                                 loadedProcess.actividades = new MatTableDataSource<Actividad>;
                                 const activities: any[] = element['Actividades']
                                 if (activities !== null) {
@@ -666,7 +583,7 @@ export class AdministracionCalendarioComponent {
                               }
                             });
                           }
-                          if (<boolean>response.data[0].AplicaExtension) {
+                          if (<boolean>response.Data[0].AplicaExtension) {
 
                             this.popUpManager.showAlert(this.translate.instant('calendario.formulario_extension'), this.translate.instant('calendario.calendario_tiene_extension'));
                           }

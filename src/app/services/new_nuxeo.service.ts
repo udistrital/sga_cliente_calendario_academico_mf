@@ -145,7 +145,7 @@ export class NewNuxeoService {
                 file: await this.fileToBase64(file.file)
             }]
 
-            this.anyService.post(environment.NUXEO_SERVICE, '/document/uploadAnyFormat', sendFileData)
+            this.anyService.post(environment.NUXEO_SERVICE, 'document/uploadAnyFormat', sendFileData)
                 .subscribe((dataResponse) => {
                     documentos.push(dataResponse);
                     if (documentos.length === files.length) {
@@ -174,7 +174,7 @@ export class NewNuxeoService {
                 representantes: file.representantes ? file.representantes : []
               }];
               
-            this.anyService.post(environment.NUXEO_SERVICE, '/document/firma_electronica', sendFileDataandSigners)
+            this.anyService.post(environment.NUXEO_SERVICE, 'document/firma_electronica', sendFileDataandSigners)
                 .subscribe((dataResponse) => {
                     documentos.push(dataResponse);
                     if (documentos.length === files.length) {
@@ -196,7 +196,7 @@ export class NewNuxeoService {
         files.map((file:any, index:any) => {
             this.documentService.get('documento/' + file.Id)
             .subscribe((doc:any) => {
-                this.anyService.get(environment.NUXEO_SERVICE, '/document/' + doc.Enlace)
+                this.anyService.get(environment.NUXEO_SERVICE, 'document/' + doc.Enlace)
                 .subscribe(async (f: any) => {
                     const url = await this.getUrlFile(f.file, file.ContentType ? file.ContentType : f['file:content']['mime-type'])
                     documentos[index] = { ...documentos[index], ...{ url: url }, ...{ Documento: this.sanitization.bypassSecurityTrustUrl(url) },
@@ -215,7 +215,7 @@ export class NewNuxeoService {
         const documentsSubject = new Subject<Documento[]>();
         const documents$ = documentsSubject.asObservable();
         let documento:any = null;
-        this.anyService.get(environment.NUXEO_SERVICE, '/document/' + uuid)
+        this.anyService.get(environment.NUXEO_SERVICE, 'document/' + uuid)
             .subscribe(async (f: any) => {
                 const url = await this.getUrlFile(f.file, f['file:content']['mime-type']);
                 documento = url
@@ -230,7 +230,7 @@ export class NewNuxeoService {
         const documentsSubject = new Subject<any>();
         const documents$ = documentsSubject.asObservable();
         const versionar = true;
-        this.anyService.delete2(environment.NUXEO_SERVICE, '/document/' + uuid + '?versionar=' + versionar)
+        this.anyService.delete2(environment.NUXEO_SERVICE, 'document/' + uuid + '?versionar=' + versionar)
             .subscribe(r => {
                 documentsSubject.next(r)
             }, e => {

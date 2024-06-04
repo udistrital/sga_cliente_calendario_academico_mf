@@ -20,16 +20,12 @@
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.single-spa.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
+              "src/assets/styles/sga-theme-angular-material.scss",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -41,21 +37,20 @@
           },
           "configurations": {
             "production": {
-                "optimization":true,
-                "outputHashing": "none",
-                "sourceMap": false,
-                "namedChunks": false,
-                "aot": true,
-                "extractLicenses": true,
-                "buildOptimizer": true,
-                "fileReplacements": [
-                  {
-                    "replace": "src/environments/environment.ts",
-                    "with": "src/environments/environment.production.ts"
-                  }
-                ],
-                "deployUrl": "https://sgacalendarioacademico.portaloas.udistrital.edu.co/"
-     
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ],
+              "deployUrl": "https://sgacalendarioacademico.portaloas.udistrital.edu.co/"
             },
             "development": {
               "optimization": true,
@@ -72,13 +67,20 @@
                 }
               ],
               "deployUrl": "https://pruebassgacalendarioacademico.portaloas.udistrital.edu.co/"
+            },
+            "local": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "outputHashing": "none",
+              "deployUrl": "http://localhost:4203/"
+            }
+          },
+          "defaultConfiguration": "local"
         },
-        "local": {
-          "deployUrl": "http://localhost:4205/"
-        }
-      },
-      "defaultConfiguration": "local"
-    },
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
@@ -87,9 +89,12 @@
             },
             "development": {
               "browserTarget": "calendario-academico-mf:build:development"
+            },
+            "local": {
+              "browserTarget": "calendario-academico-mf:build:local"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -100,22 +105,12 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": [
-
-            ]
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
+            "scripts": []
           }
         }
       }

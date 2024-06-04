@@ -1,27 +1,41 @@
-<div class="dinamic-form">
-    <h3> {{ 'calendario.para' | translate }} {{ dat.data.Dependencia }}</h3>
-    <form novalidate (ngSubmit)="register()" class="form-horizontal">
-        <div class="row">
-            <div class="col">
-                <p>{{ 'calendario.periodo' | translate }} </p>
-                <p>{{ dat.data.Periodo }}</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <mat-form-field style="width: 100%;">
-                    <mat-label>{{ 'calendario.seleccione_proyecto' | translate }} </mat-label>
-                    <mat-select [formControl]="selectedProjects" multiple>
-                        <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }} </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="selectedProjects.hasError('required') && selectedProjects.touched">{{ 'calendario.error_select_proyecto' | translate }}</mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <button class="float-right" mat-button type="submit" [disabled]="selectedProjects.invalid">{{ 'GLOBAL.guardar' | translate }}</button>
-            </div>
-        </div>
+<mat-card style="height: 100%;">
+  <mat-card-header>
+    <mat-card-title>
+      {{ "calendario.para" | translate }} {{ dat.data.Dependencia }}
+    </mat-card-title>
+    <mat-card-subtitle>
+      <p>{{ "calendario.periodo" | translate }}</p>
+      <p>{{ dat.data.Periodo }}</p>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content style="display: flex; align-items: center; height: 100%; width: 100%;">
+    <form novalidate (ngSubmit)="register()" class="margin-y" style="width: 100%;">
+      <mat-form-field style="width: 100%">
+        <mat-label
+          >{{ "calendario.seleccione_proyecto" | translate }}
+        </mat-label>
+        <mat-select [formControl]="selectedProjects" multiple>
+          <mat-option *ngFor="let project of projects" [value]="project.Id"
+            >{{ project.Nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="
+            selectedProjects.hasError('required') && selectedProjects.touched
+          "
+          >{{ "calendario.error_select_proyecto" | translate }}</mat-error
+        >
+      </mat-form-field>
+      <button
+        class="margin-y"
+        style="width: 100%;"
+        mat-flat-button
+        color="accent"
+        type="submit"
+        [disabled]="selectedProjects.invalid"
+      >
+        {{ "GLOBAL.guardar" | translate }}
+      </button>
     </form>
-</div>
+  </mat-card-content>
+</mat-card>

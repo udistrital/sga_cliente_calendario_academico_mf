@@ -8,6 +8,7 @@ import { EventoService } from 'src/app/services/evento.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import * as moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
+import { forkJoin, range } from 'rxjs';
 // import { LocalDataSource } from 'ng2-smart-table';
 
 @Component({
@@ -53,14 +54,12 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   ngOnInit() {
 
     if (this.data.editActivity !== undefined) {
-      console.log(this.data)
       this.activityForm.setValue({
         Nombre: this.data.editActivity.Nombre,
         Descripcion: this.data.editActivity.Descripcion,
         FechaInicio: moment(this.data.editActivity.FechaInicio, 'DD-MM-YYYY').toDate(),
         FechaFin: moment(this.data.editActivity.FechaFin, 'DD-MM-YYYY').toDate(),
       });
-      console.log(this.activityForm)
 
       if (this.data.editActivity.EventoPadreId !== undefined && this.data.editActivity.EventoPadreId !== null) {
 
@@ -72,40 +71,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     }
   }
 
-  // saveActivity() {
-  //   console.log("holaaa")
-  //   this.popUpManager.showConfirmAlert(
-  //     this.data.editActivity === undefined ?
-  //       this.translate.instant('calendario.seguro_registrar_actividad') :
-  //       this.translate.instant('calendario.seguro_modificar_actividad'),
-  //   ).then((ok) => {
-  //     if (ok.value) {
-  //       this.activity = this.activityForm.value;
-  //       this.activity.TipoEventoId = { Id: this.data.process.procesoId };
-  //       this.activity.FechaInicio = moment(this.activity.FechaInicio, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm') + ':00Z';
-  //       this.activity.FechaFin = moment(this.activity.FechaFin, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm') + ':00Z';
-  //       this.activity.Activo = true;
-  //       this.tableSource.getAll().then(
-  //         (data: any) => {
-  //           this.responsablesSelected = data.map(
-  //             (item: any) => {
-  //               return { responsableID: item.Id }
-  //             },
-  //           );
-  //           if (this.responsablesSelected.length > 0) {
-  //             this.dialogRef.close({ 'Actividad': this.activity, 'responsable': this.responsablesSelected });
-  //           } else {
-  //             this.popUpManager.showErrorAlert(this.translate.instant('calendario.no_publico'))
-  //           }
-  //         },
-  //       );
-  //     }
-  //   });
-  // }
-
   saveActivity() {
-    console.log(this.responsablesSelected)
-    console.log(this.data.editActivity)
     this.popUpManager.showConfirmAlert(
       this.data.editActivity === undefined ?
         this.translate.instant('calendario.seguro_registrar_actividad') :
@@ -159,10 +125,21 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     })
   }
 
-  fetchSelectData(period: any) {
-    this.parametrosService.get('periodo/' + period).subscribe(
-      (response: any) => this.period = response['Data']['Nombre'],
-    );
+  fetchSelectData(periodo: any) {
+    //si tiene multiple periodo
+    if (Array.isArray(periodo)) {
+      const observables = periodo.map(p => this.parametrosService.get(`periodo/${p}`));
+      forkJoin(observables).subscribe((responses: any[]) => {
+        const periodos = responses.map(res => res['Data']['Nombre']);
+        periodos.sort();
+        this.period = periodos.join(', ');
+      });
+
+    } else {
+      this.parametrosService.get('periodo/' + periodo).subscribe(
+        (response: any) => this.period = response['Data']['Nombre'],
+      );
+    }
     this.updateSelect();
   }
 
@@ -214,14 +191,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   }
 
   onSelectChange(event: any) {
-    console.log(this.tableSource)
-    console.log(event.value)
     const data: any = this.responsables.filter((row: any) => row.Id === event.value)[0]
-    console.log(data)
-    // this.tableSource.find(data).then(
-    //   (val:any) => this.popUpManager.showErrorAlert(this.translate.instant('calendario.publico_repetido')),
-    //   (err:any) => this.tableSource.append(data),
-    // );
     this.tableSource.data.push(data);
     this.tableSource._updateChangeSubscription();
 
@@ -249,7 +219,6 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   }
 
   onDeletePublic(event: any) {
-    console.log(event)
     this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_borrar_responsable')).then(
       willDelete => {
         if (willDelete.value) {
