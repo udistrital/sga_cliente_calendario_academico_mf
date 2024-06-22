@@ -65,7 +65,7 @@ export class AdministracionCalendarioComponent {
   };
 
 
-  userId: number = 0;
+  userId: number | null = 0;
   DependenciaID: number = 0;
   IsAdmin: boolean = false;
 
@@ -488,8 +488,8 @@ export class AdministracionCalendarioComponent {
   }
 
   getProgramaIdByUser() {
-    return new Promise((resolve, reject) => {
-      this.userId = this.userService.getPersonaId();
+    return new Promise(async (resolve, reject) => {
+      this.userId = await this.userService.getPersonaId();
       this.sgaAdmsionesMidService.get('admision/dependencia_vinculacion_tercero/' + this.userId)
         .subscribe(
           (respDependencia: any) => {
