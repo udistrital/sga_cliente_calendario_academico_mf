@@ -49,6 +49,9 @@ import { environment } from 'src/environments/environment';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu'
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -103,6 +106,9 @@ export function createTranslateLoader(http: HttpClient) {
     FullCalendarModule,
     MatDividerModule,
     MatButtonModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    MatMenuModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
