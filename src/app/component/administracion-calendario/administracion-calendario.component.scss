@@ -1,0 +1,17 @@
+//HOVER SOBRE LAS FILAS
+.mat-mdc-row:hover .mat-mdc-cell {
+  background-color: var(--color100);
+}
+
+// COLOR EN LOS MAT-EXPANSION-PANEL
+.mat-expansion-panel-gradient {
+    background: linear-gradient(0deg, var(--color100) 0%, white 100%);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.icon-search {
+  margin-right: 8px;
+}
