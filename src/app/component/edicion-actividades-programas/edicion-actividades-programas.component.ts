@@ -124,7 +124,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.periodicidad_proceso = this.data.process.TipoRecurrenciaId.Nombre;
     }
     if(this.editar_actividad){
-      console.log("TABLA -->", this.data)
       this.ActividadEditable = this.data.activity.Editable;
       this.ActivityEditor = new FormGroup({
           fecha_inicio_org: new FormControl(''),

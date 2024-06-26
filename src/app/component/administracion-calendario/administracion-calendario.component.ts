@@ -639,7 +639,6 @@ export class AdministracionCalendarioComponent implements OnInit {
   }
 
   onAction(event: any, process: any) {
-    console.log("PROCESS --> ",process);
     switch (event.action) {
       case 'view':
         this.viewProcess(event, process);

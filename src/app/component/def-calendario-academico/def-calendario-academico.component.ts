@@ -222,7 +222,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             this.calendar.PeriodoId = calendar['PeriodoId'];
           }
 
-          console.log(this.calendar);
           this.calendarForm.patchValue({
             resolucion: this.calendar.resolucion,
             anno: this.calendar.anno,
@@ -884,7 +883,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                       (periodo: any) => periodo.Id === this.calendar.PeriodoId
                     )[0].Nombre;
                   }
-                  console.log(this.calendar.MultiplePeriodoId);
                   this.calendar.Nombre +=
                     ' ' +
                     this.niveles.filter(
@@ -949,7 +947,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       .post('clonar-calendario/padre', this.calendarClone)
       .subscribe(
         (response: any) => {
-          console.log(response);
 
           if (response != null && response.Status == '404') {
             this.activebutton = true;
