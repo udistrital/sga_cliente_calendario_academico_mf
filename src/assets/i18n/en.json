@@ -773,6 +773,7 @@
         "erro_oikos": "Please select the physical space!"
     },
     "calendario": {
+        "title": "Academic Calendar",
         "seguro_continuar_inhabilitar_calendario": "¿Are you sure to disable this calendar?",
         "calendario_inhabilitado": "Calendar disabled",
         "calendario_no_inhabilitado": "Calendar not disabled",
@@ -905,7 +906,8 @@
         "edicion_actividades": "Editing activities",
         "select_proyectos_actividades" : "Selection of edition to curricular projects",
         "descripcion_actividad": "Description of the activity",
-        "seleccion_proyectos_info" : "Below you will be able to select the curricular projects to which the edition of dates in the respective activities established in the general calendar is enabled."
+        "seleccion_proyectos_info" : "Below you will be able to select the curricular projects to which the edition of dates in the respective activities established in the general calendar is enabled.",
+        "administracion_calendario_proyecto": "Academic calendar administration by curricular project"
     },
     "solicitudes": {
         "respuesta": "The response to this request has been successfully recorded",
