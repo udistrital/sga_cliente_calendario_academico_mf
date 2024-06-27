@@ -53,15 +53,12 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
     private sgaCalendarioMidService: SgaCalendarioMidService,
     private SgaCalendarioMidServide: SgaCalendarioMidService,
     private translate: TranslateService,
-    //private nuxeoService: NuxeoService,
-    private documentoService: DocumentoService,
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
     private popUpManager: PopUpManager,
     private eventoService: EventoService,
     private newNuxeoService: NewNuxeoService,
-    private location: Location
   ) {
     this.createActivitiesTable();
   }
@@ -369,11 +366,6 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
         this.popUpManager.showErrorToast('ERROR.error_cargar_documento');
       },
     );
-  }
-
-  activateTab() {
-    //this.router.navigate(['../list-calendario-academico'], { relativeTo: this.route });
-    this.location.back();
   }
 
 }

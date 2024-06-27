@@ -35,12 +35,10 @@
     </div>
 
     <div *ngIf="showCalendar" class="margin-y">
-      <mat-card>
-        <detalle-calendario
-          [calendarForProject]="calendarioId"
-          [projectId]="projectId"
-        ></detalle-calendario>
-      </mat-card>
+      <detalle-calendario
+        [calendarForProject]="calendarioId"
+        [projectId]="projectId"
+      ></detalle-calendario>
     </div>
   </mat-card-content>
 </mat-card>

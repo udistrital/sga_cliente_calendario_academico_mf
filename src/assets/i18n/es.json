@@ -809,6 +809,7 @@
         "erro_oikos": "Por favor seleccione el espacio físico!"
     },
     "calendario": {
+        "title": "Calendario Académico",
         "seguro_continuar_inhabilitar_calendario": "¿Está seguro de inhabilitar este calendario?",
         "calendario_inhabilitado": "Calendario inhabilitado",
         "calendario_no_inhabilitado": "Calendario no inhabilitado",
@@ -948,7 +949,8 @@
         "seleccione_version_calendario": "Seleccione la versión del calendario",
         "add_extension_extension": "Agregar otra extensión",
         "tooltip_ver_calendario":"ver",
-        "sin_permiso_edicion": "No tiene permiso para editar esta actividad"
+        "sin_permiso_edicion": "No tiene permiso para editar esta actividad",
+        "administracion_calendario_proyecto": "Administración calendario académico por proyecto curricular"
     },
     "solicitudes": {
         "respuesta": "La respuesta a esta solicitud ha sido registrada correctamente",
