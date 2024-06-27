@@ -35,6 +35,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   fecha_inicio_org: string = "";
   fecha_fin_org: string = "";
   displayedColumns: string[] = ['ProyectoCurricular', 'FechaInicio', 'FechaFin','FechaEdicion' ];
+  responsableDisplayedColumns: string[] = ['Nombre'];
   dataSource!: MatTableDataSource<any>;
   dataSource2!: MatTableDataSource<any>
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -136,6 +137,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.descripcion_actividad = this.data.activity.Descripcion;
       this.fecha_inicio_org = this.data.activity.FechaInicioOrg;
       this.fecha_fin_org = this.data.activity.FechaFinOrg;
+      this.dataSource2 = new MatTableDataSource(this.data.activity.responsables)
       this.ActivityEditor.patchValue({
         fecha_inicio_org: moment(this.fecha_inicio_org,"DD-MM-YYYY").toDate(),
         fecha_fin_org: moment(this.fecha_fin_org,"DD-MM-YYYY").toDate(),

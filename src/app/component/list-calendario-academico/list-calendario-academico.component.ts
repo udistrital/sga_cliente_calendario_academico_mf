@@ -137,6 +137,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
 
   onCreate(event: any) {
     this.activateTab(0, false, 1)
+    this.view = false;
   }
 
   onUpdate(event: any) {
@@ -227,6 +228,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     this.activetab = tab;
     this.calendarForEditId = calendarId;
     this.calendarForNew = calendarState;
+    
   }
 
 }

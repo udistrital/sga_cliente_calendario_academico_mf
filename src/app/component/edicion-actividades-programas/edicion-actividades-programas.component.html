@@ -7,7 +7,7 @@
     </mat-card-header>
     <mat-card-content>
       <form novalidate [formGroup]="SelectorDeps">
-        <p class="info">
+        <p class="alert info">
           {{ "calendario.seleccion_proyectos_info" | translate }}
         </p>
         <br />
@@ -42,19 +42,10 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>
-            {{ "calendario.descripcion_actividad" | translate }}
-          </mat-card-title>
-          <mat-card-subtitle>
-            {{ descripcion_actividad }}
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content> </mat-card-content>
-      </mat-card>
+      <h5>{{ "calendario.descripcion_actividad" | translate }}</h5>
+      <p>{{ descripcion_actividad }}</p>
       <br />
-      <div class="mat-elevation-z8 table">
+      <div class="table">
         <table mat-table [dataSource]="dataSource" matSort>
           <!-- ID Column -->
           <ng-container matColumnDef="ProyectoCurricular">
@@ -177,25 +168,19 @@
 </ng-container>
 
 <ng-container *ngIf="editar_actividad">
-  <mat-card>
+  <mat-card class="mat-elevation-z8">
     <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.edicion_actividades" | translate }}
-      </mat-card-title>
+      <mat-card-title>{{
+        "calendario.edicion_actividades" | translate
+      }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form novalidate [formGroup]="ActivityEditor">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              {{ "calendario.actividad" | translate }}
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
+        <mat-divider></mat-divider>
+        <div class="row" style="margin-top: 10px">
+          <div class="col-6">
             <mat-form-field style="width: 100%">
-              <mat-label>
-                {{ "calendario.proceso" | translate }}
-              </mat-label>
+              <mat-label> {{ "calendario.proceso" | translate }} </mat-label>
               <input
                 matInput
                 type="text"
@@ -204,11 +189,10 @@
                 readonly
               />
             </mat-form-field>
-
+          </div>
+          <div class="col-6">
             <mat-form-field style="width: 100%">
-              <mat-label>
-                {{ "calendario.periodo" | translate }}
-              </mat-label>
+              <mat-label> {{ "calendario.periodo" | translate }} </mat-label>
               <input
                 matInput
                 type="text"
@@ -217,11 +201,12 @@
                 readonly
               />
             </mat-form-field>
-
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
             <mat-form-field style="width: 100%">
-              <mat-label>
-                {{ "calendario.actividad" | translate }}
-              </mat-label>
+              <mat-label> {{ "calendario.actividad" | translate }} </mat-label>
               <input
                 matInput
                 type="text"
@@ -230,7 +215,10 @@
                 readonly
               />
             </mat-form-field>
-
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
             <mat-form-field style="width: 100%">
               <mat-label>
                 {{ "calendario.descripcion" | translate }}
@@ -243,178 +231,148 @@
                 readonly
               />
             </mat-form-field>
-
-            <mat-card>
-              <mat-card-content>
-                <mat-card>
-                  <mat-card-header>
-                    <mat-card-title>
-                      {{ "calendario.fechas_globales" | translate }}
-                    </mat-card-title>
-                  </mat-card-header>
-                  <mat-card-content>
-                    <div class="row">
-                      <div class="col-6">
-                        <mat-form-field style="width: 100%">
-                          <mat-label
-                            >{{
-                              "calendario.fecha_inicio" | translate
-                            }}:</mat-label
-                          >
-                          <input
-                            matInput
-                            [matDatepicker]="f_ini"
-                            formControlName="fecha_inicio_org"
-                            readonly
-                            [disabled]="true"
-                          />
-                          <mat-datepicker-toggle
-                            matSuffix
-                            [for]="f_ini"
-                          ></mat-datepicker-toggle>
-                          <mat-datepicker #f_ini></mat-datepicker>
-                        </mat-form-field>
-                      </div>
-                      <div class="col-6">
-                        <mat-form-field style="width: 100%">
-                          <mat-label
-                            >{{
-                              "calendario.fecha_fin" | translate
-                            }}:</mat-label
-                          >
-                          <input
-                            matInput
-                            [matDatepicker]="f_fin"
-                            formControlName="fecha_fin_org"
-                            readonly
-                            [disabled]="true"
-                          />
-                          <mat-datepicker-toggle
-                            matSuffix
-                            [for]="f_fin"
-                          ></mat-datepicker-toggle>
-                          <mat-datepicker #f_fin></mat-datepicker>
-                        </mat-form-field>
-                      </div>
-                    </div>
-                  </mat-card-content>
-                </mat-card>
-
-                <br />
-
-                <mat-card *ngIf="ActividadEditable">
-                  <mat-card-content>
-                    <div class="message-alert" style="font-size: 13px">
-                      {{ "calendario.modificacion_fechas_info" | translate }}
-                    </div>
-                    <div class="row">
-                      <div class="col-6">
-                        <mat-form-field style="width: 100%">
-                          <mat-label
-                            >{{
-                              "calendario.fecha_inicio" | translate
-                            }}:</mat-label
-                          >
-                          <mat-datepicker-toggle
-                            matSuffix
-                            [for]="f_ini_n"
-                          ></mat-datepicker-toggle>
-                          <mat-datepicker #f_ini_n></mat-datepicker>
-                        </mat-form-field>
-                      </div>
-                      <div class="col-6">
-                        <mat-form-field style="width: 100%">
-                          <mat-label
-                            >{{
-                              "calendario.fecha_fin" | translate
-                            }}:</mat-label
-                          >
-                          <mat-datepicker-toggle
-                            matSuffix
-                            [for]="f_fin_n"
-                          ></mat-datepicker-toggle>
-                          <mat-datepicker #f_fin_n></mat-datepicker>
-                        </mat-form-field>
-                      </div>
-                    </div>
-                  </mat-card-content>
-                </mat-card>
-              </mat-card-content>
-            </mat-card>
-          </mat-card-content>
-        </mat-card>
-
-        <br />
-
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              {{ "calendario.dirigido" | translate }}
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <br />
-            <div class="mat-elevation-z8 table">
-              <table mat-table [dataSource]="dataSource" matSort>
-                <!-- ID Column -->
-                <ng-container matColumnDef="Nombre">
-                  <th
-                    mat-header-cell
-                    *matHeaderCellDef
-                    mat-sort-header
-                    style="width: 20%"
-                  >
-                    {{ "'GLOBAL.nombre'" | translate }}
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="row" style="margin-top: 10px">
+          <div class="col-6">
+            <mat-form-field style="width: 100%">
+              <mat-label
+                >{{ "calendario.fecha_inicio" | translate }}:</mat-label
+              >
+              <input
+                matInput
+                [matDatepicker]="f_ini"
+                formControlName="fecha_inicio_org"
+                readonly
+                [disabled]="true"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="f_ini"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #f_ini></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field style="width: 100%">
+              <mat-label>{{ "calendario.fecha_fin" | translate }}:</mat-label>
+              <input
+                matInput
+                [matDatepicker]="f_fin"
+                formControlName="fecha_fin_org"
+                readonly
+                [disabled]="true"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="f_fin"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #f_fin></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+        <div *ngIf="ActividadEditable">
+          <div class="alert warning">
+            {{ "calendario.modificacion_fechas_info" | translate }}
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <mat-form-field style="width: 100%">
+                <mat-label
+                  >{{ "calendario.fecha_inicio" | translate }}:</mat-label
+                >
+                <input
+                  matInput
+                  [matDatepicker]="f_ini_n"
+                  [min]="ActivityEditor.get('fecha_inicio_org')?.value"
+                  [max]="ActivityEditor.get('fecha_fin_org')?.value"
+                  formControlName="fecha_inicio_new"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="f_ini_n"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #f_ini_n></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field style="width: 100%">
+                <mat-label>{{ "calendario.fecha_fin" | translate }}:</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="f_fin_n"
+                  [min]="ActivityEditor.get('fecha_inicio_new')?.value"
+                  [max]="ActivityEditor.get('fecha_fin_org')?.value"
+                  formControlName="fecha_fin_new"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="f_fin_n"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #f_fin_n></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="row" style="margin-top: 10px">
+          <div class="col-12">
+            <mat-card-title>{{
+              "calendario.dirigido" | translate
+            }}</mat-card-title>
+            <!-- Aquí puedes agregar el componente mat-table para mostrar la tabla -->
+            <div class="table">
+              <table mat-table [dataSource]="dataSource2" matSort>
+                <ng-container matColumnDef="responsableID">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    {{ "GLOBAL.id" | translate }}
                   </th>
-                  <td mat-cell *matCellDef="let row">{{ row.Nombre }}</td>
-                </ng-container>
-
-                <!-- Progress Column -->
-                <ng-container matColumnDef="Aspirante">
-                  <th
-                    mat-header-cell
-                    *matHeaderCellDef
-                    mat-sort-header
-                    style="width: 20%"
-                  >
-                    {{ "calendario.sin_responsables" | translate }}
-                  </th>
-
-                  <td mat-cell *matCellDef="let row">
-                    {{ row.responsableID }}
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.responsableID }}
                   </td>
                 </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumns"
-                ></tr>
+                <ng-container matColumnDef="Nombre">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    {{ "calendario.nombre" | translate }}
+                  </th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.Nombre }}
+                  </td>
+                </ng-container>
+            
+                
+            
+                <tr mat-header-row *matHeaderRowDef="responsableDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: responsableDisplayedColumns"></tr>
               </table>
+              <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
             </div>
-          </mat-card-content>
-        </mat-card>
-
-        <br />
-
-        <div *ngIf="ActividadEditable">
-          <button
-            mat-flat-button
-            color="accent"
-            (click)="guardar()"
-            [disabled]="ActivityEditor.invalid"
-          >
-            {{ "GLOBAL.guardar" | translate }}
-          </button>
+          </div>
         </div>
-        <div *ngIf="!ActividadEditable">
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="regresar()"
-          >
-            {{ "GLOBAL.regresar" | translate }}
-          </button>
+        <mat-divider></mat-divider>
+        <div align="center" style="margin-top: 10px">
+          <div *ngIf="ActividadEditable">
+            <button
+              class="float-center"
+              mat-raised-button
+              color="primary"
+              (click)="guardar()"
+              [disabled]="ActivityEditor.invalid"
+            >
+              {{ "GLOBAL.guardar" | translate }}
+            </button>
+          </div>
+          <div *ngIf="!ActividadEditable">
+            <button
+              class="float-center"
+              mat-raised-button
+              color="accent"
+              (click)="regresar()"
+            >
+              {{ "GLOBAL.regresar" | translate }}
+            </button>
+          </div>
         </div>
       </form>
     </mat-card-content>
