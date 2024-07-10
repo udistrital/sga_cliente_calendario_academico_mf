@@ -11,7 +11,7 @@
       <mat-card>
         <mat-card-header>
           <mat-card-title>
-            {{ "calendario.actividad" | translate }}
+            <!-- {{ "calendario.actividad" | translate }} -->
           </mat-card-title>
         </mat-card-header>
         <mat-card-subtitle>
@@ -211,6 +211,21 @@
               </div>
             </mat-card-content>
           </mat-card>
+
+          <br />
+
+          <div class="form-grid3">
+            <div class="form-col1">
+              <mat-checkbox>Es una actividad que necestia automatizacion </mat-checkbox>
+            </div>
+            <div class="form-col1">
+              <mat-checkbox >Es diaria ? </mat-checkbox>
+            </div>
+            <div class="form-col1">
+              <mat-checkbox [disabled]="true">Es de ejecucion unica ? </mat-checkbox>
+            </div>
+          </div>
+
 
           <br />
           <div class="row">

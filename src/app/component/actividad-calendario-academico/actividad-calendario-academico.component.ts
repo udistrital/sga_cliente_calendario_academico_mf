@@ -108,6 +108,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   }
 
   createActivityForm() {
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     this.activityForm = this.builder.group({
       Nombre: ['', Validators.required],
       Descripcion: ['', Validators.required],
@@ -241,6 +242,29 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
         }
       },
     );
+  }
+
+  automatizacion () {
+    this.activityForm.setValue({
+      Nombre: 'Actividad 1',
+      Descripcion: 'Descripcion de la actividad',
+      FechaInicio: new Date(),
+      FechaFin: new Date(),
+    });
+
+    this.tableSource.data = [
+      { Id: 1, Nombre: 'Publico 1' },
+      { Id: 2, Nombre: 'Publico 2' },
+      { Id: 3, Nombre: 'Publico 3'
+      },
+
+    ];
+
+    this.responsablesSelected = [
+      { responsableID: 1 },
+      { responsableID: 2 },
+      { responsableID: 3 },
+    ];
   }
 
   openForm() {
