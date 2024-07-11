@@ -414,7 +414,6 @@ export class AdministracionCalendarioComponent implements OnInit {
                                                 loadedActivity.DependenciaId,
                                                 DependenciaId
                                               );
-                                  
                                               if (FechasParticulares === undefined) {
                                                 loadedActivity.FechaInicio = moment(element.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
                                                 loadedActivity.FechaFin = moment(element.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
@@ -426,11 +425,9 @@ export class AdministracionCalendarioComponent implements OnInit {
                                                 loadedActivity.Activo = FechasParticulares.Activo;
                                                 loadedActivity.Editable = true;
                                               }
-                                  
                                               loadedActivity.FechaInicioOrg = moment(element.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
                                               loadedActivity.FechaFinOrg = moment(element.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
                                               loadedActivity.responsables = element.Responsable;
-                                  
                                               loadedProcess.procesoId = element.TipoEventoId.Id;
                                               loadedProcess.Descripcion = element.TipoEventoId.Descripcion;
                                               const id_rec = element.TipoEventoId.TipoRecurrenciaId.Id;
@@ -438,16 +435,11 @@ export class AdministracionCalendarioComponent implements OnInit {
                                                 Id: id_rec,
                                                 Nombre: this.periodicidad.find((rec: { Id: any; }) => rec.Id === id_rec).Nombre,
                                               };
-                                
                                             }
                                           });
-                                  
                                           this.processes.push(loadedProcess);
-                                          console.log('this.processes', this.processes);
                                           this.dataSource = new MatTableDataSource(this.processes);
-                                          console.log('this.dataSource', this.dataSource);
                                           this.datasourceActivity = new MatTableDataSource<Actividad>();
-                                          console.log('this.datasourceActivity', this.datasourceActivity);
                                           this.dataSource.paginator = this.paginator;
                                           this.dataSource.sort = this.sort;
                                         }
