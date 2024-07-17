@@ -788,7 +788,15 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                           this.calendar.MultiplePeriodoId = JSON.stringify(
                             this.calendar.PeriodoId
                           );
-                          this.calendar.PeriodoId = 0;
+                          //console.log(this.calendar.MultiplePeriodoId);
+                          const minPeriodoId = Math.min(
+                            ...this.periodos
+                              .filter((periodo: { Id: any; }) => this.calendar.PeriodoId.includes(periodo.Id))
+                              .map((periodo: { Id: any; }) => periodo.Id)
+                          );
+                          this.calendar.PeriodoId = minPeriodoId;
+                          //console.log(this.calendar.PeriodoId);
+                          //this.calendar.PeriodoId = 0;
                         } else {
                           this.calendar.Nombre += this.periodos.filter(
                             (periodo: any) =>
