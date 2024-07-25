@@ -6,6 +6,7 @@
 
 export const environment = {
   production: true,
+  CONF_MENU_SERVICE: 'https://autenticacion.portaloas.udistrital.edu.co/apioas/configuracion_crud_api/v1/menu_opcion_padre/ArbolMenus/',
   apiUrl: "https://sgacalendarioacademico.portaloas.udistrital.edu.co/",
   NUXEO_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/gestor_documental_mid/v1/",
   TERCEROS_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/terceros_crud/v1/",
