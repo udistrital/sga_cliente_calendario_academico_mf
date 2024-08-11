@@ -579,7 +579,13 @@
         "direccion_entidad": "Entity Address",
         "placeholder_direccion_entidad": "E.g.: Cra 8 # 40-78 Piso 1",
         "item": "Item",
-        "evaluar": "Evaluate"
+        "evaluar": "Evaluate",
+        "items_per_page": "Items per page",
+        "next_page": "Next page",
+        "previous_page": "Previous page",
+        "first_page": "First page",
+        "last_page": "Last page",
+        "of": "of"
     },
     "ERROR": {
         "general": "The request could not be satisfied",
