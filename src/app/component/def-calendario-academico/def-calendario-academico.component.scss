@@ -7,3 +7,11 @@
 .mat-expansion-panel-gradient {
     background: linear-gradient(0deg, var(--color100) 0%, white 100%);
 }
+
+/* Estilos para el indicador de estado */
+.badge {
+  margin: 0.4em;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 100%;
+}
