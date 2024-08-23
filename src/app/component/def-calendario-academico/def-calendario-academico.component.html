@@ -53,7 +53,25 @@
                   *ngFor="let periodo of periodos"
                   [value]="periodo.Id"
                 >
-                  {{ periodo.Nombre }}
+                  <div
+                    style="display: flex; flex-wrap: wrap; align-items: center"
+                  >
+                    <div
+                      class="badge"
+                      [ngStyle]="{
+                        backgroundColor: periodo.Activo
+                          ? 'var(--success-accent)'
+                          : 'var(--danger-base)'
+                      }"
+                    ></div>
+                    <b>{{ periodo.Nombre }}</b>
+                    <small
+                      style="margin-left: 5px; font-size: 0.8em; color: gray"
+                    >
+                      (Inicio vigencia:
+                      {{ periodo.InicioVigencia | date : "yyyy-MM-dd" }})
+                    </small>
+                  </div>
                 </mat-option>
               </mat-select>
               <mat-select
@@ -68,7 +86,25 @@
                   [value]="periodo.Id"
                   [disabled]="view"
                 >
-                  {{ periodo.Nombre }}
+                  <div
+                    style="display: flex; flex-wrap: wrap; align-items: center"
+                  >
+                    <div
+                      class="badge"
+                      [ngStyle]="{
+                        backgroundColor: periodo.Activo
+                          ? 'var(--success-accent)'
+                          : 'var(--danger-base)'
+                      }"
+                    ></div>
+                    <b>{{ periodo.Nombre }}</b>
+                    <small
+                      style="margin-left: 5px; font-size: 0.8em; color: gray"
+                    >
+                      (Inicio vigencia:
+                      {{ periodo.InicioVigencia | date : "yyyy-MM-dd" }})
+                    </small>
+                  </div>
                 </mat-option>
               </mat-select>
 
@@ -697,7 +733,6 @@
   <!-- ///////////// No tocar de aqui para arriba ///////////// -->
 
   <mat-tab label="{{ 'calendario.formulario_extension' | translate }}">
-    
     <div class="margin-y">
       <h3 class="margin-y">{{ "calendario.title" | translate }}</h3>
       <ng-container *ngIf="showList">

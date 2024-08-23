@@ -615,7 +615,13 @@
         "direccion_entidad": "Dirección de la entidad",
         "placeholder_direccion_entidad": "Ej: Cra 8 # 40-78 Piso 1",
         "item": "Ítem",
-        "evaluar": "Evaluar"
+        "evaluar": "Evaluar",
+        "items_per_page": "Elementos por página",
+        "next_page": "Página siguiente",
+        "previous_page": "Página anterior",
+        "first_page": "Primera página",
+        "last_page": "Última página",
+        "of": "de"
     },
     "ERROR": {
         "general": "La solicitud no pudo ser cumplida",

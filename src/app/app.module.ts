@@ -29,7 +29,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
 import { AsignarCalendarioProyectoComponent } from './component/asignar-calendario-proyecto/asignar-calendario-proyecto.component';
@@ -52,6 +52,7 @@ import {MatButtonModule} from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu'
+import { CustomPaginatorIntl } from './services/CustomPaginatorIntl.service';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -127,7 +128,8 @@ export function createTranslateLoader(http: HttpClient) {
     ParametrosService,
     EventoService,
     PopUpManager,
-    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilInterceptor, multi: true },
+    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
   ],
   bootstrap: [AppComponent]
 })

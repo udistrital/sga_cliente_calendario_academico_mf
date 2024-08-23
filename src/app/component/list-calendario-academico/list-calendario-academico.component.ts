@@ -75,6 +75,8 @@ export class ListCalendarioAcademicoComponent implements OnInit {
             });
           });
 
+          console.log(this.data)
+
           this.dataSource = new MatTableDataSource(this.data)
           setTimeout(() => {
             this.dataSource.paginator = this.paginator;
