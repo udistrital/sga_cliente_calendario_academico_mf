@@ -172,7 +172,7 @@
             </mat-form-field>
           </div>
         </div>
-        <div class="col-2" *ngIf="!view">
+        <div *ngIf="!view">
           <p>{{ "calendario.etiqueta_documento" | translate }}</p>
         </div>
         <div class="margin-y">
@@ -217,7 +217,7 @@
           </div>
         </div>
         <!-- //VOLVER  !createdCalendar -->
-        <div class="row" *ngIf="!createdCalendar">
+        <div *ngIf="!createdCalendar">
           <button
             mat-flat-button
             color="accent"
@@ -444,7 +444,6 @@
                             color="warn"
                             aria-hidden="false"
                             fontIcon="delete"
-                            class="icon"
                           >
                           </mat-icon>
                           <span>{{
