@@ -77,9 +77,6 @@ export class AdministracionCalendarioComponent implements OnInit {
   displayedColumns: string[] = [
     'Nombre',
     'Descripcion',
-    'FechaInicio',
-    'FechaFin',
-    'Activo',
     'Acciones',
   ];
   displayedColumnsActividades: string[] = [
@@ -140,14 +137,14 @@ export class AdministracionCalendarioComponent implements OnInit {
               this.popUpManager.showAlert(
                 this.translate.instant('GLOBAL.info'),
                 this.translate.instant('admision.multiple_vinculacion') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
+                  '. ' +
+                  this.translate.instant('GLOBAL.comunicar_OAS_error')
               );
             } else {
               this.popUpManager.showErrorAlert(
                 this.translate.instant('admision.no_vinculacion_no_rol') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
+                  '. ' +
+                  this.translate.instant('GLOBAL.comunicar_OAS_error')
               );
             }
           });
@@ -286,7 +283,7 @@ export class AdministracionCalendarioComponent implements OnInit {
       this.nivelesSelected.Id === proyecto.NivelFormacionId.Id ||
       (proyecto.NivelFormacionId.NivelFormacionPadreId &&
         proyecto.NivelFormacionId.NivelFormacionPadreId.Id ===
-        this.nivelesSelected.Id)
+          this.nivelesSelected.Id)
     );
   }
 
@@ -371,7 +368,7 @@ export class AdministracionCalendarioComponent implements OnInit {
                       this.sgaCalendarioMidService
                         .get(
                           'calendario-academico/v2/' +
-                          resp_calendar_project.Data.CalendarioId
+                            resp_calendar_project.Data.CalendarioId
                         )
                         .subscribe(
                           (response: any) => {
@@ -386,66 +383,133 @@ export class AdministracionCalendarioComponent implements OnInit {
                                     response.Data[0].proceso;
                                   console.log('processes', processes);
                                   if (processes !== null) {
-                                    processes.forEach((element) => {
-                                      if (Object.keys(element).length !== 0) {
+                                    processes.forEach((proceso) => {
+                                      if (Object.keys(proceso).length !== 0) {
                                         const loadedProcess = new Proceso();
-                                        loadedProcess.Nombre = element.Proceso;
+                                        loadedProcess.Nombre = proceso.Proceso;
                                         loadedProcess.CalendarioId = {
                                           Id: response.Data[0].Id,
                                         };
-                                        loadedProcess.actividades = new MatTableDataSource<Actividad>();
-                                  
-                                        const activities = element.Actividades;
+                                        loadedProcess.actividades =
+                                          new MatTableDataSource<Actividad>();
+
+                                        const activities = proceso.Actividades;
                                         console.log('activities', activities);
-                                  
+
                                         if (activities !== null) {
-                                          activities.forEach((element:any) => {
-                                            if (Object.keys(element).length !== 0 && element.EventoPadreId === null) {
-                                              console.log('element', element);
-                                              const loadedActivity = new Actividad();
-                                              loadedActivity.actividadId = element.actividadId;
-                                              loadedActivity.TipoEventoId = { Id: element.TipoEventoId.Id };
-                                              loadedActivity.Nombre = element.Nombre;
-                                              loadedActivity.Descripcion = element.Descripcion;
-                                              loadedActivity.DependenciaId = this.validJSONdeps(element.DependenciaId);
-                                              console.log('loadedActivity', loadedActivity);
-                                  
-                                              const FechasParticulares = this.findDatesforDep(
-                                                loadedActivity.DependenciaId,
-                                                DependenciaId
+                                          const actividades = [];
+                                          activities.forEach((actividad: any) => {
+                                            if (
+                                              Object.keys(actividad).length !==
+                                                0 &&
+                                              actividad.EventoPadreId === null
+                                            ) {
+                                              console.log('actividad', actividad);
+                                              const loadedActivity =
+                                                new Actividad();
+                                              loadedActivity.actividadId =
+                                                actividad.actividadId;
+                                              loadedActivity.TipoEventoId = {
+                                                Id: actividad.TipoEventoId.Id,
+                                              };
+                                              loadedActivity.Nombre =
+                                                actividad.Nombre;
+                                              loadedActivity.Descripcion =
+                                                actividad.Descripcion;
+                                              loadedActivity.DependenciaId =
+                                                this.validJSONdeps(
+                                                  actividad.DependenciaId
+                                                );
+                                              console.log(
+                                                'loadedActivity',
+                                                loadedActivity
                                               );
-                                              if (FechasParticulares === undefined) {
-                                                loadedActivity.FechaInicio = moment(element.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
-                                                loadedActivity.FechaFin = moment(element.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
-                                                loadedActivity.Activo = element.Activo;
+
+                                              const FechasParticulares =
+                                                this.findDatesforDep(
+                                                  loadedActivity.DependenciaId,
+                                                  DependenciaId
+                                                );
+                                              if (
+                                                FechasParticulares === undefined
+                                              ) {
+                                                loadedActivity.FechaInicio =
+                                                  moment(
+                                                    actividad.FechaInicio,
+                                                    'YYYY-MM-DD'
+                                                  ).format('DD-MM-YYYY');
+                                                loadedActivity.FechaFin =
+                                                  moment(
+                                                    actividad.FechaFin,
+                                                    'YYYY-MM-DD'
+                                                  ).format('DD-MM-YYYY');
+                                                loadedActivity.Activo =
+                                                  actividad.Activo;
                                                 loadedActivity.Editable = false;
                                               } else {
-                                                loadedActivity.FechaInicio = moment(FechasParticulares.Inicio, 'YYYY-MM-DDTHH:mm:ss[Z]').format('DD-MM-YYYY');
-                                                loadedActivity.FechaFin = moment(FechasParticulares.Fin, 'YYYY-MM-DD').format('DD-MM-YYYY');
-                                                loadedActivity.Activo = FechasParticulares.Activo;
+                                                loadedActivity.FechaInicio =
+                                                  moment(
+                                                    FechasParticulares.Inicio,
+                                                    'YYYY-MM-DDTHH:mm:ss[Z]'
+                                                  ).format('DD-MM-YYYY');
+                                                loadedActivity.FechaFin =
+                                                  moment(
+                                                    FechasParticulares.Fin,
+                                                    'YYYY-MM-DD'
+                                                  ).format('DD-MM-YYYY');
+                                                loadedActivity.Activo =
+                                                  FechasParticulares.Activo;
                                                 loadedActivity.Editable = true;
                                               }
-                                              loadedActivity.FechaInicioOrg = moment(element.FechaInicio, 'YYYY-MM-DD').format('DD-MM-YYYY');
-                                              loadedActivity.FechaFinOrg = moment(element.FechaFin, 'YYYY-MM-DD').format('DD-MM-YYYY');
-                                              loadedActivity.responsables = element.Responsable;
-                                              loadedProcess.procesoId = element.TipoEventoId.Id;
-                                              loadedProcess.Descripcion = element.TipoEventoId.Descripcion;
-                                              const id_rec = element.TipoEventoId.TipoRecurrenciaId.Id;
-                                              loadedProcess.TipoRecurrenciaId = {
-                                                Id: id_rec,
-                                                Nombre: this.periodicidad.find((rec: { Id: any; }) => rec.Id === id_rec).Nombre,
-                                              };
+                                              loadedActivity.FechaInicioOrg =
+                                                moment(
+                                                  actividad.FechaInicio,
+                                                  'YYYY-MM-DD'
+                                                ).format('DD-MM-YYYY');
+                                              loadedActivity.FechaFinOrg =
+                                                moment(
+                                                  actividad.FechaFin,
+                                                  'YYYY-MM-DD'
+                                                ).format('DD-MM-YYYY');
+                                              loadedActivity.responsables =
+                                                actividad.Responsable;
+                                              loadedProcess.procesoId =
+                                                actividad.TipoEventoId.Id;
+                                              loadedProcess.Descripcion =
+                                                actividad.TipoEventoId.Descripcion;
+                                              const id_rec =
+                                                actividad.TipoEventoId
+                                                  .TipoRecurrenciaId.Id;
+                                              loadedProcess.TipoRecurrenciaId =
+                                                {
+                                                  Id: id_rec,
+                                                  Nombre:
+                                                    this.periodicidad.find(
+                                                      (rec: { Id: any }) =>
+                                                        rec.Id === id_rec
+                                                    ).Nombre,
+                                                };
+                                                loadedProcess.actividades.data.push(loadedActivity);
                                             }
                                           });
                                           this.processes.push(loadedProcess);
-                                          this.dataSource = new MatTableDataSource(this.processes);
-                                          this.datasourceActivity = new MatTableDataSource<Actividad>();
-                                          this.dataSource.paginator = this.paginator;
+                                          this.dataSource =
+                                            new MatTableDataSource(
+                                              this.processes
+                                            );
+                                          this.datasourceActivity =
+                                            new MatTableDataSource<Actividad>();
+                                          this.dataSource.paginator =
+                                            this.paginator;
                                           this.dataSource.sort = this.sort;
+                                          console.log(
+                                            'this.processes',
+                                            this.processes
+                                          );
                                         }
                                       }
                                     });
-                                  }                             
+                                  }
                                   if (response.Data[0].AplicaExtension) {
                                     this.popUpManager.showAlert(
                                       this.translate.instant(
@@ -608,7 +672,7 @@ export class AdministracionCalendarioComponent implements OnInit {
       EdicionActividadesProgramasComponent,
       activityConfig
     );
-    newActivity.afterClosed().subscribe((activity: any) => { });
+    newActivity.afterClosed().subscribe((activity: any) => {});
   }
 
   calendarioActividad(event: any, process: any) {
