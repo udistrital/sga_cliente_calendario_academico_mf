@@ -141,21 +141,11 @@ export class AdministracionCalendarioComponent implements OnInit {
             }
           })
           .catch((err: any) => {
-            console.log('err', err);
-            if (err) {
-              this.popUpManager.showAlert(
-                this.translate.instant('GLOBAL.info'),
-                this.translate.instant('admision.multiple_vinculacion') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
-              );
-            } else {
-              this.popUpManager.showErrorAlert(
-                this.translate.instant('admision.no_vinculacion_no_rol') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
-              );
-            }
+            this.popUpManager.showErrorAlert(
+              this.translate.instant('admision.no_vinculacion_no_rol') +
+              '. ' +
+              this.translate.instant('GLOBAL.comunicar_OAS_error')
+            );
           });
       }
     });
@@ -436,7 +426,6 @@ export class AdministracionCalendarioComponent implements OnInit {
                                     response.Data[0].Nombre;
                                   const processes: any[] =
                                     response.Data[0].proceso;
-                                  console.log('processes', processes);
                                   if (processes !== null) {
                                     processes.forEach((element) => {
                                       if (Object.keys(element).length !== 0) {
@@ -448,19 +437,16 @@ export class AdministracionCalendarioComponent implements OnInit {
                                         loadedProcess.actividades = new MatTableDataSource<Actividad>();
                                   
                                         const activities = element.Actividades;
-                                        console.log('activities', activities);
                                   
                                         if (activities !== null) {
                                           activities.forEach((element:any) => {
                                             if (Object.keys(element).length !== 0 && element.EventoPadreId === null) {
-                                              console.log('element', element);
                                               const loadedActivity = new Actividad();
                                               loadedActivity.actividadId = element.actividadId;
                                               loadedActivity.TipoEventoId = { Id: element.TipoEventoId.Id };
                                               loadedActivity.Nombre = element.Nombre;
                                               loadedActivity.Descripcion = element.Descripcion;
                                               loadedActivity.DependenciaId = this.validJSONdeps(element.DependenciaId);
-                                              console.log('loadedActivity', loadedActivity);
                                   
                                               const FechasParticulares = this.findDatesforDep(
                                                 loadedActivity.DependenciaId,
