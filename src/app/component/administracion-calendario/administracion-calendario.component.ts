@@ -132,7 +132,13 @@ export class AdministracionCalendarioComponent implements OnInit {
         this.IsAdmin = false;
         this.getDependenciasPorTercero()
           .then((dependencias: any) => {
-            this.getListaProyectosPorDependencias(dependencias);
+            if (dependencias) {
+              this.getListaProyectosPorDependencias(dependencias);
+            }else {
+              this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'),
+                this.translate.instant('admision.no_vinculaciones')
+              );
+            }
           })
           .catch((err: any) => {
             console.log('err', err);
