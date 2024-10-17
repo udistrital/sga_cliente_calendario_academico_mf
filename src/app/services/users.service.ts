@@ -1,9 +1,9 @@
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ImplicitAutenticationService } from './implicit_autentication.service';
 import { AnyService } from './any.service';
+import { decrypt } from '../../utils/util-encrypt';
 
 const path = environment.TERCEROS_SERVICE;
 
@@ -141,11 +141,19 @@ export class UserService {
     return window.localStorage.getItem('usuario')!.toString();
   }
 
-  public getPersonaId(): number {
-    const id_token = window.localStorage.getItem('user')!;
-    const user = JSON.parse(atob(id_token)); 
-    this.findByUserEmail(user.userService.email)
-    return parseInt(window.localStorage.getItem('persona_id')!, 10);
+  public async getPersonaId(): Promise<number | null> {
+    return new Promise((resolve, reject) => {
+      const personaId = window.localStorage.getItem('persona_id');
+      if (personaId === null) {
+        resolve(null);
+      } else {
+        try {
+          resolve(decrypt(personaId));
+        } catch (error) {
+          reject(error);
+        }
+      }
+    });
   }
 
   public getPeriodo(): number {
