@@ -58,7 +58,7 @@ export class AdministracionCalendarioComponent implements OnInit {
     events: [],
   };
 
-  userId: number = 0;
+  userId: number | null = null;
   DependenciaID: number = 0;
   IsAdmin: boolean = false;
 
@@ -130,26 +130,22 @@ export class AdministracionCalendarioComponent implements OnInit {
         this.getListaProyectos();
       } else {
         this.IsAdmin = false;
-        this.getProgramaIdByUser()
-          .then((id: any) => {
-            this.DependenciaID = id;
-            this.getInfoPrograma(this.DependenciaID);
-          })
-          .catch((err: any) => {
-            if (err) {
-              this.popUpManager.showAlert(
-                this.translate.instant('GLOBAL.info'),
-                this.translate.instant('admision.multiple_vinculacion') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
-              );
-            } else {
-              this.popUpManager.showErrorAlert(
-                this.translate.instant('admision.no_vinculacion_no_rol') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
+        this.getDependenciasPorTercero()
+          .then((dependencias: any) => {
+            if (dependencias) {
+              this.getListaProyectosPorDependencias(dependencias);
+            }else {
+              this.popUpManager.showAlert(this.translate.instant('GLOBAL.info'),
+                this.translate.instant('admision.no_vinculaciones')
               );
             }
+          })
+          .catch((err: any) => {
+            this.popUpManager.showErrorAlert(
+              this.translate.instant('admision.no_vinculacion_no_rol') +
+              '. ' +
+              this.translate.instant('GLOBAL.comunicar_OAS_error')
+            );
           });
       }
     });
@@ -327,14 +323,38 @@ export class AdministracionCalendarioComponent implements OnInit {
       );
   }
 
+  getListaProyectosPorDependencias(dependencias: []) {
+    this.projectService
+      .get(
+        'proyecto_academico_institucion?query=Activo:true&limit=0&fields=Id,Nombre,NivelFormacionId'
+      )
+      .subscribe(
+        (response: any) => {
+          const proyectos = response.filter(
+            (proyecto: any) => 
+              dependencias.some((dependencia: number) => dependencia === proyecto.Id)
+          );
+          this.Proyectos = proyectos;
+        },
+        (error: any) => {
+          this.ProyectosFull = [];
+        }
+      );
+  }
+
   getProgramaIdByUser() {
-    return new Promise((resolve, reject) => {
-      this.userId = this.userService.getPersonaId();
+    return new Promise(async (resolve, reject) => {
+      try{
+        this.userId = await this.userService.getPersonaId();
+      } catch (error) {
+        console.error('Error al obtener el id del usuario', error);
+        reject(null);
+      }
       this.sgaAdmisionesMidService
         .get('admision/dependencia_vinculacion_tercero/' + this.userId)
         .subscribe(
           (respDependencia: any) => {
-            const dependencias = <number[]>respDependencia.Data.DependenciaId;
+            const dependencias = <number[]>respDependencia.Data.Data.DependenciaId;
             if (dependencias.length === 1) {
               resolve(dependencias[0]);
             } else {
@@ -348,6 +368,32 @@ export class AdministracionCalendarioComponent implements OnInit {
     });
   }
 
+  getDependenciasPorTercero() {
+    return new Promise(async (resolve, reject) => {
+      try{
+        this.userId = await this.userService.getPersonaId();
+        this.sgaAdmisionesMidService
+        .get('admision/dependencia_vinculacion_tercero/' + this.userId)
+        .subscribe(
+          (respDependencia: any) => {
+            const dependencias = <number[]>respDependencia.Data.Data.DependenciaId;
+            if (dependencias.length >= 1) {
+              resolve(dependencias);
+            } else {
+              reject(null);
+            }
+          },
+          (error: any) => {
+            reject(null);
+          }
+        );
+      } catch (error) {
+        console.error('Error al obtener las dependencias por tercero', error);
+        reject(null);
+      }
+    });
+  }
+
   getInfoPrograma(DependenciaId: number) {
     this.processes = [];
     this.projectService
@@ -355,10 +401,6 @@ export class AdministracionCalendarioComponent implements OnInit {
       .subscribe(
         (res_proyecto: any) => {
           this.Proyecto_nombre = res_proyecto.Nombre;
-          if (!this.IsAdmin) {
-            this.Proyectos = [res_proyecto];
-            this.proyectoSelected = res_proyecto;
-          }
           this.eventoService.get('tipo_recurrencia?limit=0').subscribe(
             (res_recurrencia: any) => {
               this.periodicidad = res_recurrencia;
@@ -384,7 +426,6 @@ export class AdministracionCalendarioComponent implements OnInit {
                                     response.Data[0].Nombre;
                                   const processes: any[] =
                                     response.Data[0].proceso;
-                                  console.log('processes', processes);
                                   if (processes !== null) {
                                     processes.forEach((element) => {
                                       if (Object.keys(element).length !== 0) {
@@ -396,19 +437,16 @@ export class AdministracionCalendarioComponent implements OnInit {
                                         loadedProcess.actividades = new MatTableDataSource<Actividad>();
                                   
                                         const activities = element.Actividades;
-                                        console.log('activities', activities);
                                   
                                         if (activities !== null) {
                                           activities.forEach((element:any) => {
                                             if (Object.keys(element).length !== 0 && element.EventoPadreId === null) {
-                                              console.log('element', element);
                                               const loadedActivity = new Actividad();
                                               loadedActivity.actividadId = element.actividadId;
                                               loadedActivity.TipoEventoId = { Id: element.TipoEventoId.Id };
                                               loadedActivity.Nombre = element.Nombre;
                                               loadedActivity.Descripcion = element.Descripcion;
                                               loadedActivity.DependenciaId = this.validJSONdeps(element.DependenciaId);
-                                              console.log('loadedActivity', loadedActivity);
                                   
                                               const FechasParticulares = this.findDatesforDep(
                                                 loadedActivity.DependenciaId,

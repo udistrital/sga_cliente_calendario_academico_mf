@@ -83,5 +83,6 @@ export const environment = {
   PROYECTO_ACADEMICO_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/proyecto_academico_crud/v1/",
   SGA_MID_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/sga_mid/v1/",
   PARAMETROS_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/parametros/v1/",
-  CALENDARIO_MID_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/calendario_mid/v1/"
+  CALENDARIO_MID_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/calendario_mid/v1/",
+  ADMISIONES_MID_SERVICE: 'https://autenticacion.portaloas.udistrital.edu.co/apioas/admisiones_mid/v1/',
 };
