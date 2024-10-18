@@ -77,9 +77,6 @@ export class AdministracionCalendarioComponent implements OnInit {
   displayedColumns: string[] = [
     'Nombre',
     'Descripcion',
-    'FechaInicio',
-    'FechaFin',
-    'Activo',
     'Acciones',
   ];
   displayedColumnsActividades: string[] = [
