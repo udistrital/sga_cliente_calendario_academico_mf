@@ -67,18 +67,6 @@
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.descripcion' | translate }}</th>
                         <td mat-cell *matCellDef="let row">{{ row.Descripcion }}</td>
                       </ng-container>
-                      <ng-container matColumnDef="FechaInicio">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.fecha_inicio' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">{{ row.FechaInicio }}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="FechaFin">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.fecha_fin' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">{{ row.FechaFin }}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="Activo">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.estado' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">{{ row.Activo ? 'Activo' : 'Inactivo' }}</td>
-                      </ng-container>
                       <ng-container matColumnDef="Acciones">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.acciones' | translate }}</th>
                         <td mat-cell *matCellDef="let row">
