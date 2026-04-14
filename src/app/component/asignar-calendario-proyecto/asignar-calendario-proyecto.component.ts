@@ -26,8 +26,8 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.projectService.get('proyecto_academico_institucion?limit=0&query=Activo:true').subscribe(
-      response => {
+    this.projectService.get('proyecto_academico_institucion?limit=0&query=Activo:true').subscribe({
+      next: response => {
           this.projects = (<any[]><unknown>response).filter(
           proyecto => this.filtrarProyecto(proyecto),
         );
@@ -36,17 +36,21 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
           this.selectedProjects.setValue(deps['proyectos']);
         }
       },
-      error => {
+      error: error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       },
-    );
+    });
   }
 
   filtrarProyecto(proyecto:any):any {
-    if (this.dat.data.Dependencia === proyecto['NivelFormacionId']['Nombre']) {
-      return true
+    const nivelFormacion = proyecto?.NivelFormacionId;
+    const padreFormacion = nivelFormacion?.NivelFormacionPadreId;
+
+    // si es calendario de un posgrado
+    if (this.dat.data.Nivel === 2){
+      return padreFormacion?.CodigoAbreviacion === 'POS' || nivelFormacion?.CodigoAbreviacion === 'POS';
     }
-    return false
+    return nivelFormacion?.Nombre === this.dat.data.Dependencia;
   }
 
   register() {
