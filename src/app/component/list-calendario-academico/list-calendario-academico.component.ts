@@ -56,8 +56,8 @@ export class ListCalendarioAcademicoComponent implements OnInit {
 
   ngOnInit() {
     this.data = []
-    this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe(
-      (response: any) => {
+    this.sgaCalendarioMidService.get('calendario-academico?limit=0').subscribe({
+      next: (response: any) => {
         const r = <any>response;
         if (response !== null && r.Status == 404) {
           this.popUpManager.showErrorToast(this.translate.instant('ERROR.404'));
@@ -72,10 +72,9 @@ export class ListCalendarioAcademicoComponent implements OnInit {
               Periodo: calendar.Periodo,
               Dependencia: this.niveles.filter(nivel => nivel.Id === calendar.Nivel)[0].Nombre,
               Estado: calendar.Activo ? this.translate.instant('GLOBAL.activo') : this.translate.instant('GLOBAL.inactivo'),
+              Nivel: calendar.Nivel,
             });
           });
-
-          console.log(this.data)
 
           this.dataSource = new MatTableDataSource(this.data)
           setTimeout(() => {
@@ -85,10 +84,10 @@ export class ListCalendarioAcademicoComponent implements OnInit {
 
         }
       },
-      (error: any) => {
+      error: (error: any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       },
-    );
+    });
   }
 
   applyFilterProces(event: Event) {
