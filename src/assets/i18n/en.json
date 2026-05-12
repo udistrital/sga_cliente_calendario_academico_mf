@@ -909,6 +909,7 @@
         "sin_proyectos_actividades": "There are no curricular projects with specific dates for this activity.",
         "periodicidad_2": "Periodicity",
         "fechas_globales": "Calendar global dates",
+        "fechas_particulares": "Specific dates",
         "edicion_actividades": "Editing activities",
         "select_proyectos_actividades" : "Selection of edition to curricular projects",
         "descripcion_actividad": "Description of the activity",
