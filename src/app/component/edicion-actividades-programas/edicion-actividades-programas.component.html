@@ -235,6 +235,13 @@
         </div>
         <mat-divider></mat-divider>
         <div class="row" style="margin-top: 10px">
+          <div class="col-12">
+            <mat-card-subtitle>{{
+              "calendario.fechas_globales" | translate
+            }}</mat-card-subtitle>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px">
           <div class="col-6">
             <mat-form-field style="width: 100%">
               <mat-label
@@ -245,13 +252,13 @@
                 [matDatepicker]="f_ini"
                 formControlName="fecha_inicio_org"
                 readonly
-                [disabled]="true"
               />
               <mat-datepicker-toggle
                 matSuffix
+                [disabled]="true"
                 [for]="f_ini"
               ></mat-datepicker-toggle>
-              <mat-datepicker #f_ini></mat-datepicker>
+              <mat-datepicker #f_ini [disabled]="true"></mat-datepicker>
             </mat-form-field>
           </div>
           <div class="col-6">
@@ -262,19 +269,26 @@
                 [matDatepicker]="f_fin"
                 formControlName="fecha_fin_org"
                 readonly
-                [disabled]="true"
               />
               <mat-datepicker-toggle
                 matSuffix
+                [disabled]="true"
                 [for]="f_fin"
               ></mat-datepicker-toggle>
-              <mat-datepicker #f_fin></mat-datepicker>
+              <mat-datepicker #f_fin [disabled]="true"></mat-datepicker>
             </mat-form-field>
           </div>
         </div>
         <div *ngIf="ActividadEditable">
           <div class="alert warning">
             {{ "calendario.modificacion_fechas_info" | translate }}
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <mat-card-subtitle>{{
+                "calendario.fechas_particulares" | translate
+              }}</mat-card-subtitle>
+            </div>
           </div>
           <div class="row">
             <div class="col-6">

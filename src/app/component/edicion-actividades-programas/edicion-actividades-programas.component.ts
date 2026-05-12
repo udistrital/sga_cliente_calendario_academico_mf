@@ -126,8 +126,8 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     if(this.editar_actividad){
       this.ActividadEditable = this.data.activity.Editable;
       this.ActivityEditor = new FormGroup({
-          fecha_inicio_org: new FormControl(''),
-          fecha_fin_org: new FormControl(''),
+          fecha_inicio_org: new FormControl({ value: '', disabled: true }),
+          fecha_fin_org: new FormControl({ value: '', disabled: true }),
           fecha_inicio_new: new FormControl(''),
           fecha_fin_new: new FormControl(''),
       });

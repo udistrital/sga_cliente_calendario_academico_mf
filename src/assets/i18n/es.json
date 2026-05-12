@@ -944,6 +944,7 @@
         "mensaje_estado_actividad": "¿Seguro de cambiar el estado de la actividad?",
         "edicion_actividades": "Edición de actividades",
         "fechas_globales": "Calendario fechas globales",
+        "fechas_particulares": "Fechas particulares",
         "modificacion_fechas_info": "A continuación usted podrá modificar las fechas de la actividad correspondiente, teniendo en cuenta que el sistema limita su edición al rango de las fechas globales del calendario general.",
         "descripcion": "Descripción",
         "descripcion_proceso": "Descripción de proceso",
