@@ -570,7 +570,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   loadSelects() {
     this.proyectoService.get('nivel_formacion?limit=0').subscribe(
       (response: any) => {
-        const nombresFiltrados = ['Pregrado', 'Posgrado', 'Doctorado'];
+        // const nombresFiltrados = ['Pregrado', 'Posgrado', 'Doctorado'];
+        const nombresFiltrados = ['Pregrado', 'Posgrado'];
         this.niveles = nombresFiltrados.flatMap((nombre: any) =>
           response.filter((item: any) => item.Nombre === nombre)
         );
