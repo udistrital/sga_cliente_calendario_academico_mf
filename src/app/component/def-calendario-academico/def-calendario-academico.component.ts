@@ -631,9 +631,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   cambiarSelectPeriodoSegunNivel(nivelSeleccionado: any) {
-    const idNivelDoctorado = this.niveles.find(
+    const idNivelDoctorado = this.niveles?.find(
       (nivel) => nivel.Nombre === 'Doctorado'
-    )!.Id;
+    )?.Id;
     if (idNivelDoctorado == nivelSeleccionado) {
       this.selectMultipleNivel = true;
       return;
