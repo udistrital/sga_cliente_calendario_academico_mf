@@ -1,1 +1,10 @@
 @import 'assets/styles/sga-sweetalert2/sga-sweetalert2.scss';
+// Dialogo amplio para edición de fechas particulares en Administración Calendario.
+.activity-edit-dialog .mat-mdc-dialog-container,
+.activity-edit-dialog .mat-mdc-dialog-surface {
+  max-height: 92vh;
+}
+
+.activity-edit-dialog .mat-mdc-dialog-content {
+  max-height: 86vh;
+}

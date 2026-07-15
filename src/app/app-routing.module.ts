@@ -7,6 +7,7 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { AuthGuard } from 'src/_guards/auth.guard';
+import { AdministracionPermisosEventosComponent } from './component/administracion_permisos_eventos/administracion_permisos_eventos.component';
 
  const routes: Routes = [
   {
@@ -23,6 +24,11 @@ import { AuthGuard } from 'src/_guards/auth.guard';
   path: 'buscar-por-proyecto',
   canActivate: [AuthGuard] ,
   component: CalendarioProyectoComponent,
+},
+{
+  path: 'configuracion/administracion_permisos_eventos',
+  canActivate: [AuthGuard],
+  component: AdministracionPermisosEventosComponent,
 }
  
 ];

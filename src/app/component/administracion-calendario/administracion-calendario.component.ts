@@ -10,11 +10,11 @@ import { Actividad } from 'src/app/models/calendario-academico/actividad';
 import { ProyectoAcademicoInstitucion } from '../../models/proyecto_academico/proyecto_academico_institucion';
 import { NivelFormacion } from 'src/app/models/proyecto_academico/nivel_formacion';
 import { UserService } from '../../services/users.service';
-import { EventoService } from 'src/app/services/evento.service';
 import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 import { SgaAdmisionesMidService } from 'src/app/services/sga_admisiones_mid.service';
 import { ImplicitAutenticationService } from 'src/app/services/implicit_autentication.service';
+import { ConfiguracionService } from 'src/app/services/configuracion.service';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PopUpManager } from '../../managers/popUpManager';
 import * as moment from 'moment';
@@ -23,6 +23,7 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
 import { EdicionActividadesProgramasComponent } from '../edicion-actividades-programas/edicion-actividades-programas.component';
+import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService, CalendarioProgramaOption } from 'src/app/services/calendario-filtros-alcance.service';
 
 @Component({
   selector: 'administracion-calendario',
@@ -61,11 +62,21 @@ export class AdministracionCalendarioComponent implements OnInit {
   userId: number | null = null;
   DependenciaID: number = 0;
   IsAdmin: boolean = false;
+  EsSecretariaAcademica: boolean = false;
+  programasUsuario: number[] = [];
+  facultadesSecretaria: number[] = [];
+  rolesUsuario: string[] = [];
+  perfilesUsuarioGestion = new Set<number>();
+  eventosCatalogoPermitidos = new Set<number>();
 
-  niveles!: NivelFormacion[];
-  nivelesSelected!: NivelFormacion;
+  periodos: CalendarioFiltroOption[] = [];
+  facultades: CalendarioFiltroOption[] = [];
+  periodoSelected?: CalendarioFiltroOption;
+  facultadSelected?: CalendarioFiltroOption;
+  niveles: CalendarioFiltroOption[] = [];
+  nivelesSelected!: CalendarioFiltroOption;
   ProyectosFull!: ProyectoAcademicoInstitucion[];
-  Proyectos!: ProyectoAcademicoInstitucion[];
+  Proyectos: CalendarioProgramaOption[] = [];
   proyectoSelected!: any;
 
   Proyecto_nombre: string = '';
@@ -94,8 +105,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     private projectService: ProyectoAcademicoService,
     private sgaAdmisionesMidService: SgaAdmisionesMidService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
-    private eventoService: EventoService,
     private autenticationService: ImplicitAutenticationService,
+    private configuracionService: ConfiguracionService,
+    private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
     private parametrosService: ParametrosService,
     private router: Router,
     private route: ActivatedRoute
@@ -111,37 +123,20 @@ export class AdministracionCalendarioComponent implements OnInit {
   ngOnInit() {
     this.dataSource = new MatTableDataSource<Proceso>();
     this.autenticationService.getRole().then((rol: any) => {
-      const r = rol.find(
+      const roles = Array.isArray(rol) ? rol : [];
+      this.rolesUsuario = roles;
+      const r = roles.find(
         (role: string) =>
           role === 'ADMIN_SGA' ||
           role === 'VICERRECTOR' ||
-          role === 'ASESOR_VICE'
+          role === 'ASESOR_VICE' ||
+          role === 'ADMISIONES_REG'
       );
-      if (r) {
-        this.IsAdmin = true;
-        this.getNivel();
-        this.getListaProyectos();
-      } else {
-        this.IsAdmin = false;
-        this.getDependenciasPorTercero()
-          .then((dependencias: any) => {
-            if (dependencias) {
-              this.getListaProyectosPorDependencias(dependencias);
-            } else {
-              this.popUpManager.showAlert(
-                this.translate.instant('GLOBAL.info'),
-                this.translate.instant('admision.no_vinculaciones')
-              );
-            }
-          })
-          .catch((err: any) => {
-            this.popUpManager.showErrorAlert(
-              this.translate.instant('admision.no_vinculacion_no_rol') +
-                '. ' +
-                this.translate.instant('GLOBAL.comunicar_OAS_error')
-            );
-          });
-      }
+      this.cargarPermisosGestionEventos(roles).finally(() => {
+        this.IsAdmin = !!r;
+        this.EsSecretariaAcademica = roles.includes('SECRETARIA_ACADEMICA') || roles.includes('SECRETARIO_ACADEMICO');
+        this.cargarAlcanceFiltros();
+      });
     });
   }
 
@@ -262,13 +257,53 @@ export class AdministracionCalendarioComponent implements OnInit {
     this.datasourceActivity = data;
   }
 
+  cargarAlcanceFiltros(): void {
+    this.filtrosAlcanceService.cargarAlcance()
+      .then((alcance) => {
+        this.periodos = alcance.periodos;
+        this.facultades = alcance.facultades;
+        this.niveles = [];
+        this.Proyectos = [];
+      })
+      .catch(() => {
+        this.periodos = [];
+        this.facultades = [];
+        this.niveles = [];
+        this.Proyectos = [];
+        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
+      });
+  }
+
+  onSelectPeriodo() {
+    this.facultadSelected = undefined;
+    this.nivelesSelected = undefined as any;
+    this.proyectoSelected = undefined;
+    this.Calendario_academico = '';
+    this.processes = [];
+    this.niveles = [];
+    this.Proyectos = [];
+    this.dataSource = new MatTableDataSource<Proceso>();
+  }
+
+  onSelectFacultad() {
+    this.nivelesSelected = undefined as any;
+    this.proyectoSelected = undefined;
+    this.Calendario_academico = '';
+    this.processes = [];
+    this.Proyectos = [];
+    this.niveles = this.filtrosAlcanceService.nivelesPorFacultad(this.facultadSelected?.Id || null);
+    this.dataSource = new MatTableDataSource<Proceso>();
+  }
+
   onSelectLevel() {
     this.proyectoSelected = '';
     this.Calendario_academico = '';
     this.processes = [];
-    this.Proyectos = this.ProyectosFull.filter((proyecto) =>
-      this.filtrarProyecto(proyecto)
+    this.Proyectos = this.filtrosAlcanceService.programasPorFacultadNivel(
+      this.facultadSelected?.Id || null,
+      this.nivelesSelected?.Id || null
     );
+    this.dataSource = new MatTableDataSource<Proceso>();
   }
 
   filtrarProyecto(proyecto: any) {
@@ -283,8 +318,12 @@ export class AdministracionCalendarioComponent implements OnInit {
   async onSelectPrograma() {
     this.Calendario_academico = '';
     this.processes = [];
+    this.dataSource = new MatTableDataSource<Proceso>();
+    if (!this.periodoSelected?.Id || !this.proyectoSelected?.Id) {
+      return;
+    }
     this.DependenciaID = this.proyectoSelected.Id;
-    this.getInfoPrograma(this.DependenciaID);
+    this.getInfoPrograma(this.DependenciaID, this.periodoSelected.Id);
   }
 
   getNivel() {
@@ -305,11 +344,12 @@ export class AdministracionCalendarioComponent implements OnInit {
   getListaProyectos() {
     this.projectService
       .get(
-        'proyecto_academico_institucion?query=Activo:true&limit=0&fields=Id,Nombre,NivelFormacionId'
+        'proyecto_academico_institucion?query=Activo:true&limit=0'
       )
       .subscribe(
         (response: any) => {
           this.ProyectosFull = response;
+          this.aplicarFiltroProyectosPorNivel();
         },
         (error: any) => {
           this.ProyectosFull = [];
@@ -335,6 +375,52 @@ export class AdministracionCalendarioComponent implements OnInit {
           this.ProyectosFull = [];
         }
       );
+  }
+
+  aplicarFiltroProyectosPorNivel() {
+    if (!this.ProyectosFull) {
+      this.Proyectos = [];
+      return;
+    }
+    let proyectos = [...this.ProyectosFull];
+
+    if (this.nivelesSelected) {
+      proyectos = proyectos.filter((proyecto) => this.filtrarProyecto(proyecto));
+    } else if (!this.IsAdmin) {
+      this.Proyectos = [];
+      return;
+    }
+
+    if (this.EsSecretariaAcademica) {
+      proyectos = proyectos.filter((proyecto: any) => this.facultadesSecretaria.includes(Number(proyecto.FacultadId)));
+    } else if (!this.IsAdmin && this.programasUsuario.length > 0) {
+      proyectos = proyectos.filter((proyecto: any) => this.programasUsuario.includes(Number(proyecto.Id)));
+    }
+
+    this.Proyectos = proyectos;
+  }
+
+  getFacultadesSecretaria() {
+    return new Promise<number[]>(async (resolve, reject) => {
+      try {
+        const documento = await this.autenticationService.getDocument();
+        if (!documento) {
+          reject([]);
+          return;
+        }
+        this.sgaCalendarioMidService
+          .get('calendario-academico/secretario-academico/' + documento + '/facultades')
+          .subscribe(
+            (response: any) => {
+              const facultades = response?.Facultades || response?.Data?.Facultades || response?.Data || [];
+              resolve(Array.isArray(facultades) ? facultades.map((facultad: any) => Number(facultad)).filter((facultad: number) => facultad > 0) : []);
+            },
+            () => reject([])
+          );
+      } catch (error) {
+        reject([]);
+      }
+    });
   }
 
   getProgramaIdByUser() {
@@ -393,18 +479,18 @@ export class AdministracionCalendarioComponent implements OnInit {
     });
   }
 
-  getInfoPrograma(DependenciaId: number) {
+  getInfoPrograma(DependenciaId: number, periodoId?: number) {
     this.processes = [];
     this.projectService
       .get('proyecto_academico_institucion/' + DependenciaId)
       .subscribe(
         (res_proyecto: any) => {
           this.Proyecto_nombre = res_proyecto.Nombre;
-          this.eventoService.get('tipo_recurrencia?limit=0').subscribe(
+          this.sgaCalendarioMidService.get('calendario-academico/eventos/tipo_recurrencia?limit=0').subscribe(
             (res_recurrencia: any) => {
               this.periodicidad = res_recurrencia;
               this.sgaCalendarioMidService
-                .get('calendario-proyecto/' + DependenciaId)
+                .get('calendario-proyecto/' + DependenciaId + (periodoId ? '?id-periodo=' + periodoId : ''))
                 .subscribe(
                   (resp_calendar_project: any) => {
                     this.idCalendario = resp_calendar_project.Data.CalendarioId;
@@ -438,26 +524,32 @@ export class AdministracionCalendarioComponent implements OnInit {
 
                                         if (activities !== null) {
                                           activities.forEach((element: any) => {
-                                            if (
-                                              Object.keys(element).length !==
-                                                0 &&
-                                              element.EventoPadreId === null
-                                            ) {
+                                            if (Object.keys(element).length !== 0) {
                                               const loadedActivity =
                                                 new Actividad();
                                               loadedActivity.actividadId =
                                                 element.actividadId;
-                                              loadedActivity.TipoEventoId = {
-                                                Id: element.TipoEventoId.Id,
-                                              };
-                                              loadedActivity.Nombre =
-                                                element.Nombre;
+                                               loadedActivity.ProcesoId = {
+                                                 Id: element.ProcesoId.Id,
+                                               };
+                                               loadedActivity.EventoCatalogoId = element.EventoCatalogoId;
+                                               loadedActivity.Nombre =
+                                                 element.Nombre;
                                               loadedActivity.Descripcion =
                                                 element.Descripcion;
-                                              loadedActivity.DependenciaId =
-                                                this.validJSONdeps(
-                                                  element.DependenciaId
-                                                );
+                                              (loadedActivity as any).ProcesoNombre = loadedProcess.Nombre;
+                                               loadedActivity.DependenciaId =
+                                                 this.validJSONdeps(
+                                                   element.DependenciaId
+                                                 );
+                                              if (
+                                                !this.actividadIncluyePrograma(
+                                                  loadedActivity.DependenciaId,
+                                                  DependenciaId
+                                                )
+                                              ) {
+                                                return;
+                                              }
 
                                               const FechasParticulares =
                                                 this.findDatesforDep(
@@ -468,51 +560,54 @@ export class AdministracionCalendarioComponent implements OnInit {
                                                 FechasParticulares === undefined
                                               ) {
                                                 loadedActivity.FechaInicio =
-                                                  moment(
-                                                    element.FechaInicio,
-                                                    'YYYY-MM-DD'
-                                                  ).format('DD-MM-YYYY');
+                                                  this.formatDateTimeLocal(
+                                                    element.FechaInicio
+                                                  );
                                                 loadedActivity.FechaFin =
-                                                  moment(
-                                                    element.FechaFin,
-                                                    'YYYY-MM-DD'
-                                                  ).format('DD-MM-YYYY');
+                                                  this.formatDateTimeLocal(
+                                                    element.FechaFin
+                                                  );
                                                 loadedActivity.Activo =
                                                   element.Activo;
                                                 loadedActivity.Editable = false;
                                               } else {
                                                 loadedActivity.FechaInicio =
-                                                  moment(
-                                                    FechasParticulares.Inicio,
-                                                    'YYYY-MM-DDTHH:mm:ss[Z]'
-                                                  ).format('DD-MM-YYYY');
+                                                  this.formatDateTimeLocal(
+                                                    FechasParticulares.Inicio
+                                                  );
                                                 loadedActivity.FechaFin =
-                                                  moment(
-                                                    FechasParticulares.Fin,
-                                                    'YYYY-MM-DD'
-                                                  ).format('DD-MM-YYYY');
+                                                  this.formatDateTimeLocal(
+                                                    FechasParticulares.Fin
+                                                  );
                                                 loadedActivity.Activo =
                                                   FechasParticulares.Activo;
                                                 loadedActivity.Editable = true;
                                               }
                                               loadedActivity.FechaInicioOrg =
-                                                moment(
-                                                  element.FechaInicio,
-                                                  'YYYY-MM-DD'
-                                                ).format('DD-MM-YYYY');
+                                                this.formatDateTimeLocal(
+                                                  element.FechaInicio
+                                                );
                                               loadedActivity.FechaFinOrg =
-                                                moment(
-                                                  element.FechaFin,
-                                                  'YYYY-MM-DD'
-                                                ).format('DD-MM-YYYY');
-                                              loadedActivity.responsables =
-                                                element.Responsable;
-                                              loadedProcess.procesoId =
-                                                element.TipoEventoId.Id;
+                                                this.formatDateTimeLocal(
+                                                  element.FechaFin
+                                                );
+                                               loadedActivity.responsables =
+                                                 element.Responsable;
+                                               loadedActivity.PuedeEditar =
+                                                 this.puedeEditarEventoCatalogo(
+                                                   loadedActivity.EventoCatalogoId
+                                                 );
+                                               loadedActivity.MotivoNoEditable = loadedActivity.PuedeEditar
+                                                 ? ''
+                                                 : this.translate.instant('calendario.sin_permiso_evento_catalogo');
+                                               loadedProcess.procesoId =
+                                                 element.ProcesoId.Id;
                                               loadedProcess.Descripcion =
-                                                element.TipoEventoId.Descripcion;
+                                                element.ProcesoId.ProcesoCatalogoId.Descripcion;
+                                              loadedProcess.ProcesoCatalogoId =
+                                                element.ProcesoId.ProcesoCatalogoId;
                                               const id_rec =
-                                                element.TipoEventoId
+                                                element.ProcesoId
                                                   .TipoRecurrenciaId.Id;
                                               loadedProcess.TipoRecurrenciaId =
                                                 {
@@ -526,11 +621,13 @@ export class AdministracionCalendarioComponent implements OnInit {
                                               activityList.push(loadedActivity);
                                             }
                                           });
-                                          loadedProcess.actividades =
-                                            new MatTableDataSource(
-                                              activityList
-                                            );
-                                          this.processes.push(loadedProcess);
+                                          if (activityList.length > 0) {
+                                            loadedProcess.actividades =
+                                              new MatTableDataSource(
+                                                activityList
+                                              );
+                                            this.processes.push(loadedProcess);
+                                          }
                                         }
                                       }
                                     });
@@ -541,16 +638,6 @@ export class AdministracionCalendarioComponent implements OnInit {
                                       new MatTableDataSource<Actividad>();
                                     this.dataSource.paginator = this.paginator;
                                     this.dataSource.sort = this.sort;
-                                  }
-                                  if (response.Data[0].AplicaExtension) {
-                                    this.popUpManager.showAlert(
-                                      this.translate.instant(
-                                        'calendario.formulario_extension'
-                                      ),
-                                      this.translate.instant(
-                                        'calendario.calendario_tiene_extension'
-                                      )
-                                    );
                                   }
                                 },
                                 (error: any) => {
@@ -568,7 +655,7 @@ export class AdministracionCalendarioComponent implements OnInit {
                         );
                     } else {
                       this.popUpManager.showErrorToast(
-                        this.translate.instant('ERROR.general')
+                        this.translate.instant('calendario.sin_calendario')
                       );
                     }
                   },
@@ -595,12 +682,15 @@ export class AdministracionCalendarioComponent implements OnInit {
   }
 
   validJSONdeps(DepIds: string) {
-    if (DepIds === '') {
+    if (!DepIds || DepIds === '' || DepIds === '{}') {
       DepIds = '{"proyectos":[],"fechas":[]}';
     }
     const jsoncheck = JSON.parse(DepIds);
     if (!jsoncheck.hasOwnProperty('proyectos')) {
       jsoncheck.proyectos = [];
+    }
+    if (!Array.isArray(jsoncheck.proyectos)) {
+      jsoncheck.proyectos = jsoncheck.proyectos ? [jsoncheck.proyectos] : [];
     }
     if (!jsoncheck.hasOwnProperty('fechas')) {
       jsoncheck.fechas = [];
@@ -630,6 +720,15 @@ export class AdministracionCalendarioComponent implements OnInit {
     return listDeps.fechas.find((p: any) => p.Id === DepId);
   }
 
+  actividadIncluyePrograma(listDeps: any, DepId: number) {
+    const proyectos = Array.isArray(listDeps?.proyectos)
+      ? listDeps.proyectos
+      : [];
+    return proyectos.some(
+      (proyectoId: any) => Number(proyectoId) === Number(DepId)
+    );
+  }
+
   generarColorAleatorio() {
     const indiceAleatorio = Math.floor(Math.random() * this.misColores.length);
     return this.misColores[indiceAleatorio];
@@ -640,12 +739,8 @@ export class AdministracionCalendarioComponent implements OnInit {
     for (let i = 0; i < process.actividades.filteredData.length; i++) {
       const evento = {
         title: process.actividades.filteredData[i].Nombre,
-        start: process.actividades.filteredData[i].FechaInicio.split('-')
-          .reverse()
-          .join('-'),
-        end: process.actividades.filteredData[i].FechaFin.split('-')
-          .reverse()
-          .join('-'),
+        start: this.parseDisplayDate(process.actividades.filteredData[i].FechaInicio),
+        end: this.parseDisplayDate(process.actividades.filteredData[i].FechaFin),
         color: this.generarColorAleatorio(),
       };
       this.misEventos.push(evento);
@@ -679,6 +774,13 @@ export class AdministracionCalendarioComponent implements OnInit {
   }
 
   onAction(event: any, process: any) {
+    if ((event.action === 'edit' || event.action === 'disable') && !event.data?.PuedeEditar) {
+      this.popUpManager.showAlert(
+        this.translate.instant('calendario.actividades'),
+        event.data?.MotivoNoEditable || this.translate.instant('calendario.sin_permiso_evento_catalogo')
+      );
+      return;
+    }
     switch (event.action) {
       case 'view':
         this.viewProcess(event, process);
@@ -711,8 +813,8 @@ export class AdministracionCalendarioComponent implements OnInit {
     this.actividad = [
       {
         title: event.data.Nombre,
-        start: event.data.FechaInicio.split('-').reverse().join('-'),
-        end: event.data.FechaFin.split('-').reverse().join('-'),
+        start: this.parseDisplayDate(event.data.FechaInicio),
+        end: this.parseDisplayDate(event.data.FechaFin),
       },
     ];
     const dialogRef = this.dialog.open(event.dialog, {
@@ -734,7 +836,7 @@ export class AdministracionCalendarioComponent implements OnInit {
         right: 'cerrar',
       },
       timeZone: 'America/Bogota',
-      initialDate: event.data.FechaInicio.split('-').reverse().join('-'),
+      initialDate: this.parseDisplayDate(event.data.FechaInicio),
       fixedWeekCount: false,
       showNonCurrentDates: false,
       locale: esLocale,
@@ -744,10 +846,66 @@ export class AdministracionCalendarioComponent implements OnInit {
     };
   }
 
+  parseDisplayDate(date: any) {
+    return this.localDateTimeParts(date).iso;
+  }
+
+  formatDateTimeLocal(date: any) {
+    return this.localDateTimeParts(date).display;
+  }
+
+  localDateTimeParts(date: any) {
+    const value = this.extractDateText(date);
+    let match = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(value);
+    if (match) {
+      const [, year, month, day, hour, minute] = match;
+      return {
+        display: `${day}/${month}/${year} ${hour}:${minute}`,
+        iso: `${year}-${month}-${day}T${hour}:${minute}:00`,
+      };
+    }
+    match = /^(\d{2})[/-](\d{2})[/-](\d{4})(?:[ T](\d{2}):(\d{2}))?/.exec(value);
+    if (match) {
+      const [, day, month, year, hour = '00', minute = '00'] = match;
+      return {
+        display: `${day}/${month}/${year} ${hour}:${minute}`,
+        iso: `${year}-${month}-${day}T${hour}:${minute}:00`,
+      };
+    }
+    const parsed = moment.parseZone(value, ['DD/MM/YYYY HH:mm', 'DD/MM/YYYY', 'DD-MM-YYYY HH:mm', 'DD-MM-YYYY', moment.ISO_8601], true);
+    const safe = parsed.isValid() ? parsed : moment.parseZone(value);
+    return {
+      display: safe.format('DD/MM/YYYY HH:mm'),
+      iso: safe.format('YYYY-MM-DDTHH:mm:ss'),
+    };
+  }
+
+  extractDateText(date: any) {
+    if (date === null || date === undefined) {
+      return '';
+    }
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hour = String(date.getHours()).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hour}:${minute}:00`;
+    }
+    return String(date).trim().replace(/ ([+-]\d{4}) [+-]\d{4}$/, ' $1');
+  }
+
+  fechaGMTMinus5() {
+    return moment().format('YYYY-MM-DDTHH:mm:ss');
+  }
+
   editActivity(event: any, process: any) {
     const activityConfig = new MatDialogConfig();
-    activityConfig.width = '800px';
-    activityConfig.height = '600px';
+    activityConfig.width = 'min(1100px, 94vw)';
+    activityConfig.maxWidth = '94vw';
+    activityConfig.height = 'auto';
+    activityConfig.maxHeight = '92vh';
+    activityConfig.panelClass = 'activity-edit-dialog';
     activityConfig.data = {
       process: process,
       activity: event.data,
@@ -761,14 +919,14 @@ export class AdministracionCalendarioComponent implements OnInit {
     );
     newActivity.afterClosed().subscribe((activity: any) => {
       if (activity !== undefined) {
-        this.eventoService
-          .get('calendario_evento/' + event.data.actividadId)
+        this.sgaCalendarioMidService
+          .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
           .subscribe(
             (respGet: any) => {
               respGet.DependenciaId = JSON.stringify(
                 activity.UpdateDependencias
               );
-              this.eventoService.put('calendario_evento', respGet).subscribe(
+              this.sgaCalendarioMidService.put('calendario-academico/actividad/' + event.data.actividadId + '/dependencias', { DependenciaId: respGet.DependenciaId }).subscribe(
                 (respPut: any) => {
                   this.popUpManager.showSuccessAlert(
                     this.translate.instant('calendario.actividad_actualizada')
@@ -803,8 +961,8 @@ export class AdministracionCalendarioComponent implements OnInit {
       .then((accion) => {
         if (accion.value) {
           if (event.data.Editable) {
-            this.eventoService
-              .get('calendario_evento/' + event.data.actividadId)
+            this.sgaCalendarioMidService
+              .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
               .subscribe(
                 (respGet: any) => {
                   const dep = JSON.parse(respGet.DependenciaId);
@@ -816,15 +974,13 @@ export class AdministracionCalendarioComponent implements OnInit {
                     }) => {
                       if (fd.Id === this.DependenciaID) {
                         fd.Activo = !fd.Activo;
-                        fd.Modificacion = moment(new Date()).format(
-                          'DD-MM-YYYY'
-                        );
+                        fd.Modificacion = this.fechaGMTMinus5();
                       }
                     }
                   );
                   respGet.DependenciaId = JSON.stringify(dep);
-                  this.eventoService
-                    .put('calendario_evento', respGet)
+                  this.sgaCalendarioMidService
+                    .put('calendario-academico/eventos/calendario_evento/' + respGet.Id, respGet)
                     .subscribe(
                       (respPut: any) => {
                         this.getInfoPrograma(this.DependenciaID);
@@ -859,5 +1015,96 @@ export class AdministracionCalendarioComponent implements OnInit {
           }
         }
       });
+  }
+
+  cargarPermisosGestionEventos(roles: string[]): Promise<void> {
+    return new Promise((resolve) => {
+      this.configuracionService.get('aplicacion/?query=Alias:SGA_MF&limit=1').subscribe(
+        (aplicaciones: any) => {
+          const aplicacion = this.normalizarListaRespuesta(aplicaciones)[0];
+          const aplicacionId = this.obtenerIdRespuesta(aplicacion);
+          if (!aplicacionId) {
+            resolve();
+            return;
+          }
+          this.configuracionService.get('perfil/?query=Aplicacion.Id:' + aplicacionId + '&limit=0').subscribe(
+            (perfiles: any) => {
+              const rolesNormalizados = new Set(roles.map((role: string) => this.normalizarTextoPermiso(role)));
+              this.perfilesUsuarioGestion = new Set(
+                this.normalizarListaRespuesta(perfiles)
+                  .filter((perfil: any) =>
+                    rolesNormalizados.has(this.normalizarTextoPermiso(perfil?.Nombre || perfil?.nombre || '')) ||
+                    rolesNormalizados.has(this.normalizarTextoPermiso(perfil?.CodigoAbreviacion || perfil?.codigo_abreviacion || ''))
+                  )
+                  .map((perfil: any) => this.obtenerIdRespuesta(perfil))
+                  .filter((id: number) => id > 0)
+              );
+              this.cargarEventosCatalogoPermitidos().then(resolve).catch(() => resolve());
+            },
+            () => resolve()
+          );
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  cargarEventosCatalogoPermitidos(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.perfilesUsuarioGestion.size === 0) {
+        this.eventosCatalogoPermitidos = new Set<number>();
+        resolve();
+        return;
+      }
+      this.sgaCalendarioMidService
+        .get('calendario-academico/eventos/evento_catalogo_rol_gestion?query=Activo:true&limit=0')
+        .subscribe(
+          (relaciones: any) => {
+            const permitidos = this.normalizarListaRespuesta(relaciones)
+              .filter((relacion: any) => this.perfilesUsuarioGestion.has(Number(relacion?.PerfilId || relacion?.perfil_id || 0)))
+              .map((relacion: any) => this.obtenerIdRespuesta(relacion?.EventoCatalogoId || relacion?.evento_catalogo_id))
+              .filter((id: number) => id > 0);
+            this.eventosCatalogoPermitidos = new Set(permitidos);
+            resolve();
+          },
+          () => {
+            this.eventosCatalogoPermitidos = new Set<number>();
+            resolve();
+          }
+        );
+    });
+  }
+
+  puedeEditarEventoCatalogo(eventoCatalogo: any): boolean {
+    const eventoCatalogoId = this.obtenerIdRespuesta(eventoCatalogo);
+    return eventoCatalogoId > 0 && this.eventosCatalogoPermitidos.has(eventoCatalogoId);
+  }
+
+  normalizarListaRespuesta(respuesta: any): any[] {
+    if (Array.isArray(respuesta)) {
+      return respuesta;
+    }
+    if (Array.isArray(respuesta?.Data?.Data)) {
+      return respuesta.Data.Data;
+    }
+    if (Array.isArray(respuesta?.Data)) {
+      return respuesta.Data;
+    }
+    return [];
+  }
+
+  obtenerIdRespuesta(valor: any): number {
+    if (typeof valor === 'number') {
+      return valor;
+    }
+    return Number(valor?.Id || valor?.id || 0);
+  }
+
+  normalizarTextoPermiso(valor: string): string {
+    return String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toUpperCase();
   }
 }

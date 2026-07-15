@@ -11,7 +11,6 @@ import { ParametrosService } from './services/parametros.service';
 import { RequestManager } from './managers/requestManager';
 import { HttpErrorManager } from './managers/errorManager';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { EventoService } from './services/evento.service';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -30,7 +29,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
-import {MatNativeDateModule} from '@angular/material/core';
+import {MatNativeDateModule, MAT_DATE_LOCALE} from '@angular/material/core';
 import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
 import { AsignarCalendarioProyectoComponent } from './component/asignar-calendario-proyecto/asignar-calendario-proyecto.component';
 import { DefCalendarioAcademicoComponent } from './component/def-calendario-academico/def-calendario-academico.component';
@@ -44,7 +43,7 @@ import { DetalleCalendarioComponent } from './component/detalle-calendario/detal
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
 import { SgaAdmisionesMidService } from './services/sga_admisiones_mid.service';
-import { SpinnerUtilInterceptor, SpinnerUtilModule } from 'spinner-util';
+import { SpinnerUtilModule } from 'spinner-util';
 import { environment } from 'src/environments/environment';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import {MatDividerModule} from '@angular/material/divider';
@@ -52,7 +51,10 @@ import {MatButtonModule} from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CustomPaginatorIntl } from './services/CustomPaginatorIntl.service';
+import { AdministracionPermisosEventosComponent } from './component/administracion_permisos_eventos/administracion_permisos_eventos.component';
+import { SpinnerUtilCounterInterceptor } from './interceptors/spinner-util-counter.interceptor';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -76,6 +78,7 @@ export function createTranslateLoader(http: HttpClient) {
     ProcesoCalendarioAcademicoComponent,
     EdicionActividadesProgramasComponent,
     ActividadCalendarioAcademicoComponent,
+    AdministracionPermisosEventosComponent,
 
 
 
@@ -110,6 +113,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatToolbarModule,
     MatTooltipModule,
     MatMenuModule,
+    MatSlideToggleModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
@@ -126,9 +130,9 @@ export function createTranslateLoader(http: HttpClient) {
     DocumentoService,
     RequestManager,
     ParametrosService,
-    EventoService,
     PopUpManager,
-    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilInterceptor, multi: true },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
+    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilCounterInterceptor, multi: true },
     { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
   ],
   bootstrap: [AppComponent]

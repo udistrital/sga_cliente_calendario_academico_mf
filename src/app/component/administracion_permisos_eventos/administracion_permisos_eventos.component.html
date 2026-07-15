@@ -1,0 +1,109 @@
+<mat-card class="roles-card">
+  <mat-card-header>
+    <mat-card-title>{{ 'calendario.roles_gestion_evento_catalogo' | translate }}</mat-card-title>
+    <mat-card-subtitle>{{ 'calendario.roles_gestion_evento_catalogo_info' | translate }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-form-field class="full-width">
+      <mat-label>{{ 'calendario.evento_catalogo' | translate }}</mat-label>
+      <input
+        matInput
+        [(ngModel)]="eventoCatalogoTexto"
+        [matAutocomplete]="eventosAutocomplete"
+        [placeholder]="'calendario.buscar_evento_catalogo' | translate"
+        autocomplete="off"
+        (ngModelChange)="onBuscarEventoCatalogo()" />
+      <mat-icon matPrefix>search</mat-icon>
+      <button *ngIf="displayEventoCatalogo(eventoCatalogoTexto)" mat-icon-button matSuffix type="button" (click)="eventoCatalogoTexto = ''; onBuscarEventoCatalogo()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-autocomplete #eventosAutocomplete="matAutocomplete" [displayWith]="displayEventoCatalogo" (optionSelected)="onSeleccionarEventoCatalogo($event.option.value)">
+        <mat-option *ngFor="let evento of eventoCatalogosFiltrados" [value]="evento">
+          <span>{{ evento.Nombre }}</span>
+          <small class="autocomplete-option-detail">ID {{ evento.Id }}</small>
+        </mat-option>
+        <mat-option *ngIf="eventoCatalogosFiltrados.length === 0" disabled>
+          {{ 'calendario.sin_eventos_catalogo_filtro' | translate }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <div *ngIf="eventoCatalogoSeleccionado" class="evento-resumen">
+      <h3>{{ eventoCatalogoSeleccionado.Nombre }}</h3>
+      <p>{{ eventoCatalogoSeleccionado.Descripcion || ('GLOBAL.NA' | translate) }}</p>
+      <span>{{ 'calendario.perfiles_gestores_asignados' | translate:{ total: perfilesAsignados.length } }}</span>
+    </div>
+
+    <div *ngIf="cargando" class="loading-state">
+      <mat-spinner diameter="34"></mat-spinner>
+      <span>{{ 'GLOBAL.cargando' | translate }}</span>
+    </div>
+
+    <section *ngIf="eventoCatalogoSeleccionado && !cargando" class="roles-grid">
+      <mat-card class="roles-list-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'calendario.perfiles_disponibles_gestion' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field class="full-width">
+            <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
+            <input matInput [(ngModel)]="filtroDisponibles" [placeholder]="'GLOBAL.buscar' | translate" />
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <div class="profile-list">
+            <article *ngFor="let perfil of perfilesDisponibles" class="profile-row">
+              <div>
+                <strong>{{ perfil.Nombre }}</strong>
+                <small>ID {{ perfil.Id }}</small>
+              </div>
+              <button mat-stroked-button color="accent" (click)="agregarPerfil(perfil)" [disabled]="guardandoPerfilId !== null">
+                <mat-icon>add</mat-icon>
+                {{ 'GLOBAL.asignar' | translate }}
+              </button>
+            </article>
+
+            <p *ngIf="perfilesDisponibles.length === 0" class="empty-state">
+              {{ 'calendario.sin_perfiles_disponibles_gestion' | translate }}
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="roles-list-card assigned">
+        <mat-card-header>
+          <mat-card-title>{{ 'calendario.perfiles_asignados_gestion' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field class="full-width">
+            <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
+            <input matInput [(ngModel)]="filtroAsignados" [placeholder]="'GLOBAL.buscar' | translate" />
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <div class="profile-list">
+            <article *ngFor="let perfil of perfilesAsignados" class="profile-row active">
+              <div>
+                <strong>{{ perfil.Nombre }}</strong>
+                <small>ID {{ perfil.Id }}</small>
+              </div>
+              <button mat-stroked-button color="warn" (click)="retirarPerfil(perfil)" [disabled]="guardandoPerfilId !== null">
+                <mat-icon>remove</mat-icon>
+                {{ 'GLOBAL.eliminar' | translate }}
+              </button>
+            </article>
+
+            <p *ngIf="perfilesAsignados.length === 0" class="empty-state">
+              {{ 'calendario.sin_perfiles_asignados_gestion' | translate }}
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <p *ngIf="!eventoCatalogoSeleccionado && !cargando" class="empty-state initial">
+      {{ 'calendario.seleccione_evento_catalogo_roles' | translate }}
+    </p>
+  </mat-card-content>
+</mat-card>
