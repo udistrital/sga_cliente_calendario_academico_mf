@@ -1,0 +1,77 @@
+.program-manager-card {
+  box-shadow: none;
+  margin: 0;
+}
+
+.program-manager-card mat-card-content {
+  padding-top: 1rem;
+}
+
+.program-form {
+  width: 100%;
+}
+
+.program-manager {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1rem 0;
+}
+
+.program-panel {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  min-height: 430px;
+  padding: 1.25rem;
+}
+
+.program-panel h4 {
+  margin: 0 0 0.75rem;
+}
+
+.program-search {
+  width: 100%;
+}
+
+.program-list {
+  max-height: 335px;
+  overflow: auto;
+}
+
+.program-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.5rem 0;
+}
+
+.empty-list {
+  color: rgba(0, 0, 0, 0.54);
+  margin: 0.5rem 0;
+}
+
+.alert.info {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 0.75rem;
+}
+
+.alert.warning {
+  background: #fff8e1;
+  border-left: 4px solid #ffb300;
+  padding: 0.75rem;
+}
+
+.program-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.program-actions button {
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .program-manager {
+    grid-template-columns: 1fr;
+  }
+}

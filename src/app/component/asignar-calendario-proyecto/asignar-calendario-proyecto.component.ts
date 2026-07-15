@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
@@ -8,12 +8,14 @@ import { PopUpManager } from '../../managers/popUpManager';
 @Component({
   selector: 'asignar-calendario-proyecto',
   templateUrl: './asignar-calendario-proyecto.component.html',
-  styleUrls: ['./calendario-academico.component.scss'],
+  styleUrls: ['./asignar-calendario-proyecto.component.scss'],
 })
 export class AsignarCalendarioProyectoComponent implements OnInit {
 
   selectedProjects: FormControl;
   projects!: any[];
+  filtroProgramasAsociados = '';
+  filtroProgramasDisponibles = '';
   constructor(
     private projectService: ProyectoAcademicoService,
     private popUpManager: PopUpManager,
@@ -21,7 +23,7 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
     public dialogRef: MatDialogRef<AsignarCalendarioProyectoComponent>,
     @Inject(MAT_DIALOG_DATA) public dat: any,
   ) {
-    this.selectedProjects = new FormControl([], Validators.required);
+    this.selectedProjects = new FormControl([]);
     this.dialogRef.backdropClick().subscribe(() => this.dialogRef.close());
   }
 
@@ -31,10 +33,7 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
           this.projects = (<any[]><unknown>response).filter(
           proyecto => this.filtrarProyecto(proyecto),
         );
-        if (this.dat.calendar.DependenciaId !== '{}') {
-          const deps = JSON.parse(this.dat.calendar.DependenciaId);
-          this.selectedProjects.setValue(deps['proyectos']);
-        }
+        this.selectedProjects.setValue(this.proyectosIniciales());
       },
       error: error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
@@ -56,8 +55,56 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   register() {
     this.popUpManager.showConfirmAlert(this.translate.instant('calendario.seguro_proyectos'))
       .then((ok) => {
-        if (ok.value) this.dialogRef.close(this.selectedProjects.value);
+        if (ok.value) this.dialogRef.close({ proyectos: this.selectedProjects.value, programas: this.projects });
       });
+  }
+
+  proyectosIniciales() {
+    if (!this.dat.calendar?.DependenciaId || this.dat.calendar.DependenciaId === '{}') {
+      return [];
+    }
+    try {
+      const deps = typeof this.dat.calendar.DependenciaId === 'string' ? JSON.parse(this.dat.calendar.DependenciaId) : this.dat.calendar.DependenciaId;
+      return Array.isArray(deps?.proyectos) ? deps.proyectos.map((id: any) => Number(id)) : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  programasAsociados() {
+    const selectedIds = new Set((this.selectedProjects.value || []).map((id: any) => Number(id)));
+    return (this.projects || []).filter((project: any) => selectedIds.has(Number(project.Id)));
+  }
+
+  programasDisponibles() {
+    const selectedIds = new Set((this.selectedProjects.value || []).map((id: any) => Number(id)));
+    return (this.projects || []).filter((project: any) => !selectedIds.has(Number(project.Id)));
+  }
+
+  programasAsociadosFiltrados() {
+    return this.filterPrograms(this.programasAsociados(), this.filtroProgramasAsociados);
+  }
+
+  programasDisponiblesFiltrados() {
+    return this.filterPrograms(this.programasDisponibles(), this.filtroProgramasDisponibles);
+  }
+
+  filterPrograms(programs: any[], filter: string) {
+    const normalizedFilter = (filter || '').toLowerCase().trim();
+    if (!normalizedFilter) {
+      return programs;
+    }
+    return programs.filter((project: any) => (project.Nombre || '').toLowerCase().includes(normalizedFilter));
+  }
+
+  togglePrograma(projectId: any, checked: boolean) {
+    const currentIds = (this.selectedProjects.value || []).map((id: any) => Number(id));
+    const id = Number(projectId);
+    const updatedIds = checked
+      ? Array.from(new Set([...currentIds, id]))
+      : currentIds.filter((selectedId: number) => selectedId !== id);
+    this.selectedProjects.setValue(updatedIds);
+    this.selectedProjects.markAsTouched();
   }
 
 }

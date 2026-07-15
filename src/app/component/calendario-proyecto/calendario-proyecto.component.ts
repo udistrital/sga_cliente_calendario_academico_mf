@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { NivelFormacion } from 'src/app/models/proyecto_academico/nivel_formacion';
-import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService, CalendarioProgramaOption } from 'src/app/services/calendario-filtros-alcance.service';
 
 @Component({
   selector: 'calendario-proyecto',
@@ -13,63 +12,103 @@ import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.ser
 })
 export class CalendarioProyectoComponent {
 
+  selectedPeriod: FormControl;
+  selectedFaculty: FormControl;
   selectedLevel: FormControl;
   selectedProject: FormControl;
-  niveles!: NivelFormacion[];
-  projects!: any[];
+  periodos: CalendarioFiltroOption[] = [];
+  facultades: CalendarioFiltroOption[] = [];
+  niveles: CalendarioFiltroOption[] = [];
+  projects: CalendarioProgramaOption[] = [];
   calendarioId: string = '';
   projectId: number = 0;
   showCalendar: boolean = false;
 
   constructor(
-    private projectService: ProyectoAcademicoService,
+    private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
     private popUpManager: PopUpManager,
     private translate: TranslateService,
   ) {
-    this.selectedLevel = new FormControl('');
-    this.selectedProject = new FormControl('');
-    this.nivel_load();
+    this.selectedPeriod = new FormControl('');
+    this.selectedFaculty = new FormControl({ value: '', disabled: true });
+    this.selectedLevel = new FormControl({ value: '', disabled: true });
+    this.selectedProject = new FormControl({ value: '', disabled: true });
+    this.cargarAlcance();
   }
 
-  filtrarProyecto(proyecto:any):any {
-    if (this.selectedLevel.value === proyecto['NivelFormacionId']['Id']) {
-      return true
-    }
-    if (proyecto['NivelFormacionId']['NivelFormacionPadreId'] !== null) {
-      if (proyecto['NivelFormacionId']['NivelFormacionPadreId']['Id'] === this.selectedLevel.value) {
-        return true
-      }
-    } else {
-      return false
-    }
-  }
-
-  onSelectLevel() {
-    this.showCalendar = false;
-    this.projectService.get('proyecto_academico_institucion?limit=0&fields=Id,Nombre,NivelFormacionId').subscribe(
-      (response:any) => {
-        if (response[0].Id !== undefined) {
-          this.projects = <any[]>response.filter((proyecto:any) => this.filtrarProyecto(proyecto));
-        } else {
-          this.popUpManager.showErrorAlert(this.translate.instant('calendario.sin_calendarios'));
-        }
-      },
-      error => {
+  cargarAlcance(): void {
+    this.filtrosAlcanceService.cargarAlcance()
+      .then((alcance) => {
+        this.periodos = alcance.periodos;
+        this.facultades = alcance.facultades;
+        this.niveles = [];
+        this.projects = [];
+      })
+      .catch(() => {
+        this.periodos = [];
+        this.facultades = [];
+        this.niveles = [];
+        this.projects = [];
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-      },
+      });
+  }
+
+  onSelectPeriod(): void {
+    this.showCalendar = false;
+    this.calendarioId = '';
+    this.projectId = 0;
+    this.resetControl(this.selectedFaculty, !this.selectedPeriod.value);
+    this.resetControl(this.selectedLevel, true);
+    this.resetControl(this.selectedProject, true);
+    this.niveles = [];
+    this.projects = [];
+  }
+
+  onSelectFaculty(): void {
+    this.showCalendar = false;
+    this.calendarioId = '';
+    this.projectId = 0;
+    this.resetControl(this.selectedLevel, !this.selectedFaculty.value);
+    this.resetControl(this.selectedProject, true);
+    this.projects = [];
+    this.niveles = this.filtrosAlcanceService.nivelesPorFacultad(Number(this.selectedFaculty.value));
+  }
+
+  onSelectLevel(): void {
+    this.showCalendar = false;
+    this.calendarioId = '';
+    this.projectId = 0;
+    this.resetControl(this.selectedProject, !this.selectedLevel.value);
+    this.projects = this.filtrosAlcanceService.programasPorFacultadNivel(
+      Number(this.selectedFaculty.value),
+      Number(this.selectedLevel.value)
     );
+  }
+
+  resetControl(control: FormControl, disabled: boolean): void {
+    control.setValue('');
+    if (disabled) {
+      control.disable();
+    } else {
+      control.enable();
+    }
   }
 
   onSelectProject() {
     this.showCalendar = false;
-    this.sgaCalendarioMidService.get('calendario-proyecto/' + this.selectedProject.value).subscribe(
+    const periodoId = Number(this.selectedPeriod.value);
+    const programaId = Number(this.selectedProject.value);
+    if (!periodoId || !programaId) {
+      return;
+    }
+    this.sgaCalendarioMidService.get('calendario-proyecto/' + programaId + '?id-periodo=' + periodoId).subscribe(
       (response:any) => {
-        this.calendarioId = response.Data["CalendarioId"];
-        this.projectId = this.selectedProject.value
-        if (this.calendarioId === "0") {
+        this.calendarioId = String(response?.Data?.CalendarioId || response?.CalendarioId || '0');
+        this.projectId = programaId;
+        if (this.calendarioId === '0') {
           this.showCalendar = false;
-          this.popUpManager.showAlert('', this.translate.instant('calendario.sin_calendario'))
+          this.popUpManager.showAlert('', this.translate.instant('calendario.sin_calendario'));
         } else {
           this.showCalendar = true;
         }
@@ -77,18 +116,6 @@ export class CalendarioProyectoComponent {
       (error:any) => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       },
-    );
-  }
-
-  nivel_load() {
-    this.projectService.get('nivel_formacion?limit=0').subscribe(
-      // (response: NivelFormacion[]) => {
-        (response: any) => {
-        this.niveles = response.filter((nivel:any) => nivel.NivelFormacionPadreId === null)
-      },
-      error => {
-        this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
-      }
     );
   }
 
