@@ -5,13 +5,16 @@ export class Actividad {
     FechaFin!: string;
     Activo!: boolean;
     responsables!: any[];
-    TipoEventoId!: any; // id del proceso
+    ProcesoId!: any;
+    EventoCatalogoId?: any;
     actividadId!: number;
-    EventoPadreId!: any;
     DependenciaId!: any;
     Editable!: any;
+    PuedeEditar?: boolean;
+    MotivoNoEditable?: string;
     FechaInicioOrg!: any;
     FechaFinOrg!: any
+    Extensiones!: any[];
     
 
 }

@@ -14,38 +14,22 @@
       class="form-horizontal"
     >
       <mat-form-field floatLabel="always" style="width: 100%">
-        <input
-          matInput
-          type="text"
-          formControlName="Nombre"
-          placeholder="*{{ 'calendario.nombre' | translate }} "
-          required
-        />
+        <mat-label>*{{ "calendario.proceso" | translate }}</mat-label>
+        <mat-select formControlName="ProcesoCatalogoId" required>
+          <mat-option *ngFor="let proceso of procesosCatalogo" [value]="proceso.Id">
+            {{ proceso.Nombre }}
+          </mat-option>
+        </mat-select>
         <mat-error
           *ngIf="
-            processForm.get('Nombre')?.hasError('required') &&
-            processForm.get('Nombre')?.touched
+            processForm.get('ProcesoCatalogoId')?.hasError('required') &&
+            processForm.get('ProcesoCatalogoId')?.touched
           "
         >
           {{ "calendario.error_nombre_proceso" | translate }}
         </mat-error>
       </mat-form-field>
-      <mat-form-field floatLabel="always" style="width: 100%">
-        <input
-          matInput
-          type="text"
-          formControlName="Descripcion"
-          placeholder="*{{ 'GLOBAL.descripcion' | translate }} "
-        />
-        <mat-error
-          *ngIf="
-            processForm.get('Descripcion')?.hasError('required') &&
-            processForm.get('Descripcion')?.touched
-          "
-        >
-          {{ "calendario.error_desc_proceso" | translate }}
-        </mat-error>
-      </mat-form-field>
+      <p><strong>{{ "GLOBAL.descripcion" | translate }}:</strong> {{ getSelectedProcesoCatalogo()?.Descripcion || '-' }}</p>
       <mat-form-field style="width: 100%" floatLabel="always">
         <mat-label>*{{ "calendario.periodicidad" | translate }} </mat-label>
         <mat-select

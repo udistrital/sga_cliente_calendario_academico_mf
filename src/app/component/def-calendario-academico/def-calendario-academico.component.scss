@@ -15,3 +15,24 @@
   height: 0.5em;
   border-radius: 100%;
 }
+
+.activity-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.activity-status.active {
+  background-color: var(--success-accent);
+}
+
+.activity-status.inactive {
+  background-color: var(--danger-base);
+}

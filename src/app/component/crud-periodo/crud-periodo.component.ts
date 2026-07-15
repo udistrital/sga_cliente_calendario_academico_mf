@@ -107,13 +107,8 @@ export class CrudPeriodoComponent implements OnInit {
           this.info_periodo.Descripcion =
             'Periodo académico ' + this.info_periodo.Nombre;
           this.info_periodo.Activo = true;
-          this.info_periodo.InicioVigencia =
-            moment(this.info_periodo.InicioVigencia).format(
-              'YYYY-MM-DDTHH:mm',
-            ) + ':00Z';
-          this.info_periodo.FinVigencia =
-            moment(this.info_periodo.FinVigencia).format('YYYY-MM-DDTHH:mm') +
-            ':00Z';
+          this.info_periodo.InicioVigencia = this.formatUtc(this.info_periodo.InicioVigencia);
+          this.info_periodo.FinVigencia = this.formatUtc(this.info_periodo.FinVigencia);
           this.parametrosService
             .put('periodo', this.info_periodo)
             .subscribe(res => {
@@ -143,13 +138,8 @@ export class CrudPeriodoComponent implements OnInit {
             'Periodo académico ' + this.info_periodo.Nombre;
           this.info_periodo.CodigoAbreviacion = 'PA';
           this.info_periodo.Activo = true;
-          this.info_periodo.InicioVigencia =
-            moment(this.info_periodo.InicioVigencia).format(
-              'YYYY-MM-DDTHH:mm',
-            ) + ':00Z';
-          this.info_periodo.FinVigencia =
-            moment(this.info_periodo.FinVigencia).format('YYYY-MM-DDTHH:mm') +
-            ':00Z';
+          this.info_periodo.InicioVigencia = this.formatUtc(this.info_periodo.InicioVigencia);
+          this.info_periodo.FinVigencia = this.formatUtc(this.info_periodo.FinVigencia);
           this.info_periodo.AplicacionId = 41; // ID de SGA en Configuracion_CRUD
           this.parametrosService
             .post('periodo', this.info_periodo)
@@ -177,5 +167,9 @@ export class CrudPeriodoComponent implements OnInit {
         this.updatePeriodo(event.data.Periodo);
       }
     }
+  }
+
+  formatUtc(date: any) {
+    return moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
   }
 }

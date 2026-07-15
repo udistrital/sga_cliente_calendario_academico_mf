@@ -2,4 +2,197 @@
 .mat-mdc-row:hover .mat-mdc-cell {
     background-color: var(--color100);
   }
-  
+
+.public-actions {
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.abbreviation-cell {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.abbreviation-input {
+  max-width: 140px;
+}
+
+.public-table {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.public-directed-table {
+  width: 100%;
+}
+
+.public-directed-table th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.public-action-cell {
+  padding-right: 0.75rem;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.public-action-header {
+  text-align: right;
+}
+
+.public-action-group {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 52px 32px;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  min-height: 40px;
+}
+
+.public-action-group button {
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  line-height: 32px;
+  padding: 0;
+  width: 32px;
+}
+
+.public-action-group button mat-icon {
+  font-size: 20px;
+  height: 20px;
+  line-height: 20px;
+  width: 20px;
+}
+
+.public-action-group mat-slide-toggle {
+  align-items: center;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+}
+
+.activity-title-subtitle {
+  color: rgba(0, 0, 0, 0.72);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+.activity-description {
+  margin: 0.75rem 0 1rem;
+}
+
+.activity-context-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1rem 0 0;
+}
+
+.activity-context-grid .context-description {
+  grid-column: 1 / -1;
+}
+
+:host ::ng-deep mat-card {
+  box-shadow: none;
+}
+
+:host ::ng-deep .mat-mdc-tab-body-content {
+  overflow: visible;
+}
+
+.extension-form {
+  margin-top: 1rem;
+}
+
+.extension-form .form-grid2 {
+  gap: 1rem;
+}
+
+table {
+  width: 100%;
+}
+
+.extension-table {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.extension-table table {
+  min-width: 760px;
+}
+
+.extension-action-header,
+.extension-action-cell {
+  min-width: 88px;
+  text-align: center;
+  width: 88px;
+}
+
+.extension-action-header {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.extension-action-cell {
+  overflow: visible;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  white-space: nowrap;
+}
+
+.extension-action-group {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  min-width: 72px;
+}
+
+.extension-action-cell button,
+td.mat-mdc-cell button[mat-icon-button] {
+  height: 32px;
+  width: 32px;
+}
+
+.extension-action-cell mat-icon,
+td.mat-mdc-cell button[mat-icon-button] mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .activity-context-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .public-action-group {
+    justify-content: flex-start;
+  }
+}
