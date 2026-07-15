@@ -16,17 +16,17 @@ import { HttpErrorManager } from './errorManager'
 })
 export class RequestManager {
   private path!: any;
-  public httpOptions: any;
-  constructor(private http: HttpClient, private errManager: HttpErrorManager) {
+  constructor(private http: HttpClient, private errManager: HttpErrorManager) {}
+
+  private getHttpOptions(): any {
     const acces_token = window.localStorage.getItem('access_token');
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
     if (acces_token !== null) {
-      this.httpOptions = {
-         headers: new HttpHeaders({
-           'Content-Type': 'application/json',
-           'Authorization': `Bearer ${acces_token}`,
-         }),
-      }
+      headers = headers.set('Authorization', `Bearer ${acces_token}`);
     }
+    return { headers };
   }
 
 
@@ -46,7 +46,7 @@ export class RequestManager {
    * @returns Observable<any>
    */
   get(endpoint: any) {
-    return this.http.get<any>(`${this.path}${endpoint}`, this.httpOptions).pipe(
+    return this.http.get<any>(`${this.path}${endpoint}`, this.getHttpOptions()).pipe(
       map(
         (res) => {
           if (res.hasOwnProperty('Body')) {
@@ -67,7 +67,7 @@ export class RequestManager {
    * @returns Observable<any>
    */
   post(endpoint: any, element: any) {
-    return this.http.post<any>(`${this.path}${endpoint}`, element, this.httpOptions).pipe(
+    return this.http.post<any>(`${this.path}${endpoint}`, element, this.getHttpOptions()).pipe(
       catchError(this.errManager.handleError),
     );
   }
@@ -79,9 +79,14 @@ export class RequestManager {
    * @returns Observable<any>
    */
   post_file(endpoint: any, element: any) {
-    return this.http.post<any>(`${this.path}${endpoint}`, element, {    headers: new HttpHeaders({
+    const acces_token = window.localStorage.getItem('access_token');
+    let headers = new HttpHeaders({
       'Content-Type': 'multipart/form-data',
-  })}).pipe(
+    });
+    if (acces_token !== null) {
+      headers = headers.set('Authorization', `Bearer ${acces_token}`);
+    }
+    return this.http.post<any>(`${this.path}${endpoint}`, element, { headers }).pipe(
       catchError(this.errManager.handleError),
     );
   }
@@ -93,8 +98,10 @@ export class RequestManager {
    * @returns Observable<any>
    */
   put(endpoint: any, element: { Id: any; }) {
-    const path = (element.Id) ? `${this.path}${endpoint}/${element.Id}` : `${this.path}${endpoint}`;
-    return this.http.put<any>(path, element, this.httpOptions).pipe(
+    const endpointPath = String(endpoint).replace(/\/$/, '');
+    const elementId = element?.Id;
+    const path = (elementId && !endpointPath.endsWith(`/${elementId}`)) ? `${this.path}${endpointPath}/${elementId}` : `${this.path}${endpointPath}`;
+    return this.http.put<any>(path, element, this.getHttpOptions()).pipe(
       catchError(this.errManager.handleError),
     );
   }
@@ -106,7 +113,7 @@ export class RequestManager {
    * @returns Observable<any>
    */
   delete(endpoint: any, id: any) {
-    return this.http.delete<any>(`${this.path}${endpoint}/${id}`, this.httpOptions).pipe(
+    return this.http.delete<any>(`${this.path}${endpoint}/${id}`, this.getHttpOptions()).pipe(
       catchError(this.errManager.handleError),
     );
   }
