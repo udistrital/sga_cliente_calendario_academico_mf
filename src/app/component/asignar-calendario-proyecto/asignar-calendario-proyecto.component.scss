@@ -18,15 +18,23 @@
   margin: 1rem 0;
 }
 
+.program-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.program-panel-header h4 {
+  margin: 0;
+}
+
 .program-panel {
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 8px;
   min-height: 430px;
   padding: 1.25rem;
-}
-
-.program-panel h4 {
-  margin: 0 0 0.75rem;
 }
 
 .program-search {
@@ -73,5 +81,10 @@
 @media (max-width: 768px) {
   .program-manager {
     grid-template-columns: 1fr;
+  }
+
+  .program-panel-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

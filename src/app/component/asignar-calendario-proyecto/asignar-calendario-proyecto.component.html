@@ -21,7 +21,12 @@
       </p>
       <div class="program-manager">
         <section class="program-panel associated">
-          <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
+          <div class="program-panel-header">
+            <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
+            <button mat-button color="warn" type="button" (click)="deseleccionarProgramasAsociadosFiltrados()" [disabled]="programasAsociadosFiltrados().length === 0">
+              {{ "calendario.masivo_deseleccionar_todos_programas" | translate }}
+            </button>
+          </div>
           <mat-form-field appearance="outline" class="program-search">
             <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
             <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
@@ -39,7 +44,12 @@
         </section>
 
         <section class="program-panel available">
-          <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
+          <div class="program-panel-header">
+            <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
+            <button mat-button color="accent" type="button" (click)="seleccionarProgramasDisponiblesFiltrados()" [disabled]="programasDisponiblesFiltrados().length === 0">
+              {{ "calendario.masivo_seleccionar_todos_programas" | translate }}
+            </button>
+          </div>
           <mat-form-field appearance="outline" class="program-search">
             <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
             <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />

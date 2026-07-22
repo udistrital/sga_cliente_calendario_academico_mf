@@ -107,4 +107,18 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
     this.selectedProjects.markAsTouched();
   }
 
+  seleccionarProgramasDisponiblesFiltrados() {
+    const currentIds = (this.selectedProjects.value || []).map((id: any) => Number(id));
+    const availableIds = this.programasDisponiblesFiltrados().map((project: any) => Number(project.Id)).filter((id: number) => id > 0);
+    this.selectedProjects.setValue(Array.from(new Set([...currentIds, ...availableIds])));
+    this.selectedProjects.markAsTouched();
+  }
+
+  deseleccionarProgramasAsociadosFiltrados() {
+    const idsARetirar = new Set(this.programasAsociadosFiltrados().map((project: any) => Number(project.Id)));
+    const currentIds = (this.selectedProjects.value || []).map((id: any) => Number(id));
+    this.selectedProjects.setValue(currentIds.filter((id: number) => !idsARetirar.has(id)));
+    this.selectedProjects.markAsTouched();
+  }
+
 }
