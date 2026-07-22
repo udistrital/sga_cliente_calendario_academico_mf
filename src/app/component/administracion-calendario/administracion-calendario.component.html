@@ -45,13 +45,6 @@
             <mat-option *ngIf="!Proyectos.length" disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
           </mat-select>
         </mat-form-field>
-
-        <ng-container *ngIf="Calendario_academico">  
-          <mat-form-field class="full-width">
-            <mat-label>{{ 'calendario.calendario_academico' | translate }}</mat-label>
-            <input matInput type="text" placeholder="{{ 'calendario.calendario_academico' | translate }}" [value]="Calendario_academico" readonly />
-          </mat-form-field>
-        </ng-container>
       </mat-card-content>
     </mat-card>
 

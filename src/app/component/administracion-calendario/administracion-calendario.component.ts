@@ -931,7 +931,7 @@ export class AdministracionCalendarioComponent implements OnInit {
                   this.popUpManager.showSuccessAlert(
                     this.translate.instant('calendario.actividad_actualizada')
                   );
-                  this.getInfoPrograma(this.DependenciaID);
+                  this.getInfoPrograma(this.DependenciaID, this.periodoSelected?.Id);
                 },
                 (error: any) => {
                   this.popUpManager.showErrorToast(
@@ -983,7 +983,7 @@ export class AdministracionCalendarioComponent implements OnInit {
                     .put('calendario-academico/eventos/calendario_evento/' + respGet.Id, respGet)
                     .subscribe(
                       (respPut: any) => {
-                        this.getInfoPrograma(this.DependenciaID);
+                        this.getInfoPrograma(this.DependenciaID, this.periodoSelected?.Id);
                         this.popUpManager.showSuccessAlert(
                           this.translate.instant(
                             'calendario.actividad_actualizada'
