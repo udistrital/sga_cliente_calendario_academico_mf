@@ -55,6 +55,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CustomPaginatorIntl } from './services/CustomPaginatorIntl.service';
 import { AdministracionPermisosEventosComponent } from './component/administracion_permisos_eventos/administracion_permisos_eventos.component';
 import { SpinnerUtilCounterInterceptor } from './interceptors/spinner-util-counter.interceptor';
+import { GestionMasivaActividadesProgramasComponent } from './component/gestion-masiva-actividades-programas/gestion-masiva-actividades-programas.component';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -79,6 +80,7 @@ export function createTranslateLoader(http: HttpClient) {
     EdicionActividadesProgramasComponent,
     ActividadCalendarioAcademicoComponent,
     AdministracionPermisosEventosComponent,
+    GestionMasivaActividadesProgramasComponent,
 
 
 

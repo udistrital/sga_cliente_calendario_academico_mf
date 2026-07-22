@@ -41,6 +41,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 import { ordenarPorPropiedad } from 'src/utils/listas';
+import { GestionMasivaActividadesProgramasComponent } from '../gestion-masiva-actividades-programas/gestion-masiva-actividades-programas.component';
 
 @Component({
   selector: 'def-calendario-academico',
@@ -688,6 +689,25 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
               );
             }
           );
+      }
+    });
+  }
+
+  abrirGestionMasivaProgramas() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '90vw';
+    dialogConfig.maxWidth = '99vw';
+    dialogConfig.height = '90vh';
+    dialogConfig.maxHeight = '98vh';
+    dialogConfig.data = {
+      calendar: this.calendar,
+      projects: this.projects,
+      processes: this.processes,
+    };
+    const dialogRef = this.dialog.open(GestionMasivaActividadesProgramasComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe((actualizado: boolean) => {
+      if (actualizado) {
+        this.loadCalendar();
       }
     });
   }

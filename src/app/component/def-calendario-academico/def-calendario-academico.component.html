@@ -453,6 +453,17 @@
             </mat-tab>
 
             <mat-tab label="{{ 'calendario.actividades' | translate }}">
+              <mat-toolbar *ngIf="!view" class="activities-toolbar">
+                <button
+                  mat-flat-button
+                  color="accent"
+                  type="button"
+                  (click)="abrirGestionMasivaProgramas()"
+                >
+                  <mat-icon fontIcon="hub"></mat-icon>
+                  {{ 'calendario.masivo_programas_abrir' | translate }}
+                </button>
+              </mat-toolbar>
               <mat-accordion>
                 <mat-expansion-panel
                   *ngFor="let process of processes; index as i"

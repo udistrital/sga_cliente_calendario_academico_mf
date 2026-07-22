@@ -1,0 +1,220 @@
+<h2 mat-dialog-title>{{ 'calendario.masivo_programas_titulo' | translate }}</h2>
+
+<mat-dialog-content class="bulk-dialog">
+  <section class="bulk-hero">
+    <div>
+      <p class="eyebrow">{{ 'calendario.masivo_asociacion' | translate }}</p>
+      <h3>{{ 'calendario.masivo_programas_info' | translate }}</h3>
+      <p>{{ 'calendario.masivo_programas_contexto' | translate }}</p>
+    </div>
+    <div class="program-selector-wrap">
+      <mat-form-field class="program-selector" floatLabel="always">
+        <mat-label>{{ 'calendario.programas_academicos' | translate }}</mat-label>
+        <input
+          #programaInput
+          type="text"
+          matInput
+          [(ngModel)]="programaFiltro"
+          [matAutocomplete]="programasAuto"
+          [placeholder]="'calendario.masivo_buscar_programa' | translate"
+        >
+        <mat-autocomplete #programasAuto="matAutocomplete" (optionSelected)="seleccionarProgramaAutocomplete($event, programaInput)">
+          <mat-option *ngFor="let project of programasFiltrados()" [value]="project.Id">
+            {{ project.Nombre }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <div class="program-selection-summary" *ngIf="programasSeleccionadosDetalle().length > 0">
+        <strong>{{ 'calendario.masivo_programas_seleccionados' | translate }}: {{ programaIdsSeleccionados.length }}</strong>
+      </div>
+      <div class="program-chip-list" *ngIf="programasSeleccionadosDetalle().length > 0">
+        <span class="program-chip" *ngFor="let programa of programasSeleccionadosDetalle()">
+          {{ programa.Nombre }}
+          <button type="button" (click)="quitarPrograma(programa.Id)" [attr.aria-label]="'GLOBAL.eliminar' | translate">×</button>
+        </span>
+      </div>
+      <div class="program-selector-actions">
+        <button mat-button type="button" (click)="seleccionarTodosProgramas()" [disabled]="projects.length === 0 || programaIdsSeleccionados.length === projects.length">
+          {{ 'calendario.masivo_seleccionar_todos_programas' | translate }}
+        </button>
+        <button mat-button type="button" (click)="deseleccionarTodosProgramas()" [disabled]="programaIdsSeleccionados.length === 0">
+          {{ 'calendario.masivo_deseleccionar_todos_programas' | translate }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="summary-grid">
+    <article>
+      <span>{{ 'calendario.masivo_programas_seleccionados' | translate }}</span>
+      <strong>{{ programaIdsSeleccionados.length }}</strong>
+    </article>
+    <article>
+      <span>{{ 'calendario.masivo_candidatas_asociar' | translate }}</span>
+      <strong>{{ totalCandidatasAsociar }}</strong>
+    </article>
+    <article>
+      <span>{{ 'calendario.masivo_candidatas_desasociar' | translate }}</span>
+      <strong>{{ totalCandidatasDesasociar }}</strong>
+    </article>
+    <article>
+      <span>{{ 'calendario.masivo_cruces_existentes' | translate }}</span>
+      <strong>{{ totalAsociacionesExistentes() }}</strong>
+    </article>
+  </section>
+
+  <p class="validation-state" *ngIf="validando">
+    {{ 'calendario.masivo_validando' | translate }}
+  </p>
+
+  <mat-tab-group class="operation-tabs" [selectedIndex]="operacionTabIndex" (selectedIndexChange)="onOperacionTabChange($event)">
+    <mat-tab label="{{ 'calendario.masivo_asociar' | translate }}">
+      <section class="summary-detail">
+        <h3>{{ 'calendario.masivo_detalle_asociar' | translate }}</h3>
+        <div class="detail-list vertical">
+          <p class="empty-state compact" *ngIf="actividadesDetalleResumen('asociar').length === 0">{{ 'calendario.masivo_detalle_sin_actividades' | translate }}</p>
+          <article class="detail-item" *ngFor="let item of actividadesDetalleResumen('asociar')">
+            <strong>{{ item.actividad.Nombre }}</strong>
+            <span>{{ 'calendario.masivo_detalle_proceso' | translate }}: {{ item.proceso }}</span>
+            <small>{{ 'calendario.masivo_detalle_faltantes' | translate }}:</small>
+            <div class="detail-program-list">
+              <span *ngFor="let programa of item.programas">{{ programa }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="operation-summary">
+        <span>{{ 'calendario.masivo_actividades_seleccionadas' | translate }}: {{ actividadesSeleccionadas('asociar').length }}</span>
+        <span>{{ 'calendario.masivo_cruces_totales' | translate }}: {{ totalCruces('asociar') }}</span>
+      </section>
+      <ng-container *ngIf="procesosCandidatosAsociar.length > 0; else sinCandidatasAsociar">
+        <mat-accordion class="activity-matrix">
+          <mat-expansion-panel *ngFor="let proceso of procesosCandidatosAsociar" [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>{{ proceso.Nombre }}</mat-panel-title>
+              <mat-panel-description>{{ proceso.actividadesCandidatas.length }} {{ 'calendario.actividades' | translate }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="process-toolbar">
+              <mat-checkbox
+                [checked]="procesoSeleccionado(proceso, 'asociar')"
+                [indeterminate]="procesoParcial(proceso, 'asociar')"
+                (change)="toggleProceso(proceso, $event.checked, 'asociar')"
+              >
+                {{ 'calendario.masivo_seleccionar_proceso' | translate }}
+              </mat-checkbox>
+            </div>
+
+            <div class="activity-row" *ngFor="let actividad of proceso.actividadesCandidatas">
+              <mat-checkbox
+                [checked]="actividadSeleccionada(actividad, 'asociar')"
+                (change)="toggleActividad(actividad, $event.checked, 'asociar')"
+              ></mat-checkbox>
+              <div class="activity-copy">
+                <strong>{{ actividad.Nombre }}</strong>
+                <span>{{ actividad.Descripcion }}</span>
+              </div>
+              <span class="coverage-pill" [ngClass]="claseCobertura(actividad)">
+                {{ textoCobertura(actividad) }}
+              </span>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </ng-container>
+      <ng-template #sinCandidatasAsociar>
+        <p class="empty-state">{{ 'calendario.masivo_sin_candidatas_asociar' | translate }}</p>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="{{ 'calendario.masivo_desasociar' | translate }}">
+      <section class="summary-detail">
+        <h3>{{ 'calendario.masivo_detalle_desasociar' | translate }}</h3>
+        <div class="detail-list vertical">
+          <p class="empty-state compact" *ngIf="actividadesDetalleResumen('desasociar').length === 0">{{ 'calendario.masivo_detalle_sin_actividades' | translate }}</p>
+          <article class="detail-item" *ngFor="let item of actividadesDetalleResumen('desasociar')">
+            <strong>{{ item.actividad.Nombre }}</strong>
+            <span>{{ 'calendario.masivo_detalle_proceso' | translate }}: {{ item.proceso }}</span>
+            <small>{{ 'calendario.masivo_detalle_asociados' | translate }}:</small>
+            <div class="detail-program-list">
+              <span *ngFor="let programa of item.programas">{{ programa }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="operation-summary">
+        <span>{{ 'calendario.masivo_actividades_seleccionadas' | translate }}: {{ actividadesSeleccionadas('desasociar').length }}</span>
+        <span>{{ 'calendario.masivo_cruces_totales' | translate }}: {{ totalCruces('desasociar') }}</span>
+      </section>
+      <ng-container *ngIf="procesosCandidatosDesasociar.length > 0; else sinCandidatasDesasociar">
+        <mat-accordion class="activity-matrix">
+          <mat-expansion-panel *ngFor="let proceso of procesosCandidatosDesasociar" [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>{{ proceso.Nombre }}</mat-panel-title>
+              <mat-panel-description>{{ proceso.actividadesCandidatas.length }} {{ 'calendario.actividades' | translate }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="process-toolbar">
+              <mat-checkbox
+                [checked]="procesoSeleccionado(proceso, 'desasociar')"
+                [indeterminate]="procesoParcial(proceso, 'desasociar')"
+                (change)="toggleProceso(proceso, $event.checked, 'desasociar')"
+              >
+                {{ 'calendario.masivo_seleccionar_proceso' | translate }}
+              </mat-checkbox>
+            </div>
+
+            <div class="activity-row" *ngFor="let actividad of proceso.actividadesCandidatas">
+              <mat-checkbox
+                [checked]="actividadSeleccionada(actividad, 'desasociar')"
+                (change)="toggleActividad(actividad, $event.checked, 'desasociar')"
+              ></mat-checkbox>
+              <div class="activity-copy">
+                <strong>{{ actividad.Nombre }}</strong>
+                <span>{{ actividad.Descripcion }}</span>
+              </div>
+              <span class="coverage-pill" [ngClass]="claseCobertura(actividad)">
+                {{ textoCobertura(actividad) }}
+              </span>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </ng-container>
+      <ng-template #sinCandidatasDesasociar>
+        <p class="empty-state">{{ 'calendario.masivo_sin_candidatas_desasociar' | translate }}</p>
+      </ng-template>
+
+      <section class="blocked-panel" *ngIf="bloqueadasDesasociacion.length > 0">
+        <h3>{{ 'calendario.masivo_bloqueadas_titulo' | translate }}</h3>
+        <p>{{ 'calendario.masivo_bloqueadas_info' | translate }}</p>
+        <div class="activity-row blocked" *ngFor="let actividad of bloqueadasDesasociacion">
+          <div class="activity-copy">
+            <strong>{{ actividad.Nombre }}</strong>
+            <span>{{ actividad.Descripcion }}</span>
+            <ng-container *ngIf="programasBloqueo(actividad).length > 0">
+              <div class="detail-program-list blocked-programs">
+                <span *ngFor="let programa of programasBloqueo(actividad)">{{ programa }}</span>
+              </div>
+            </ng-container>
+          </div>
+          <span class="coverage-pill blocked-pill">
+            {{ textoBloqueo(actividad) }}
+          </span>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="bulk-actions">
+  <button mat-button type="button" (click)="cerrar()">
+    {{ 'GLOBAL.cerrar' | translate }}
+  </button>
+  <button mat-flat-button color="accent" type="button" *ngIf="operacionTabIndex === 0" (click)="aplicar('asociar')" [disabled]="!puedeAplicar('asociar')">
+    {{ 'calendario.masivo_asociar' | translate }}
+  </button>
+  <button mat-stroked-button color="warn" type="button" *ngIf="operacionTabIndex === 1" (click)="aplicar('desasociar')" [disabled]="!puedeAplicar('desasociar')">
+    {{ 'calendario.masivo_desasociar' | translate }}
+  </button>
+</mat-dialog-actions>
