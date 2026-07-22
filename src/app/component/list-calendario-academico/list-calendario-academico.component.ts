@@ -46,8 +46,10 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     private sgaCalendarioMidService: SgaCalendarioMidService
   ) { }
   recargarDespuesClon(newItem: any) {
-    this.calendarForEditId = newItem
-    this.ngOnInit()
+    this.calendarForEditId = newItem;
+    this.calendarForNew = false;
+    this.view = false;
+    this.activetab = 1;
   }
 
   actualizarListadoCalendarios() {
@@ -223,8 +225,8 @@ export class ListCalendarioAcademicoComponent implements OnInit {
       },
       error => {
         const impactos = this.impactosDesasociacion(error);
-        if (impactos.length > 0 && !forzar) {
-          this.confirmarRetiroCascada(calendarioId, proyectos, impactos, programas);
+        if (impactos.length > 0) {
+          this.popUpManager.showErrorToast(error?.Message || error?.error?.Message || this.translate.instant('calendario.programas_no_desasociables'));
           return;
         }
         this.popUpManager.showErrorToast(error?.error?.Message || error?.message || this.translate.instant('ERROR.general'));
