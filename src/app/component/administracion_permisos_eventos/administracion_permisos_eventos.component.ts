@@ -3,7 +3,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
-import * as moment from 'moment';
 
 interface PerfilGestion {
   Id: number;
@@ -190,20 +189,20 @@ export class AdministracionPermisosEventosComponent implements OnInit {
       return;
     }
     this.guardandoPerfilId = perfil.Id;
-    const ahora = this.fechaParaCrud();
     const payload = {
       EventoCatalogoId: { Id: this.eventoCatalogoSeleccionado.Id },
       PerfilId: perfil.Id,
       Activo: true,
-      FechaCreacion: ahora,
-      FechaModificacion: ahora,
     };
     this.sgaCalendarioMidService.post('calendario-academico/eventos/evento_catalogo_rol_gestion', payload).subscribe(
       (respuesta: any) => {
         const relacionCreada = this.normalizarRelacion(this.extraerEntidad(respuesta));
-        if (relacionCreada.Id > 0 && relacionCreada.PerfilId > 0) {
-          this.relaciones = this.consolidarRelaciones([...this.relaciones, relacionCreada]);
+        if (relacionCreada.Id <= 0 || relacionCreada.PerfilId <= 0) {
+          this.guardandoPerfilId = null;
+          this.popUpManager.showErrorToast(this.translate.instant('calendario.error_guardar_roles_gestion'));
+          return;
         }
+        this.relaciones = this.consolidarRelaciones([...this.relaciones, relacionCreada]);
         this.guardandoPerfilId = null;
         this.popUpManager.showSuccessAlert(this.translate.instant('calendario.rol_gestion_asignado'));
         this.cargarRelaciones();
@@ -225,18 +224,18 @@ export class AdministracionPermisosEventosComponent implements OnInit {
 
   private actualizarRelacion(relacion: RolGestionEventoCatalogo, activo: boolean): void {
     this.guardandoPerfilId = relacion.PerfilId;
-    const payload = {
+    const payload: any = {
       Id: relacion.Id,
       EventoCatalogoId: { Id: this.eventoCatalogoSeleccionado?.Id || this.obtenerId(relacion.EventoCatalogoId) },
       PerfilId: relacion.PerfilId,
       Activo: activo,
-      FechaCreacion: this.fechaParaCrud(relacion.FechaCreacion),
-      FechaModificacion: this.fechaParaCrud(),
     };
+    if (relacion.FechaCreacion) {
+      payload.FechaCreacion = relacion.FechaCreacion;
+    }
     this.sgaCalendarioMidService.put('calendario-academico/eventos/evento_catalogo_rol_gestion/' + relacion.Id, payload).subscribe(
       () => {
         relacion.Activo = activo;
-        relacion.FechaModificacion = payload.FechaModificacion;
         this.relaciones = this.consolidarRelaciones(this.relaciones);
         this.guardandoPerfilId = null;
         this.popUpManager.showSuccessAlert(
@@ -334,14 +333,5 @@ export class AdministracionPermisosEventosComponent implements OnInit {
       return valor;
     }
     return Number(valor?.Id || valor?.id || 0);
-  }
-
-  private fechaParaCrud(valor?: string): string {
-    const texto = String(valor || '').trim();
-    const match = texto.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d{1,6})?/);
-    if (match) {
-      return `${match[1]} ${match[2]}${(match[3] || '.000').substring(0, 4)}`;
-    }
-    return moment().utcOffset(-300).format('YYYY-MM-DD HH:mm:ss.SSS');
   }
 }
