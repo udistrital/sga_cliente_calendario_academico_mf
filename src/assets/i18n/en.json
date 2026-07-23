@@ -791,6 +791,7 @@
         "calendarios_academicos": "Academic calendars",
         "nombre": "Name",
         "periodo": "Academic Period",
+        "nivel": "Level",
         "dependencia": "Academic program",
         "estado": "Status",
         "definicion": "Defining Academic calendar",

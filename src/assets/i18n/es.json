@@ -827,6 +827,7 @@
         "calendarios_academicos": "Calendarios Académicos",
         "nombre": "Nombre",
         "periodo": "Periodo Académico",
+        "nivel": "Nivel",
         "dependencia": "Programa Académico",
         "estado": "Estado",
         "definicion": "Definición del calendario Académico",

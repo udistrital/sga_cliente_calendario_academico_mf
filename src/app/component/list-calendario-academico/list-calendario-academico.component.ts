@@ -31,7 +31,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
   calendarForEditId: number = 0;
   calendarForNew: boolean = false;
   niveles: NivelFormacion[] = [];
-  displayedColumns: string[] = ['Nombre', 'Periodo_Académico', "Tipo_de_dependencia", "Estado", "Acciones" ];
+  displayedColumns: string[] = ['Nombre', 'Periodo_Académico', "Nivel", "Estado", "Acciones" ];
   displayedColumnsTable: string[] = ['Nombre', "Dirigido" ];
   dataSource!: MatTableDataSource<any>;
   view!: boolean
@@ -79,7 +79,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
               Id: calendar.Id,
               Nombre: calendar.Nombre,
               Periodo: calendar.Periodo,
-              Dependencia: this.niveles.find(nivel => nivel.Id === calendar.Nivel)?.Nombre || '',
+              NivelNombre: this.niveles.find(nivel => nivel.Id === calendar.Nivel)?.Nombre || '',
               Estado: calendar.Activo ? this.translate.instant('GLOBAL.activo') : this.translate.instant('GLOBAL.inactivo'),
               Activo: calendar.Activo,
               Nivel: calendar.Nivel,

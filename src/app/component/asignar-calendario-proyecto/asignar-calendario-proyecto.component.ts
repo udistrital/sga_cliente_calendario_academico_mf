@@ -44,12 +44,13 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   filtrarProyecto(proyecto:any):any {
     const nivelFormacion = proyecto?.NivelFormacionId;
     const padreFormacion = nivelFormacion?.NivelFormacionPadreId;
+    const nivelCalendarioId = Number(this.dat?.calendar?.Nivel || this.dat?.data?.Nivel);
 
     // si es calendario de un posgrado
-    if (this.dat.data.Nivel === 2){
+    if (nivelCalendarioId === 2){
       return padreFormacion?.CodigoAbreviacion === 'POS' || nivelFormacion?.CodigoAbreviacion === 'POS';
     }
-    return nivelFormacion?.Nombre === this.dat.data.Dependencia;
+    return Number(nivelFormacion?.Id) === nivelCalendarioId || Number(padreFormacion?.Id) === nivelCalendarioId;
   }
 
   register() {
