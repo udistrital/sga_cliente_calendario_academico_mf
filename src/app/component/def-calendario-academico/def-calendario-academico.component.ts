@@ -151,6 +151,10 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   }
 
   clonarCalendario() {
+    if (this.calendarFormClone.invalid) {
+      this.calendarFormClone.markAllAsTouched();
+      return;
+    }
     this.calendarClone = new CalendarioClone();
     this.calendarClone = this.calendarFormClone.value;
     this.calendarClone.Id = this.calendar.calendarioId;
@@ -535,8 +539,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
 
   createCalendarFormClone() {
     this.calendarFormClone = this.builder.group({
-      PeriodoIdClone: '',
-      NivelClone: '',
+      PeriodoIdClone: ['', Validators.required],
+      NivelClone: ['', Validators.required],
     });
   }
 
@@ -609,7 +613,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       )
       .subscribe(
         (res: any) => {
-          this.periodos = ordenarPorPropiedad(res.Data, 'Nombre', -1);
+          this.periodosClone = ordenarPorPropiedad(res.Data, 'Nombre', -1);
         },
         (error) => {
           this.popUpManager.showErrorToast(
@@ -699,6 +703,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     dialogConfig.maxWidth = '99vw';
     dialogConfig.height = '90vh';
     dialogConfig.maxHeight = '98vh';
+    dialogConfig.autoFocus = false;
     dialogConfig.data = {
       calendar: this.calendar,
       projects: this.projects,

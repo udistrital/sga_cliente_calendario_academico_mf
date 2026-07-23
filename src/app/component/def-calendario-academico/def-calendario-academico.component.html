@@ -304,6 +304,7 @@
                   mat-flat-button
                   color="accent"
                   type="button"
+                  [disabled]="calendarFormClone.invalid"
                   (click)="clonarCalendario()"
                 >
                   {{ "calendario.clonar_calendario" | translate }}
