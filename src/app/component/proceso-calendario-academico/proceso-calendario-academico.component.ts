@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Proceso } from 'src/app/models/calendario-academico/proceso';
 import { Calendario } from 'src/app/models/calendario-academico/calendario';
 import { PopUpManager } from 'src/app/managers/popUpManager';
-import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
 
 @Component({
   selector: 'proceso-calendario-academico',
@@ -25,7 +25,7 @@ export class ProcesoCalendarioAcademicoComponent {
     private builder: FormBuilder,
     private translate: TranslateService,
     @Inject(MAT_DIALOG_DATA) private data: any,
-    private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
     private popUpManager: PopUpManager,
   ) {
     this.fetchSelectData();
@@ -72,8 +72,8 @@ export class ProcesoCalendarioAcademicoComponent {
   }
 
   fetchSelectData() {
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/tipo_recurrencia?limit=0').subscribe((data:any) => this.periodicidad = data);
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/proceso_catalogo?query=Activo:true&limit=0').subscribe((data:any) => this.procesosCatalogo = data);
+    this.eventoService.get('tipo_recurrencia?limit=0').subscribe((data:any) => this.periodicidad = data);
+    this.eventoService.get('proceso_catalogo?query=Activo:true&limit=0').subscribe((data:any) => this.procesosCatalogo = data);
   }
 
   getCatalogId(tipoCatalogo: any) {

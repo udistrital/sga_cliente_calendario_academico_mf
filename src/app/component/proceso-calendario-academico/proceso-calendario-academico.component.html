@@ -1,64 +1,57 @@
-<mat-card style="height: 100%;">
-  <mat-card-header>
-    <mat-card-title>
-      {{ "calendario.proceso" | translate }}
-    </mat-card-title>
-  </mat-card-header>
-  <mat-card-content style="display: flex; flex-direction: column;justify-content: center; height: 100%;">
-    <form
-      style="display: flex; flex-direction: column;justify-content: center;"
-      novalidate
-      [formGroup]="processForm"
-      #fform="ngForm"
-      (ngSubmit)="saveProcess()"
-      class="form-horizontal"
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="process-dialog-title" mat-dialog-title>{{ "calendario.proceso" | translate }}</h2>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
     >
-      <mat-form-field floatLabel="always" style="width: 100%">
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="sga-modal-content process-dialog-content">
+    <form novalidate [formGroup]="processForm" (ngSubmit)="saveProcess()" class="process-form">
+      <mat-form-field appearance="outline" floatLabel="always">
         <mat-label>*{{ "calendario.proceso" | translate }}</mat-label>
         <mat-select formControlName="ProcesoCatalogoId" required>
           <mat-option *ngFor="let proceso of procesosCatalogo" [value]="proceso.Id">
             {{ proceso.Nombre }}
           </mat-option>
         </mat-select>
-        <mat-error
-          *ngIf="
-            processForm.get('ProcesoCatalogoId')?.hasError('required') &&
-            processForm.get('ProcesoCatalogoId')?.touched
-          "
-        >
+        <mat-error *ngIf="processForm.get('ProcesoCatalogoId')?.hasError('required') && processForm.get('ProcesoCatalogoId')?.touched">
           {{ "calendario.error_nombre_proceso" | translate }}
         </mat-error>
       </mat-form-field>
-      <p><strong>{{ "GLOBAL.descripcion" | translate }}:</strong> {{ getSelectedProcesoCatalogo()?.Descripcion || '-' }}</p>
-      <mat-form-field style="width: 100%" floatLabel="always">
-        <mat-label>*{{ "calendario.periodicidad" | translate }} </mat-label>
-        <mat-select
-          placeholder="Semestral/Anual"
-          formControlName="TipoRecurrenciaId"
-          required
-        >
+
+      <div class="process-description">
+        <span>{{ "GLOBAL.descripcion" | translate }}</span>
+        <p>{{ getSelectedProcesoCatalogo()?.Descripcion || '-' }}</p>
+      </div>
+
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>*{{ "calendario.periodicidad" | translate }}</mat-label>
+        <mat-select formControlName="TipoRecurrenciaId" required>
           <mat-option *ngFor="let period of periodicidad" [value]="period.Id">
             {{ period.Nombre }}
           </mat-option>
         </mat-select>
-        <mat-error
-          *ngIf="
-            processForm.get('TipoRecurrenciaId')?.hasError('required') &&
-            processForm.get('TipoRecurrenciaId')?.touched
-          "
-        >
+        <mat-error *ngIf="processForm.get('TipoRecurrenciaId')?.hasError('required') && processForm.get('TipoRecurrenciaId')?.touched">
           {{ "calendario.error_period_proceso" | translate }}
         </mat-error>
       </mat-form-field>
-      <button
-        style="width: 100%;"
-        mat-flat-button
-        color="accent"
-        type="submit"
-        [disabled]="processForm.invalid"
-      >
-        {{ "GLOBAL.guardar" | translate }}
-      </button>
     </form>
-  </mat-card-content>
-</mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sga-modal-actions">
+    <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+    <button mat-flat-button color="accent" type="button" [disabled]="processForm.invalid" (click)="saveProcess()">
+      {{ "GLOBAL.guardar" | translate }}
+    </button>
+  </mat-dialog-actions>
+</section>

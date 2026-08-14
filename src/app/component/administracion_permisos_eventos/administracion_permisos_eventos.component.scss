@@ -18,7 +18,7 @@
   padding: 1rem;
   border-left: 5px solid var(--primary);
   border-radius: 0.5rem;
-  background: linear-gradient(90deg, var(--color100), white);
+  background: var(--color100);
 }
 
 .evento-resumen h3 {
@@ -74,7 +74,7 @@
 
 .profile-row.active {
   border-color: var(--success-accent);
-  background: linear-gradient(90deg, rgba(50, 160, 90, 0.12), white);
+  background: rgba(50, 160, 90, 0.12);
 }
 
 .profile-row strong,

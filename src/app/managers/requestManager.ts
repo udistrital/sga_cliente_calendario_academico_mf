@@ -112,8 +112,9 @@ export class RequestManager {
    * @param id element's id for remove
    * @returns Observable<any>
    */
-  delete(endpoint: any, id: any) {
-    return this.http.delete<any>(`${this.path}${endpoint}/${id}`, this.getHttpOptions()).pipe(
+  delete(endpoint: any, id: any, element?: any) {
+    const options = { ...this.getHttpOptions(), body: element };
+    return this.http.delete<any>(`${this.path}${endpoint}/${id}`, options).pipe(
       catchError(this.errManager.handleError),
     );
   }

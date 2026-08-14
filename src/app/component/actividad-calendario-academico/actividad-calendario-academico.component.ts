@@ -1,12 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Actividad } from 'src/app/models/calendario-academico/actividad';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
-import { NewNuxeoService } from 'src/app/services/new_nuxeo.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import * as moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
@@ -31,20 +31,12 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   tiposPublico: any[] = [];
   eventosCatalogo: any[] = [];
   responsablesSelected!: any[];
-  extensionForm!: FormGroup;
   publicTable: any;
   // tableSource: LocalDataSource;
   tableSource: MatTableDataSource<any> = new MatTableDataSource<any>
   displayedColumns = ['Nombre', 'Acciones']
-  extensionDisplayedColumns = ['NumeroExtension', 'FechaFin', 'Dependencias', 'Descripcion', 'DocumentoId', 'Vigente', 'Acciones'];
   minDate!: Date;
   maxDate!: Date;
-  extensiones: any[] = [];
-  dependencias: any[] = [];
-  extensionFile: any = null;
-  extensionMode: 'create' | 'edit' = 'create';
-  editingExtension: any = null;
-  selectedDependencyRanges: any[] = [];
   activeTab = 0;
 
   constructor(
@@ -52,8 +44,8 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     private builder: FormBuilder,
     private parametrosService: ParametrosService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
     private configuracionService: ConfiguracionService,
-    private newNuxeoService: NewNuxeoService,
     private translate: TranslateService,
     private popUpManager: PopUpManager,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -64,15 +56,12 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     this.fetchSelectData(this.data.calendar.PeriodoId);
     this.createActivityForm();
     this.createPublicTable();
-    this.createExtensionForm();
     this.dialogRef.backdropClick().subscribe(() => this.closeDialog());
   }
 
   ngOnInit() {
 
     if (this.data.editActivity !== undefined) {
-      this.extensiones = this.normalizeExtensions(this.data.editActivity.Extensiones);
-      this.dependencias = this.loadExtensionDependencies();
       this.activityForm.setValue({
         EventoCatalogoId: this.getCatalogId(this.data.editActivity.EventoCatalogoId),
         FechaInicio: this.parseActivityDate(this.activityStartDateValue()),
@@ -117,7 +106,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
   }
 
   publicTabIndex() {
-    return this.data.editActivity !== undefined ? 2 : 1;
+    return 1;
   }
 
   buildActivityPayload() {
@@ -156,7 +145,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       return;
     }
     const actividadId = this.data.editActivity.actividadId || this.data.editActivity.Id;
-    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/', { Id: actividadId, actividad: activity }).subscribe(
+    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/' + actividadId, { Id: actividadId, actividad: activity }).subscribe(
       () => this.popUpManager.showSuccessAlert(this.t('calendario.fechas_globales_actualizadas')),
       (error: any) => this.popUpManager.showErrorToast(error?.error?.Message || error?.error?.Data || error?.Message || error?.message || this.t('calendario.error_actualizar_fechas_globales')),
     );
@@ -173,7 +162,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       return;
     }
     const actividadId = this.data.editActivity.actividadId || this.data.editActivity.Id;
-    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/', { Id: actividadId, resp: responsables }).subscribe(
+    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/' + actividadId, { Id: actividadId, resp: responsables }).subscribe(
       () => this.popUpManager.showSuccessAlert(this.t('calendario.publico_dirigido_actualizado')),
       (error: any) => this.popUpManager.showErrorToast(error?.error?.Message || error?.message || this.t('calendario.error_actualizar_publico_dirigido')),
     );
@@ -184,7 +173,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       return;
     }
     const actividadId = this.data.editActivity.actividadId || this.data.editActivity.Id;
-    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/', { Id: actividadId, resp: this.selectedPublicPayload() }).subscribe(
+    this.sgaCalendarioMidService.put('actividad-calendario/calendario/actividad/' + actividadId, { Id: actividadId, resp: this.selectedPublicPayload() }).subscribe(
       () => {
         this.data.editActivity.responsables = this.selectedPublicPayload();
       },
@@ -211,17 +200,6 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       HoraInicio: ['00:00', Validators.required],
       HoraFin: ['23:59', Validators.required],
     })
-  }
-
-  createExtensionForm() {
-    this.extensionForm = this.builder.group({
-      FechaFin: ['', Validators.required],
-      HoraFin: ['23:59', Validators.required],
-      DocumentoId: [''],
-      DocumentoSoporte: [''],
-      Descripcion: [''],
-      Dependencias: [[], Validators.required],
-    });
   }
 
   fetchSelectData(periodo: any) {
@@ -253,7 +231,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       return;
     }
 
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/evento_catalogo_proceso_catalogo?query=Activo:true,ProcesoCatalogoId__Id:' + procesoCatalogoId + '&limit=0').subscribe(
+    this.eventoService.get('evento_catalogo_proceso_catalogo?query=Activo:true,ProcesoCatalogoId__Id:' + procesoCatalogoId + '&limit=0').subscribe(
       (data: any) => {
         const relaciones = Array.isArray(data) ? data : [];
         this.eventosCatalogo = relaciones
@@ -397,7 +375,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       this.ensureProcessLoaded();
       return;
     }
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/proceso_catalogo/' + procesoCatalogoId).subscribe(
+    this.eventoService.get('proceso_catalogo/' + procesoCatalogoId).subscribe(
       (procesoCatalogo: any) => {
         this.setProcessCatalogContext(procesoCatalogo);
       },
@@ -410,7 +388,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     if (processId === null || processId === undefined) {
       return;
     }
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/proceso?query=Id:' + processId + '&limit=1').subscribe(
+    this.eventoService.get('proceso?query=Id:' + processId + '&limit=1').subscribe(
       (procesos: any) => {
         const proceso = Array.isArray(procesos) ? procesos[0] : procesos;
         if (!proceso || proceso.Type === 'error') {
@@ -504,7 +482,7 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
     if (eventoCatalogoId === null || this.eventosCatalogo.some((evento: any) => evento.Id === eventoCatalogoId)) {
       return;
     }
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/evento_catalogo/' + eventoCatalogoId).subscribe(
+    this.eventoService.get('evento_catalogo/' + eventoCatalogoId).subscribe(
       (eventoCatalogo: any) => {
         if (eventoCatalogo !== null && eventoCatalogo.Type !== 'error' && eventoCatalogo.Activo === true) {
           this.eventosCatalogo = [...this.eventosCatalogo, eventoCatalogo];
@@ -530,316 +508,6 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
       || this.data.editActivity?.EventoCatalogoId?.Descripcion
       || this.data.editActivity?.Descripcion
       || '-';
-  }
-
-  saveExtension() {
-    if (this.extensionForm.invalid || this.data.editActivity === undefined) {
-      this.popUpManager.showErrorToast(this.t('calendario.error_extension_formulario'));
-      return;
-    }
-    const fechaFin = this.extensionForm.get('FechaFin')?.value;
-    const horaFin = this.extensionForm.get('HoraFin')?.value;
-    const fechaFinExtension = this.combineDateAndTime(fechaFin, horaFin);
-    if (this.extensionMode === 'create' && !this.validateExtensionEndDate(fechaFinExtension)) {
-      return;
-    }
-    const payload = {
-      FechaFin: this.formatGmtMinus5(fechaFinExtension),
-      DocumentoId: this.extensionForm.get('DocumentoId')?.value || null,
-      Descripcion: this.extensionForm.get('Descripcion')?.value || '',
-      Dependencias: this.extensionForm.get('Dependencias')?.value || [],
-    };
-    const actividadId = this.data.editActivity.actividadId || this.data.editActivity.Id;
-    const editingExtensionId = this.extensionId(this.editingExtension);
-    this.uploadExtensionFileIfNeeded().then((documentoId: any) => {
-      payload.DocumentoId = documentoId || payload.DocumentoId;
-      this.persistExtension(actividadId, editingExtensionId, payload);
-    }).catch((error: any) => {
-      this.popUpManager.showErrorToast(error?.message || this.t('ERROR.error_subir_documento'));
-    });
-  }
-
-  persistExtension(actividadId: any, editingExtensionId: any, payload: any) {
-    const request = this.extensionMode === 'edit' && editingExtensionId
-      ? this.sgaCalendarioMidService.put('actividad-calendario/' + actividadId + '/extension/' + editingExtensionId, payload)
-      : this.sgaCalendarioMidService.post('actividad-calendario/' + actividadId + '/extension', payload);
-    request.subscribe(
-      () => {
-        this.popUpManager.showSuccessAlert(this.extensionMode === 'edit' ? this.t('calendario.extension_actualizada') : this.t('calendario.extension_registrada'));
-        this.resetExtensionForm();
-        this.reloadExtensions(actividadId);
-      },
-      (error: any) => {
-        const message = error?.error?.Message || error?.error?.Data || error?.message || this.t('calendario.error_guardar_extension');
-        this.popUpManager.showErrorToast(message);
-      },
-    );
-  }
-
-  uploadExtensionFileIfNeeded() {
-    return new Promise((resolve, reject) => {
-      if (!this.extensionFile) {
-        resolve(null);
-        return;
-      }
-      this.newNuxeoService.uploadFiles([this.extensionFile]).subscribe(
-        (responseNux: any[]) => {
-          if (responseNux[0]?.Status == '200') {
-            resolve(responseNux[0].res.Id);
-          } else {
-            reject(new Error(this.t('ERROR.error_subir_documento')));
-          }
-        },
-        (error: any) => reject(error),
-      );
-    });
-  }
-
-  onInputFileExtension(event: any) {
-    this.extensionFile = null;
-    const selectedFile = event.target.files?.[0];
-    if (!selectedFile) {
-      return;
-    }
-    if (selectedFile.type !== 'application/pdf') {
-      this.popUpManager.showErrorToast(this.t('ERROR.formato_documento_pdf'));
-      this.extensionForm.patchValue({ DocumentoSoporte: '' });
-      return;
-    }
-    const actividadId = this.data.editActivity?.actividadId || this.data.editActivity?.Id;
-    this.extensionFile = {
-      IdDocumento: 14,
-      nombre: 'Extension_Actividad_Calendario',
-      metadatos: this.extensionFileMetadata(actividadId),
-      descripcion: 'Extension_Actividad_Calendario',
-      file: selectedFile,
-    };
-  }
-
-  extensionFileMetadata(actividadId: any) {
-    const metadata: any = {};
-    if (this.data.calendar?.resolucion !== undefined && this.data.calendar?.resolucion !== null) {
-      metadata.resolucion = String(this.data.calendar.resolucion);
-    }
-    if (this.data.calendar?.anno !== undefined && this.data.calendar?.anno !== null) {
-      metadata.anno = String(this.data.calendar.anno);
-    }
-    if (actividadId !== undefined && actividadId !== null) {
-      metadata.actividad_id = String(actividadId);
-    }
-    const extensionId = this.extensionId(this.editingExtension);
-    if (extensionId !== undefined && extensionId !== null) {
-      metadata.extension_id = String(extensionId);
-    }
-    return metadata;
-  }
-
-  downloadExtensionFile(idDocumento: any) {
-    if (!idDocumento) {
-      return;
-    }
-    this.newNuxeoService.get([{ Id: idDocumento }]).subscribe(
-      (response: any) => {
-        const url = response?.[0]?.url;
-        if (url) {
-          window.open(url);
-        }
-      },
-      () => this.popUpManager.showErrorToast(this.t('ERROR.error_cargar_documento')),
-    );
-  }
-
-  reloadExtensions(actividadId: any) {
-    this.sgaCalendarioMidService.get('actividad-calendario/' + actividadId + '/extension').subscribe(
-      (response: any) => {
-        this.extensiones = this.normalizeExtensions(response?.Data || response);
-        this.data.editActivity.Extensiones = this.extensiones;
-      },
-      () => {
-        this.popUpManager.showErrorToast(this.t('calendario.extension_creada_error_recarga'));
-      },
-    );
-  }
-
-  loadExtensionDependencies() {
-    const dependenciaId = this.data.editActivity?.DependenciaId || this.data.calendar?.DependenciaId;
-    const parsed = typeof dependenciaId === 'string' ? this.safeParseJson(dependenciaId) : dependenciaId;
-    const proyectos = Array.isArray(parsed?.proyectos) ? parsed.proyectos : [];
-    const idsAsociados = proyectos.map((id: any) => Number(id)).filter((id: number) => id > 0);
-    const dependencias = Array.isArray(this.data.dependencias) ? this.data.dependencias : [];
-    if (dependencias.length > 0) {
-      return dependencias.filter((dependencia: any) => idsAsociados.includes(Number(dependencia.Id)));
-    }
-    return idsAsociados.map((id: any) => ({ Id: id, Nombre: this.t('calendario.programa_academico') + ' ' + id }));
-  }
-
-  safeParseJson(value: string) {
-    try {
-      return JSON.parse(value);
-    } catch (error) {
-      return {};
-    }
-  }
-
-  dependencyName(id: any) {
-    const dependencia = this.dependencias.find((item: any) => Number(item.Id) === Number(id));
-    return dependencia?.Nombre || (this.t('calendario.programa_academico') + ' ' + id);
-  }
-
-  extensionDependencyNames(extension: any) {
-    const programas = Array.isArray(extension?.Programas) ? extension.Programas : [];
-    return programas.map((programa: any) => this.dependencyName(programa.DependenciaId)).join(', ') || '-';
-  }
-
-  extensionIsCurrent(extension: any) {
-    return this.extensionHasCurrentPrograms(extension) ? 'Sí' : 'No';
-  }
-
-  extensionHasCurrentPrograms(extension: any) {
-    const programas = Array.isArray(extension?.Programas) ? extension.Programas : [];
-    return programas.some((programa: any) => programa.Vigente === true);
-  }
-
-  formatExtensionDate(date: any) {
-    const parsedDate = this.parseFlexibleDate(date);
-    return parsedDate.isValid() ? parsedDate.format('DD/MM/YYYY HH:mm') : '-';
-  }
-
-  normalizeExtensions(value: any): any[] {
-    const rawExtensions = Array.isArray(value) ? value : (Array.isArray(value?.Data) ? value.Data : []);
-    return rawExtensions.filter((extension: any) => {
-      const extensionId = extension?.Id || extension?.id || extension?.CalendarioEventoExtensionId?.Id;
-      return extension !== undefined && extension !== null && Object.keys(extension).length > 0 && extensionId !== undefined && extensionId !== null;
-    }).map((extension: any) => {
-      if (extension?.CalendarioEventoExtensionId !== undefined && extension.CalendarioEventoExtensionId !== null) {
-        return {
-          ...extension.CalendarioEventoExtensionId,
-          Programas: [extension],
-        };
-      }
-      return {
-        ...extension,
-        Id: extension?.Id || extension?.id,
-        NumeroExtension: extension?.NumeroExtension || extension?.numero_extension,
-        FechaFin: extension?.FechaFin || extension?.fecha_fin,
-        DocumentoId: extension?.DocumentoId || extension?.documento_id,
-        Descripcion: extension?.Descripcion || extension?.descripcion,
-        Programas: Array.isArray(extension?.Programas) ? extension.Programas : [],
-      };
-    });
-  }
-
-  extensionId(extension: any) {
-    return extension?.Id || extension?.id || extension?.CalendarioEventoExtensionId?.Id;
-  }
-
-  startEditExtension(extension: any) {
-    this.extensionMode = 'edit';
-    this.editingExtension = extension;
-    const fechaFin = this.parseActivityDate(extension.FechaFin);
-    this.extensionForm.patchValue({
-      FechaFin: fechaFin,
-      HoraFin: this.parseActivityTime(extension.FechaFin),
-      DocumentoId: extension.DocumentoId || '',
-      DocumentoSoporte: '',
-      Descripcion: extension.Descripcion || '',
-      Dependencias: this.extensionDependencyIds(extension),
-    });
-    this.extensionFile = null;
-    this.extensionForm.get('Dependencias')?.disable();
-    this.updateSelectedDependencyRanges();
-  }
-
-  cancelEditExtension() {
-    this.resetExtensionForm();
-  }
-
-  resetExtensionForm() {
-    this.extensionMode = 'create';
-    this.editingExtension = null;
-    this.selectedDependencyRanges = [];
-    this.extensionFile = null;
-    this.extensionForm.get('Dependencias')?.enable();
-    this.extensionForm.reset({ FechaFin: '', HoraFin: '23:59', DocumentoId: '', DocumentoSoporte: '', Descripcion: '', Dependencias: [] });
-  }
-
-  deleteExtension(extension: any) {
-    const extensionId = this.extensionId(extension);
-    if (!extensionId) {
-      this.popUpManager.showErrorToast(this.t('calendario.error_identificar_extension_anular'));
-      return;
-    }
-    const actividadId = this.data.editActivity.actividadId || this.data.editActivity.Id;
-    this.popUpManager.showConfirmAlert(this.t('calendario.confirmar_anular_extension')).then((ok) => {
-      if (!ok.value) {
-        return;
-      }
-      this.sgaCalendarioMidService.put('actividad-calendario/' + actividadId + '/extension/' + extensionId + '/anular', {}).subscribe(
-        () => {
-          this.popUpManager.showSuccessAlert(this.t('calendario.extension_anulada'));
-          this.resetExtensionForm();
-          this.reloadExtensions(actividadId);
-        },
-        (error: any) => {
-          const message = error?.error?.Message || error?.error?.Data || error?.message || this.t('calendario.error_anular_extension');
-          this.popUpManager.showErrorToast(message);
-        },
-      );
-    });
-  }
-
-  extensionDependencyIds(extension: any) {
-    const programas = Array.isArray(extension?.Programas) ? extension.Programas : [];
-    return programas.map((programa: any) => programa.DependenciaId);
-  }
-
-  updateSelectedDependencyRanges() {
-    const actividadId = this.data.editActivity?.actividadId || this.data.editActivity?.Id;
-    const dependencias = this.extensionForm.get('Dependencias')?.value || [];
-    this.selectedDependencyRanges = [];
-    if (!actividadId || dependencias.length === 0) {
-      return;
-    }
-    const rangosRequests = dependencias.map((dependenciaId: any) => this.sgaCalendarioMidService.get('actividad-calendario/' + actividadId + '/rango-dependencia/' + dependenciaId));
-    forkJoin(rangosRequests).subscribe(
-      (responses: any) => {
-        const ranges = Array.isArray(responses) ? responses : [];
-        this.selectedDependencyRanges = ranges.map((response: any) => response?.Data || response);
-      },
-      () => {
-        this.popUpManager.showErrorToast(this.t('calendario.error_consultar_rangos_programas'));
-      },
-    );
-  }
-
-  validateExtensionEndDate(fechaFinExtension: moment.Moment) {
-    const dependencias = this.extensionForm.get('Dependencias')?.value || [];
-    if (dependencias.length === 0) {
-      return false;
-    }
-    if (this.selectedDependencyRanges.length !== dependencias.length) {
-      this.popUpManager.showErrorToast(this.t('calendario.espere_consulta_rangos_programas'));
-      this.updateSelectedDependencyRanges();
-      return false;
-    }
-    const dependenciasInvalidas = this.selectedDependencyRanges.filter((range: any) => {
-      const fechaFinVigente = this.parseFlexibleDate(range?.RangoPermitido?.FechaFin);
-      return !fechaFinVigente.isValid() || !fechaFinExtension.isAfter(fechaFinVigente);
-    });
-    if (dependenciasInvalidas.length > 0) {
-      const nombres = dependenciasInvalidas.map((range: any) => this.rangeDependencyName(range)).join(', ');
-      this.popUpManager.showErrorToast(this.t('calendario.fecha_fin_extension_mayor_vigente', { programas: nombres }));
-      return false;
-    }
-    return true;
-  }
-
-  rangeDependencyName(range: any) {
-    return this.dependencyName(range?.DependenciaId);
-  }
-
-  rangeCurrentEnd(range: any) {
-    return this.formatExtensionDate(range?.RangoPermitido?.FechaFin);
   }
 
 }

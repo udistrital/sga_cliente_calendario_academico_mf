@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
-import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
 
 interface PerfilGestion {
   Id: number;
@@ -44,7 +44,7 @@ export class AdministracionPermisosEventosComponent implements OnInit {
   guardandoPerfilId: number | null = null;
 
   constructor(
-    private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
     private configuracionService: ConfiguracionService,
     private popUpManager: PopUpManager,
     private translate: TranslateService
@@ -56,8 +56,8 @@ export class AdministracionPermisosEventosComponent implements OnInit {
 
   cargarDatosIniciales(): void {
     this.cargando = true;
-    this.sgaCalendarioMidService
-      .get('calendario-academico/eventos/evento_catalogo?query=Activo:true&limit=0')
+    this.eventoService
+      .get('evento_catalogo?query=Activo:true&limit=0')
       .subscribe(
         (eventos: any) => {
           this.eventoCatalogos = this.normalizarLista(eventos)
@@ -138,8 +138,8 @@ export class AdministracionPermisosEventosComponent implements OnInit {
       return;
     }
     this.cargando = true;
-    const endpoint = 'calendario-academico/eventos/evento_catalogo_rol_gestion?query=EventoCatalogoId.Id:' + this.eventoCatalogoSeleccionado.Id + '&limit=0';
-    this.sgaCalendarioMidService.get(endpoint).subscribe(
+    const endpoint = 'evento_catalogo_rol_gestion?query=EventoCatalogoId.Id:' + this.eventoCatalogoSeleccionado.Id + '&limit=0';
+    this.eventoService.get(endpoint).subscribe(
       (relaciones: any) => {
         this.relaciones = this.consolidarRelaciones(this.normalizarLista(relaciones)
           .map((relacion: any) => this.normalizarRelacion(relacion))
@@ -194,7 +194,7 @@ export class AdministracionPermisosEventosComponent implements OnInit {
       PerfilId: perfil.Id,
       Activo: true,
     };
-    this.sgaCalendarioMidService.post('calendario-academico/eventos/evento_catalogo_rol_gestion', payload).subscribe(
+    this.eventoService.post('evento_catalogo_rol_gestion', payload).subscribe(
       (respuesta: any) => {
         const relacionCreada = this.normalizarRelacion(this.extraerEntidad(respuesta));
         if (relacionCreada.Id <= 0 || relacionCreada.PerfilId <= 0) {
@@ -233,7 +233,7 @@ export class AdministracionPermisosEventosComponent implements OnInit {
     if (relacion.FechaCreacion) {
       payload.FechaCreacion = relacion.FechaCreacion;
     }
-    this.sgaCalendarioMidService.put('calendario-academico/eventos/evento_catalogo_rol_gestion/' + relacion.Id, payload).subscribe(
+    this.eventoService.put('evento_catalogo_rol_gestion/' + relacion.Id, payload).subscribe(
       () => {
         relacion.Activo = activo;
         this.relaciones = this.consolidarRelaciones(this.relaciones);

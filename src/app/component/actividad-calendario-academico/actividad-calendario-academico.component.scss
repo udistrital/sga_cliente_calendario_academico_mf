@@ -1,4 +1,9 @@
 //HOVER SOBRE LAS FILAS
+:host {
+  display: block;
+  height: 100%;
+}
+
 .mat-mdc-row:hover .mat-mdc-cell {
     background-color: var(--color100);
   }
@@ -83,15 +88,6 @@
   justify-content: center;
 }
 
-.activity-title-subtitle {
-  color: rgba(0, 0, 0, 0.72);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-top: 0.25rem;
-  text-transform: uppercase;
-}
-
 .activity-description {
   margin: 0.75rem 0 1rem;
 }
@@ -100,86 +96,36 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem 1rem;
-  margin: 1rem 0 0;
+  margin: 0;
 }
 
 .activity-context-grid .context-description {
   grid-column: 1 / -1;
 }
 
-:host ::ng-deep mat-card {
-  box-shadow: none;
+.activity-context-panel {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color200, #e2e8f0);
+  border-radius: 8px;
+  background: var(--color100, #f7f8fa);
 }
 
 :host ::ng-deep .mat-mdc-tab-body-content {
   overflow: visible;
 }
 
-.extension-form {
-  margin-top: 1rem;
-}
-
-.extension-form .form-grid2 {
-  gap: 1rem;
-}
-
 table {
   width: 100%;
 }
 
-.extension-table {
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
+.public-directed-section {
+  padding: 1rem 0 0;
 }
 
-.extension-table table {
-  min-width: 760px;
-}
-
-.extension-action-header,
-.extension-action-cell {
-  min-width: 88px;
-  text-align: center;
-  width: 88px;
-}
-
-.extension-action-header {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-
-.extension-action-cell {
-  overflow: visible;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-  white-space: nowrap;
-}
-
-.extension-action-group {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-  justify-content: center;
-  min-width: 72px;
-}
-
-.extension-action-cell button,
-td.mat-mdc-cell button[mat-icon-button] {
-  height: 32px;
-  width: 32px;
-}
-
-.extension-action-cell mat-icon,
-td.mat-mdc-cell button[mat-icon-button] mat-icon {
-  font-size: 20px;
-  height: 20px;
-  width: 20px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
+.public-directed-section h3 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
 }
 
 @media (max-width: 600px) {

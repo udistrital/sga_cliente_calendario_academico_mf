@@ -25,7 +25,6 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
@@ -42,6 +41,7 @@ import { DocumentoService } from './services/documento.service';
 import { DetalleCalendarioComponent } from './component/detalle-calendario/detalle-calendario.component';
 import { CalendarioProyectoComponent } from './component/calendario-proyecto/calendario-proyecto.component';
 import { SgaCalendarioMidService } from './services/sga_calendario_mid.service';
+import { EventoService } from './services/evento.service';
 import { SgaAdmisionesMidService } from './services/sga_admisiones_mid.service';
 import { SpinnerUtilModule } from 'spinner-util';
 import { environment } from 'src/environments/environment';
@@ -52,10 +52,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatListModule } from '@angular/material/list';
 import { CustomPaginatorIntl } from './services/CustomPaginatorIntl.service';
 import { AdministracionPermisosEventosComponent } from './component/administracion_permisos_eventos/administracion_permisos_eventos.component';
 import { SpinnerUtilCounterInterceptor } from './interceptors/spinner-util-counter.interceptor';
 import { GestionMasivaActividadesProgramasComponent } from './component/gestion-masiva-actividades-programas/gestion-masiva-actividades-programas.component';
+import { GestionExtensionesActividadComponent } from './component/gestion-extensiones-actividad/gestion-extensiones-actividad.component';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -81,6 +83,7 @@ export function createTranslateLoader(http: HttpClient) {
     ActividadCalendarioAcademicoComponent,
     AdministracionPermisosEventosComponent,
     GestionMasivaActividadesProgramasComponent,
+    GestionExtensionesActividadComponent,
 
 
 
@@ -94,7 +97,6 @@ export function createTranslateLoader(http: HttpClient) {
     MatNativeDateModule,
     MatDialogModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatCardModule,
     MatFormFieldModule,
     MatCheckboxModule,
@@ -116,6 +118,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatTooltipModule,
     MatMenuModule,
     MatSlideToggleModule,
+    MatListModule,
     TranslateModule.forRoot({
       loader:{
         provide:TranslateLoader,
@@ -126,6 +129,7 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   providers: [
     SgaCalendarioMidService,
+    EventoService,
     SgaAdmisionesMidService,
     MatSnackBar,
     HttpErrorManager,

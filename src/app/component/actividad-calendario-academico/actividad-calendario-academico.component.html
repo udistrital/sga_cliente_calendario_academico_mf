@@ -1,22 +1,32 @@
-<mat-card>
-  <mat-card-content>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="activity-dialog-title" mat-dialog-title>
+        {{ activityTitle() || ("calendario.actividad" | translate) }}
+      </h2>
+      <p>{{ processName || "-" }} - {{ period || "-" }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
     <form
       novalidate
       [formGroup]="activityForm"
       #fform="ngForm"
       (ngSubmit)="saveActivity()"
-      class="form-horizontal"
+      class="form-horizontal sga-modal-form"
     >
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>
-            {{ "calendario.actividad" | translate }}
-          </mat-card-title>
-          <mat-card-subtitle *ngIf="activityTitle()" class="activity-title-subtitle">
-            {{ activityTitle() }}
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-subtitle>
+      <mat-dialog-content class="sga-modal-content activity-dialog-content">
+        <section class="activity-context-panel">
           <div class="activity-context-grid">
             <mat-form-field appearance="outline">
               <mat-label>{{ "calendario.proceso" | translate }}</mat-label>
@@ -39,8 +49,7 @@
               <textarea matInput [value]="activityDescription()" readonly rows="2"></textarea>
             </mat-form-field>
           </div>
-        </mat-card-subtitle>
-        <mat-card-content>
+        </section>
           <mat-tab-group [(selectedIndex)]="activeTab">
             <mat-tab label="{{ 'calendario.fechas_globales' | translate }}">
           <div class="form-grid2" *ngIf="data.editActivity === undefined">
@@ -154,218 +163,9 @@
 
             </mat-tab>
 
-            <mat-tab label="{{ 'calendario.extensiones' | translate }}" *ngIf="data.editActivity !== undefined">
-          <mat-card class="extension-card">
-            <mat-card-header>
-              <mat-card-title>{{ "calendario.extensiones" | translate }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <p>
-                <strong>{{ "calendario.rango_original" | translate }}:</strong>
-                {{ activityForm.get('FechaInicio')?.value | date : 'dd/MM/yyyy' }} {{ activityForm.get('HoraInicio')?.value }} -
-                {{ activityForm.get('FechaFin')?.value | date : 'dd/MM/yyyy' }} {{ activityForm.get('HoraFin')?.value }}
-              </p>
-
-              <div class="table extension-table" *ngIf="extensiones.length > 0; else sinExtensiones">
-                <table mat-table [dataSource]="extensiones" class="demo-table">
-                  <ng-container matColumnDef="NumeroExtension">
-                    <th mat-header-cell *matHeaderCellDef>#</th>
-                    <td mat-cell *matCellDef="let row">{{ row.NumeroExtension }}</td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="FechaFin">
-                    <th mat-header-cell *matHeaderCellDef>Fecha fin</th>
-                    <td mat-cell *matCellDef="let row">{{ formatExtensionDate(row.FechaFin) }}</td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="Dependencias">
-                    <th mat-header-cell *matHeaderCellDef>{{ "calendario.programas_academicos" | translate }}</th>
-                    <td mat-cell *matCellDef="let row">{{ extensionDependencyNames(row) }}</td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="Descripcion">
-                    <th mat-header-cell *matHeaderCellDef>{{ "calendario.descripcion" | translate }}</th>
-                    <td mat-cell *matCellDef="let row">{{ row.Descripcion || '-' }}</td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="DocumentoId">
-                    <th mat-header-cell *matHeaderCellDef>{{ "calendario.documento" | translate }}</th>
-                    <td mat-cell *matCellDef="let row">
-                      <button
-                        *ngIf="row.DocumentoId; else sinDocumentoExtension"
-                        mat-icon-button
-                        color="primary"
-                        type="button"
-                        (click)="downloadExtensionFile(row.DocumentoId)"
-                        matTooltip="{{ 'calendario.descargar_documento_soporte' | translate }}"
-                      >
-                        <mat-icon fontIcon="cloud_download"></mat-icon>
-                      </button>
-                      <ng-template #sinDocumentoExtension>-</ng-template>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="Vigente">
-                    <th mat-header-cell *matHeaderCellDef>{{ "calendario.vigente" | translate }}</th>
-                    <td mat-cell *matCellDef="let row">{{ extensionIsCurrent(row) }}</td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="Acciones">
-                    <th mat-header-cell *matHeaderCellDef class="extension-action-header">{{ "calendario.acciones" | translate }}</th>
-                    <td mat-cell *matCellDef="let row" class="extension-action-cell">
-                      <div class="extension-action-group">
-                        <button
-                          *ngIf="extensionId(row) && extensionHasCurrentPrograms(row)"
-                          mat-icon-button
-                          color="primary"
-                          type="button"
-                          (click)="startEditExtension(row)"
-                          matTooltip="{{ 'GLOBAL.editar' | translate }}"
-                        >
-                          <mat-icon fontIcon="edit"></mat-icon>
-                        </button>
-                        <button
-                          *ngIf="extensionId(row) && extensionHasCurrentPrograms(row)"
-                          mat-icon-button
-                          color="warn"
-                          type="button"
-                          (click)="deleteExtension(row)"
-                          matTooltip="{{ 'calendario.anular_extension' | translate }}"
-                        >
-                          <mat-icon fontIcon="block"></mat-icon>
-                        </button>
-                      </div>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="extensionDisplayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: extensionDisplayedColumns"></tr>
-                </table>
-              </div>
-              <ng-template #sinExtensiones>
-                <p>{{ "calendario.sin_extensiones_actividad" | translate }}</p>
-              </ng-template>
-
-              <div [formGroup]="extensionForm" class="extension-form">
-                <h4>{{ extensionMode === 'edit' ? ('calendario.editar_extension' | translate:{ numero: editingExtension?.NumeroExtension }) : ('calendario.crear_extension' | translate) }}</h4>
-                <p class="alert warning" *ngIf="dependencias.length === 0">
-                  {{ "calendario.actividad_sin_programas_extension" | translate }}
-                </p>
-                <p class="alert info" *ngIf="extensionMode === 'edit'">
-                  {{ "calendario.edicion_extension_conserva_programas" | translate }}
-                </p>
-                <div class="form-grid2">
-                  <div class="form-col1">
-                    <mat-form-field floatLabel="always" style="width: 100%">
-                      <input
-                        matInput
-                        [matDatepicker]="fechaFinExtensionPicker"
-                        formControlName="FechaFin"
-                        placeholder="*{{ 'calendario.fecha_fin_extension' | translate }}"
-                      />
-                      <mat-datepicker-toggle matSuffix [for]="fechaFinExtensionPicker"></mat-datepicker-toggle>
-                      <mat-datepicker #fechaFinExtensionPicker></mat-datepicker>
-                    </mat-form-field>
-                  </div>
-                  <div class="form-col1">
-                    <mat-form-field floatLabel="always" style="width: 100%">
-                      <input matInput type="time" formControlName="HoraFin" placeholder="*{{ 'calendario.hora_fin_extension' | translate }}" />
-                    </mat-form-field>
-                  </div>
-                  <div class="form-col1">
-                    <div class="extension-file-field">
-                      <label>{{ "calendario.documento_soporte_opcional" | translate }}</label>
-                      <div class="extension-file-actions">
-                        <button mat-flat-button color="accent" type="button" (click)="extensionFileInput.click()">
-                          <mat-icon fontIcon="attach_file"></mat-icon>
-                          {{ "calendario.subir_documento_soporte" | translate }}
-                        </button>
-                        <button
-                          *ngIf="extensionForm.get('DocumentoId')?.value && !extensionFile"
-                          mat-button
-                          color="primary"
-                          type="button"
-                          (click)="downloadExtensionFile(extensionForm.get('DocumentoId')?.value)"
-                        >
-                          <mat-icon fontIcon="cloud_download"></mat-icon>
-                          {{ "calendario.descargar_documento_soporte" | translate }}
-                        </button>
-                      </div>
-                      <input
-                        formControlName="DocumentoSoporte"
-                        #extensionFileInput
-                        type="file"
-                        (change)="onInputFileExtension($event)"
-                        style="display: none"
-                        accept="application/pdf"
-                        data-max-size="5120"
-                      />
-                      <label class="extension-file-name" *ngIf="extensionFile">
-                        {{ "GLOBAL.archivo_seleccionado" | translate }}: {{ extensionFile.file.name }}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-grid2">
-                  <div class="form-col2">
-                    <mat-form-field floatLabel="always" style="width: 100%">
-                      <textarea matInput formControlName="Descripcion" placeholder="{{ 'calendario.descripcion' | translate }}"></textarea>
-                    </mat-form-field>
-                  </div>
-                </div>
-
-                <div class="form-grid2">
-                  <div class="form-col2">
-                    <mat-form-field floatLabel="always" style="width: 100%">
-                      <mat-label>*{{ "calendario.programas_academicos_autorizados" | translate }}</mat-label>
-                      <mat-select formControlName="Dependencias" multiple (selectionChange)="updateSelectedDependencyRanges()">
-                        <mat-option *ngFor="let dependencia of dependencias" [value]="dependencia.Id">
-                          {{ dependencia.Nombre || (("calendario.programa_academico" | translate) + ' ' + dependencia.Id) }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </div>
-
-                <div class="alert info" *ngIf="selectedDependencyRanges.length > 0">
-                  <strong>{{ "calendario.rangos_vigentes" | translate }}:</strong>
-                  <div *ngFor="let range of selectedDependencyRanges">
-                    {{ "calendario.fecha_fin_vigente_programa" | translate:{ programa: rangeDependencyName(range), fecha: rangeCurrentEnd(range) } }}
-                  </div>
-                </div>
-
-                <button
-                  mat-flat-button
-                  color="primary"
-                  type="button"
-                  [disabled]="extensionForm.invalid || dependencias.length === 0"
-                  (click)="saveExtension()"
-                >
-                  {{ extensionMode === 'edit' ? ('calendario.guardar_cambios' | translate) : ('calendario.crear_extension' | translate) }}
-                </button>
-                <button
-                  *ngIf="extensionMode === 'edit'"
-                  mat-button
-                  color="accent"
-                  type="button"
-                  (click)="cancelEditExtension()"
-                >
-                  {{ "calendario.cancelar_edicion" | translate }}
-                </button>
-              </div>
-            </mat-card-content>
-          </mat-card>
-            </mat-tab>
-
             <mat-tab label="{{ 'calendario.publico_dirigido' | translate }}">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>
-                {{ "calendario.dirigido" | translate }}
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
+          <section class="public-directed-section">
+              <h3>{{ "calendario.dirigido" | translate }}</h3>
               <div class="form-grid2">
                 <div class="form-col2">
                   <mat-form-field style="width: 100%" floatLabel="always">
@@ -428,7 +228,9 @@
                         <button
                           mat-icon-button
                           color="warn"
+                          type="button"
                           (click)="deletePublic(row)"
+                          [attr.aria-label]="'GLOBAL.eliminar' | translate"
                           [matTooltip]="'GLOBAL.eliminar' | translate"
                         >
                           <mat-icon aria-hidden="false" fontIcon="delete"></mat-icon>
@@ -451,25 +253,17 @@
                   </tr>
                 </table>
               </div>
-            </mat-card-content>
-          </mat-card>
+          </section>
 
             </mat-tab>
           </mat-tab-group>
-          <div class="modal-actions">
-            <button
-              mat-flat-button
-              color="accent"
-              type="button"
-              (click)="saveActivity()"
-            >
-              {{ data.editActivity === undefined ? ("GLOBAL.guardar" | translate) : ("calendario.guardar_cambios" | translate) }}
-            </button>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <br />
-    </form>
+      </mat-dialog-content>
 
-  </mat-card-content>
-</mat-card>
+      <mat-dialog-actions align="end" class="sga-modal-actions">
+        <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+        <button mat-flat-button color="accent" type="submit">
+          {{ data.editActivity === undefined ? ("GLOBAL.guardar" | translate) : ("calendario.guardar_cambios" | translate) }}
+        </button>
+      </mat-dialog-actions>
+    </form>
+</section>

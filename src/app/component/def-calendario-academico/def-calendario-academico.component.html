@@ -671,6 +671,34 @@
                             </button>
                             <button
                               mat-menu-item
+                              data-testid="manage-extensions-action"
+                              [attr.data-activity-id]="row.actividadId"
+                              (click)="
+                                onAction(
+                                  { action: 'extensions', data: row },
+                                  process
+                                )
+                              "
+                            >
+                              <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                              <span class="extension-menu-label">
+                                <span>{{
+                                  (extensionsReadOnly(row)
+                                    ? "calendario.consultar_extensiones"
+                                    : "calendario.gestionar_extensiones")
+                                    | translate
+                                }}</span>
+                                <span
+                                  class="extension-count-badge"
+                                  [class.empty]="activeExtensionCount(row) === 0"
+                                  [attr.aria-label]="('calendario.extensiones_vigentes_count' | translate:{ total: activeExtensionCount(row) })"
+                                >
+                                  {{ activeExtensionCount(row) }}
+                                </span>
+                              </span>
+                            </button>
+                            <button
+                              mat-menu-item
                               (click)="
                                 onAction(
                                   { action: 'view', data: row },
@@ -1301,6 +1329,31 @@
                                       }}</span>
                                     </button>
                                     <button
+                                      mat-menu-item
+                                      (click)="
+                                        onAction(
+                                          { action: 'extensions', data: row },
+                                          process
+                                        )
+                                      "
+                                    >
+                                      <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                                      <span class="extension-menu-label">
+                                        <span>{{
+                                          (extensionsReadOnly(row)
+                                            ? "calendario.consultar_extensiones"
+                                            : "calendario.gestionar_extensiones")
+                                            | translate
+                                        }}</span>
+                                        <span
+                                          class="extension-count-badge"
+                                          [class.empty]="activeExtensionCount(row) === 0"
+                                        >
+                                          {{ activeExtensionCount(row) }}
+                                        </span>
+                                      </span>
+                                    </button>
+                                    <button
                                       (click)="
                                         onAction(
                                           { action: 'view', data: row },
@@ -1695,6 +1748,31 @@
                                     "calendario.tooltip_seleccionar_proyectos"
                                       | translate
                                   }}</span>
+                                </button>
+                                <button
+                                  mat-menu-item
+                                  (click)="
+                                    onAction(
+                                      { action: 'extensions', data: row },
+                                      process
+                                    )
+                                  "
+                                >
+                                  <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                                  <span class="extension-menu-label">
+                                    <span>{{
+                                      (extensionsReadOnly(row)
+                                        ? "calendario.consultar_extensiones"
+                                        : "calendario.gestionar_extensiones")
+                                        | translate
+                                    }}</span>
+                                    <span
+                                      class="extension-count-badge"
+                                      [class.empty]="activeExtensionCount(row) === 0"
+                                    >
+                                      {{ activeExtensionCount(row) }}
+                                    </span>
+                                  </span>
                                 </button>
                                 <button
                                   mat-menu-item

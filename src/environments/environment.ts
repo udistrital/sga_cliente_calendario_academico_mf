@@ -80,6 +80,7 @@ export const environment = {
   PARAMETROS_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/parametros/v1/",
   // CALENDARIO_MID_SERVICE: "https://autenticacion.portaloas.udistrital.edu.co/apioas/calendario_mid/v1/",
   CALENDARIO_MID_SERVICE: "http://localhost:8109/v1/",
+  EVENTO_SERVICE: 'http://localhost:8107/v1/',
   ADMISIONES_MID_SERVICE: 'https://autenticacion.portaloas.udistrital.edu.co/apioas/admisiones_mid/v1/',
   CONFIGURACION_SERVICE: 'https://autenticacion.portaloas.udistrital.edu.co/apioas/configuracion_crud_api/v1/',
 };

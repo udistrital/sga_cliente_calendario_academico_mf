@@ -164,6 +164,22 @@ export class UserService {
     return this.personaId;
   }
 
+  public async getTerceroId(): Promise<number | null> {
+    const currentTerceroId = this.normalizarPersonaId(this.user?.Id);
+    if (currentTerceroId !== null) {
+      return currentTerceroId;
+    }
+    const tercero: any = await firstValueFrom(
+      this.tercero$.pipe(
+        filter((usuario: any) => !!usuario?.Id),
+        take(1),
+        timeout(3000),
+        catchError(() => of(null))
+      )
+    );
+    return this.normalizarPersonaId(tercero?.Id);
+  }
+
   private normalizarPersonaId(valor: any): number | null {
     if (valor === null || valor === undefined || valor === '') {
       return null;

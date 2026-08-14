@@ -5,7 +5,7 @@
 
 // COLOR EN LOS MAT-EXPANSION-PANEL
 .mat-expansion-panel-gradient {
-    background: linear-gradient(0deg, var(--color100) 0%, white 100%);
+    background: var(--color100);
 }
 
 /* Estilos para el indicador de estado */
@@ -41,4 +41,31 @@
   margin: 1rem 0;
   background: transparent;
   padding: 0;
+}
+
+.extension-menu-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.extension-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.55rem;
+  height: 1.55rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  color: #155724;
+  background: #d4edda;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.extension-count-badge.empty {
+  color: #4f5965;
+  background: #edf2f7;
 }

@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   EventEmitter,
   ViewChild,
@@ -40,15 +41,23 @@ import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
 import { ordenarPorPropiedad } from 'src/utils/listas';
 import { GestionMasivaActividadesProgramasComponent } from '../gestion-masiva-actividades-programas/gestion-masiva-actividades-programas.component';
+import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import {
+  GestionExtensionesActividadComponent,
+  GestionExtensionesActividadResult,
+} from '../gestion-extensiones-actividad/gestion-extensiones-actividad.component';
 
 @Component({
   selector: 'def-calendario-academico',
   templateUrl: './def-calendario-academico.component.html',
   styleUrls: ['./def-calendario-academico.component.scss'],
 })
-export class DefCalendarioAcademicoComponent implements OnChanges {
+export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   fileResolucion: any;
   processSettings: any;
   activitiesSettings: any;
@@ -123,6 +132,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
   calendarCloneOut = new EventEmitter<number>();
   @Output()
   newCalendar = new EventEmitter<void>();
+  private readonly destroy$ = new Subject<void>();
+  private loadCalendarVersion = 0;
 
   constructor(
     private sanitization: DomSanitizer,
@@ -133,9 +144,11 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     //private nuxeoService: NuxeoService,
     private documentoService: DocumentoService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
     private proyectoService: ProyectoAcademicoService,
     private popUpManager: PopUpManager,
-    private newNuxeoService: NewNuxeoService
+    private newNuxeoService: NewNuxeoService,
+    private calendarioActualizacionService: CalendarioActualizacionService
   ) {
     this.calendarActivity = new ActividadHija();
     this.calendarioEvento = new CalendarioEvento();
@@ -144,6 +157,13 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     this.loadSelects();
     this.createCalendarFormClone();
     this.createCalendarFormExtend();
+    this.calendarioActualizacionService.actualizacion$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((actualizacion) => {
+        if (Number(actualizacion.calendarioId) === Number(this.calendar?.calendarioId)) {
+          this.loadCalendar();
+        }
+      });
   }
 
   ngOnInit() {
@@ -196,7 +216,13 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     //this.activetab = true;
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadCalendar() {
+    const loadVersion = ++this.loadCalendarVersion;
     this.processes = [];
     //this.processTable.load(this.processes);
     this.dataSource = new MatTableDataSource(this.processes);
@@ -208,8 +234,11 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.uploadMode = true;
       this.setCalendarHeaderReadonly(false);
 
-      this.sgaCalendarioMidService.get('calendario-academico/eventos/calendario/' + this.calendarForEditId).subscribe(
+      this.eventoService.get('calendario/' + this.calendarForEditId).subscribe(
         (calendar: any) => {
+          if (loadVersion !== this.loadCalendarVersion) {
+            return;
+          }
           this.calendar = new Calendario();
           this.calendar.calendarioId = calendar['Id'];
           this.calendar.DocumentoId = calendar['DocumentoId'];
@@ -230,6 +259,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           });
         },
         (error: any) => {
+          if (loadVersion !== this.loadCalendarVersion) {
+            return;
+          }
           this.popUpManager.showErrorToast(
             this.translate.instant('ERROR.general')
           );
@@ -252,8 +284,11 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       this.CalendarIdasfather = this.calendarForEditId;
       this.sgaCalendarioMidService
         .get('calendario-academico/v2/' + this.calendarForEditId)
-        .subscribe(
+          .subscribe(
           (response: any) => {
+            if (loadVersion !== this.loadCalendarVersion) {
+              return;
+            }
             if (response != null && response.Success) {
               const calendar = response.Data[0];
               this.calendar = new Calendario();
@@ -372,6 +407,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             }
           },
           (error: any) => {
+            if (loadVersion !== this.loadCalendarVersion) {
+              return;
+            }
             this.popUpManager.showErrorToast(
               this.translate.instant('ERROR.general')
             );
@@ -642,7 +680,62 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       case 'view':
         this.viewActivities(event, process);
         break;
+      case 'extensions':
+        this.manageActivityExtensions(event, process);
+        break;
     }
+  }
+
+  manageActivityExtensions(event: any, process: any) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '1040px';
+    dialogConfig.maxWidth = '96vw';
+    dialogConfig.height = '860px';
+    dialogConfig.maxHeight = '94vh';
+    dialogConfig.autoFocus = false;
+    dialogConfig.ariaLabelledBy = 'extensions-dialog-title';
+    dialogConfig.panelClass = 'sga-modal-panel';
+    dialogConfig.data = {
+      activity: event.data,
+      calendar: this.calendar,
+      dependencias: this.projects,
+      readOnly: this.extensionsReadOnly(event.data),
+      calendarViewMode: this.view,
+    };
+
+    const dialogRef = this.dialog.open(GestionExtensionesActividadComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe((result: GestionExtensionesActividadResult | undefined) => {
+      if (!result) {
+        return;
+      }
+      event.data.Extensiones = result.extensiones;
+      if (result.action === 'managePrograms' && !this.extensionsReadOnly(event.data)) {
+        this.selectDependencias(event, process);
+      }
+    });
+  }
+
+  extensionsReadOnly(activity: any): boolean {
+    return this.view || this.calendar?.Activo === false || activity?.Activo === false;
+  }
+
+  activeExtensionCount(activity: any): number {
+    const extensions = Array.isArray(activity?.Extensiones) ? activity.Extensiones : [];
+    const currentByExtension = new Map<number, boolean>();
+
+    extensions.forEach((extension: any, index: number) => {
+      const source = extension?.CalendarioEventoExtensionId || extension;
+      const extensionId = Number(source?.Id || source?.id || index + 1);
+      const programs = extension?.CalendarioEventoExtensionId
+        ? [extension]
+        : (Array.isArray(extension?.Programas) ? extension.Programas : []);
+      const current = source?.Activo !== false && programs.some(
+        (program: any) => program?.Vigente === true && program?.Activo !== false,
+      );
+      currentByExtension.set(extensionId, currentByExtension.get(extensionId) === true || current);
+    });
+
+    return Array.from(currentByExtension.values()).filter((current) => current).length;
   }
 
   selectDependencias(event: any, process: any) {
@@ -651,6 +744,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     activityConfig.maxWidth = '95vw';
     activityConfig.height = '720px';
     activityConfig.maxHeight = '90vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = {
       calendar: this.calendar,
       activity: event.data,
@@ -664,35 +758,25 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     );
     newActivity.afterClosed().subscribe((DepsEdit: any) => {
       if (DepsEdit != undefined) {
-        this.sgaCalendarioMidService
-          .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
-          .subscribe(
-            (respGet: any) => {
-              respGet.DependenciaId = JSON.stringify(
-                DepsEdit.UpdateDependencias
-              );
-              this.sgaCalendarioMidService.put('calendario-academico/actividad/' + event.data.actividadId + '/dependencias', { DependenciaId: respGet.DependenciaId }).subscribe(
-                (respPut) => {
-                  this.popUpManager.showSuccessAlert(
-                    this.translate.instant('calendario.actividad_actualizada')
-                  );
-                  this.loadCalendar();
-                },
-                (error) => {
-                  this.popUpManager.showErrorToast(
-                    this.translate.instant(
-                      'calendario.error_registro_actividad'
-                    )
-                  );
-                }
-              );
-            },
-            (error: any) => {
-              this.popUpManager.showErrorToast(
-                this.translate.instant('calendario.error_registro_actividad')
-              );
-            }
-          );
+        const dependenciaId = JSON.stringify(DepsEdit.UpdateDependencias);
+        this.sgaCalendarioMidService.put('calendario-academico/actividad/' + event.data.actividadId + '/dependencias', { DependenciaId: dependenciaId }).subscribe(
+          (respPut) => {
+            this.calendarioActualizacionService.notificar({
+              calendarioId: Number(this.calendar?.calendarioId),
+              actividadIds: [Number(event.data.actividadId)],
+            });
+            this.popUpManager.showSuccessAlert(
+              this.translate.instant('calendario.programas_actividad_actualizados')
+            );
+          },
+          (error) => {
+            this.popUpManager.showErrorToast(
+              this.translate.instant(
+                'calendario.error_actualizar_programas_actividad'
+              )
+            );
+          }
+        );
       }
     });
   }
@@ -703,34 +787,28 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     dialogConfig.maxWidth = '99vw';
     dialogConfig.height = '90vh';
     dialogConfig.maxHeight = '98vh';
-    dialogConfig.autoFocus = false;
+    dialogConfig.panelClass = 'sga-modal-panel';
     dialogConfig.data = {
       calendar: this.calendar,
       projects: this.projects,
       processes: this.processes,
     };
-    const dialogRef = this.dialog.open(GestionMasivaActividadesProgramasComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe((actualizado: boolean) => {
-      if (actualizado) {
-        this.loadCalendar();
-      }
-    });
+    this.dialog.open(GestionMasivaActividadesProgramasComponent, dialogConfig);
   }
 
   viewActivities(event: any, process: any) {
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '800px';
     activityConfig.height = '500px';
+    activityConfig.maxWidth = '94vw';
+    activityConfig.maxHeight = '90vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = {
       activity: event.data,
       projects: this.projects,
       vista: 'view',
     };
-    const newActivity = this.dialog.open(
-      EdicionActividadesProgramasComponent,
-      activityConfig
-    );
-    newActivity.afterClosed().subscribe((activity: any) => {});
+    this.dialog.open(EdicionActividadesProgramasComponent, activityConfig);
   }
 
   createCalendar(event: any) {
@@ -745,7 +823,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           if (ok.value) {
             if (this.fileResolucion) {
               this.calendar = this.calendarForm.value;
-              this.sgaCalendarioMidService.get('calendario-academico/eventos/calendario?query=Activo:true').subscribe(
+              this.eventoService.get('calendario?query=Activo:true').subscribe(
                 (response: Calendario[]) => {
                   let calendarExists = false;
                   response.forEach((calendar) => {
@@ -775,8 +853,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
                             (nivel: any) => nivel.Id === this.calendar.Nivel
                           )[0].Nombre;
 
-                        this.sgaCalendarioMidService
-                          .post('calendario-academico/eventos/calendario', this.calendar)
+                        this.eventoService
+                          .post('calendario', this.calendar)
                           .subscribe(
                             (response: any) => {
                               this.calendar.calendarioId = response['Id'];
@@ -938,6 +1016,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     const periodConfig = new MatDialogConfig();
     periodConfig.width = '800px';
     periodConfig.height = '400px';
+    periodConfig.maxWidth = '94vw';
+    periodConfig.maxHeight = '90vh';
+    periodConfig.panelClass = 'sga-modal-panel';
     const newPeriod = this.dialog.open(CrudPeriodoComponent, periodConfig);
     newPeriod.afterClosed().subscribe(() => {
       this.loadSelects();
@@ -948,6 +1029,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     const processConfig = new MatDialogConfig();
     processConfig.width = '800px';
     processConfig.height = '400px';
+    processConfig.maxWidth = '94vw';
+    processConfig.maxHeight = '90vh';
+    processConfig.panelClass = 'sga-modal-panel';
     processConfig.data = { calendar: this.calendar };
     const newProcess = this.dialog.open(
       ProcesoCalendarioAcademicoComponent,
@@ -995,6 +1079,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     const processConfig = new MatDialogConfig();
     processConfig.width = '800px';
     processConfig.height = '400px';
+    processConfig.maxWidth = '94vw';
+    processConfig.maxHeight = '90vh';
+    processConfig.panelClass = 'sga-modal-panel';
     processConfig.data = { calendar: this.calendar, editProcess: event.data };
     const editedProcess = this.dialog.open(
       ProcesoCalendarioAcademicoComponent,
@@ -1067,6 +1154,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     activityConfig.maxWidth = '95vw';
     activityConfig.height = '820px';
     activityConfig.maxHeight = '92vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = { process: process, calendar: this.calendar };
     const newActivity = this.dialog.open(
       ActividadCalendarioAcademicoComponent,
@@ -1083,7 +1171,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
           this.popUpManager.showErrorToast('La actividad ya existe en el proceso.');
           return;
         }
-        this.sgaCalendarioMidService.get('calendario-academico/eventos/calendario_evento?query=Activo:true,ProcesoId__Id:' + process.procesoId + ',EventoCatalogoId__Id:' + eventoCatalogoId + '&limit=1').subscribe(
+        this.eventoService.get('calendario_evento?query=Activo:true,ProcesoId__Id:' + process.procesoId + ',EventoCatalogoId__Id:' + eventoCatalogoId + '&limit=1').subscribe(
           (actividadesExistentes: any) => {
             if (Array.isArray(actividadesExistentes) && actividadesExistentes.length > 0 && Object.keys(actividadesExistentes[0]).length > 0) {
               this.popUpManager.showErrorToast('La actividad ya existe en el proceso.');
@@ -1131,6 +1219,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     activityConfig.maxWidth = '95vw';
     activityConfig.height = '820px';
     activityConfig.maxHeight = '92vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = {
       process: process,
       calendar: this.calendar,
@@ -1144,7 +1233,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
     editedActivity.afterClosed().subscribe((activity: any) => {
       if (activity !== undefined) {
         this.sgaCalendarioMidService
-          .put('actividad-calendario/calendario/actividad/', {
+          .put('actividad-calendario/calendario/actividad/' + event.data.actividadId, {
             Id: event.data.actividadId,
             actividad: activity.Actividad,
             resp: activity.responsable,
@@ -1158,7 +1247,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
             },
             (error) => {
               this.popUpManager.showErrorToast(
-                this.translate.instant('calendario.error_registro_actividad')
+                this.translate.instant('calendario.error_actualizar_actividad')
               );
             }
           );
@@ -1174,35 +1263,22 @@ export class DefCalendarioAcademicoComponent implements OnChanges {
       .then((willDelete) => {
         if (willDelete.value) {
           this.sgaCalendarioMidService
-            .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
+            .put('actividad-calendario/calendario/actividad/' + event.data.actividadId, {
+              Id: event.data.actividadId,
+              actividad: { Activo: !event.data.Activo },
+            })
             .subscribe(
               (response: any) => {
-                const activityInactive = response;
-                if (activityInactive['DependenciaId'] === '' || activityInactive['DependenciaId'] === null) {
-                  activityInactive['DependenciaId'] = JSON.stringify({ proyectos: [], fechas: [] });
-                }
-                activityInactive['Activo'] = !event.data.Activo;
-                this.sgaCalendarioMidService
-                  .put('calendario-academico/eventos/calendario_evento/' + activityInactive.Id, activityInactive)
-                  .subscribe(
-                    (response) => {
-                      this.popUpManager.showSuccessAlert(
-                        this.translate.instant(
-                          'calendario.actividad_estado_actualizado'
-                        )
-                      );
-                      this.ngOnChanges();
-                    },
-                    (error) => {
-                      this.popUpManager.showErrorToast(
-                        this.errorMessage(error, 'calendario.error_inactivar_actividad')
-                      );
-                    }
-                  );
+                this.popUpManager.showSuccessAlert(
+                  this.translate.instant(
+                    'calendario.actividad_estado_actualizado'
+                  )
+                );
+                this.ngOnChanges();
               },
-              (error: any) => {
+              (error) => {
                 this.popUpManager.showErrorToast(
-                  this.translate.instant('calendario.error_inactivar_actividad')
+                  this.errorMessage(error, 'calendario.error_inactivar_actividad')
                 );
               }
             );
