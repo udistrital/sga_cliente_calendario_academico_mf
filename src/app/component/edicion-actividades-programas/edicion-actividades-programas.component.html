@@ -1,10 +1,24 @@
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="activity-program-dialog-title" mat-dialog-title>{{ dialogTitle() }}</h2>
+      <p *ngIf="dialogSubtitle()">{{ dialogSubtitle() }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+<mat-dialog-content class="sga-modal-content activity-program-dialog-content">
 <ng-container *ngIf="select_proyectos_act">
-  <mat-card class="program-manager-card">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.select_proyectos_actividades" | translate }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="program-manager-card sga-modal-flat-card">
     <mat-card-content>
       <form novalidate [formGroup]="SelectorDeps">
         <p class="alert info">
@@ -59,23 +73,13 @@
         <p class="alert warning">
           {{ "calendario.programas_bloqueados_info" | translate }}
         </p>
-        <div class="program-actions">
-          <button mat-flat-button color="accent" (click)="guardar()">
-            {{ "GLOBAL.guardar" | translate }}
-          </button>
-        </div>
       </form>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="actividad_detalle_proyectos">
-  <mat-card style="margin: 1em">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.actividad" | translate }}: {{ actividad }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="sga-modal-flat-card">
     <mat-card-content>
       <h5>{{ "calendario.descripcion_actividad" | translate }}</h5>
       <p>{{ descripcion_actividad }}</p>
@@ -143,21 +147,12 @@
           </tr>
         </table>
       </div>
-      <br />
-      <button mat-flat-button color="primary" (click)="regresar()">
-        {{ "GLOBAL.regresar" | translate }}
-      </button>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="proceso_detalle">
-  <mat-card style="margin: 1em">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.proceso" | translate }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="sga-modal-flat-card">
     <mat-card-content>
       <br />
       <mat-form-field style="width: 100%">
@@ -195,20 +190,12 @@
           readonly
         />
       </mat-form-field>
-      <button mat-flat-button color="primary" (click)="regresar()">
-        {{ "GLOBAL.regresar" | translate }}
-      </button>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="editar_actividad">
-  <mat-card class="mat-elevation-z8">
-    <mat-card-header>
-      <mat-card-title>{{
-        "calendario.edicion_actividades" | translate
-      }}</mat-card-title>
-    </mat-card-header>
+  <mat-card class="mat-elevation-z8 sga-modal-flat-card">
     <mat-card-content>
       <form novalidate [formGroup]="ActivityEditor">
         <mat-divider></mat-divider>
@@ -411,30 +398,25 @@
           </div>
         </div>
         <mat-divider></mat-divider>
-        <div align="center" style="margin-top: 10px">
-          <div *ngIf="ActividadEditable">
-            <button
-              class="float-center"
-              mat-raised-button
-              color="primary"
-              (click)="guardar()"
-              [disabled]="ActivityEditor.invalid"
-            >
-              {{ "GLOBAL.guardar" | translate }}
-            </button>
-          </div>
-          <div *ngIf="!ActividadEditable">
-            <button
-              class="float-center"
-              mat-raised-button
-              color="accent"
-              (click)="regresar()"
-            >
-              {{ "GLOBAL.regresar" | translate }}
-            </button>
-          </div>
-        </div>
       </form>
     </mat-card-content>
   </mat-card>
 </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="sga-modal-actions">
+  <button mat-button type="button" (click)="closeDialog()">
+    {{ (select_proyectos_act || (editar_actividad && ActividadEditable) ? "GLOBAL.cancelar" : "GLOBAL.cerrar") | translate }}
+  </button>
+  <button
+    *ngIf="select_proyectos_act || (editar_actividad && ActividadEditable)"
+    mat-flat-button
+    color="accent"
+    type="button"
+    [disabled]="(select_proyectos_act && SelectorDeps.invalid) || (editar_actividad && ActivityEditor.invalid)"
+    (click)="guardar()"
+  >
+    {{ "GLOBAL.guardar" | translate }}
+  </button>
+</mat-dialog-actions>
+</section>

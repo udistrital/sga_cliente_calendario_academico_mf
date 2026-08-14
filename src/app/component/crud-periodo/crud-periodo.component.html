@@ -1,9 +1,33 @@
-<div style="height: 100%;">
-  <ngx-dinamicform
-    [normalform]="formPeriodo"
-    [modeloData]="info_periodo"
-    (result)="validarForm($event)"
-    [clean]="clean"
-  >
-  </ngx-dinamicform>
-</div>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="period-dialog-title" mat-dialog-title>{{ "GLOBAL.periodo" | translate }}</h2>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="sga-modal-content period-dialog-content">
+    <ngx-dinamicform
+      [normalform]="formPeriodo"
+      [modeloData]="info_periodo"
+      [showHeader]="false"
+      [showActions]="false"
+      (result)="validarForm($event)"
+      [clean]="clean"
+    ></ngx-dinamicform>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sga-modal-actions">
+    <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+    <button mat-flat-button color="accent" type="button" (click)="submitForm()">{{ "GLOBAL.guardar" | translate }}</button>
+  </mat-dialog-actions>
+</section>

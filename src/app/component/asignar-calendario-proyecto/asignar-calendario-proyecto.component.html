@@ -1,14 +1,24 @@
-<mat-card class="program-manager-card">
-  <mat-card-header>
-    <mat-card-title>
-      {{ "calendario.para" | translate }} {{ dat.data.NivelNombre }}
-    </mat-card-title>
-    <mat-card-subtitle>
-      <p>{{ "calendario.periodo" | translate }}</p>
-      <p>{{ dat.data.Periodo }}</p>
-    </mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="assign-programs-dialog-title" mat-dialog-title>
+        {{ "calendario.para" | translate }} {{ dat.data.NivelNombre }}
+      </h2>
+      <p>{{ "calendario.periodo" | translate }}: {{ dat.data.Periodo }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="sga-modal-content">
     <form novalidate (ngSubmit)="register()" class="program-form">
       <p class="alert info">
         {{ "calendario.seleccion_proyectos_calendario_info" | translate }}
@@ -19,6 +29,7 @@
       <p>
         <strong>{{ "calendario.programas_asociados" | translate:{ total: selectedProjects.value?.length || 0 } }}</strong>
       </p>
+
       <div class="program-manager">
         <section class="program-panel associated">
           <div class="program-panel-header">
@@ -66,11 +77,11 @@
           </div>
         </section>
       </div>
-      <div class="program-actions">
-        <button mat-flat-button color="accent" type="submit">
-          {{ "GLOBAL.guardar" | translate }}
-        </button>
-      </div>
     </form>
-  </mat-card-content>
-</mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sga-modal-actions">
+    <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+    <button mat-flat-button color="accent" type="button" (click)="register()">{{ "GLOBAL.guardar" | translate }}</button>
+  </mat-dialog-actions>
+</section>

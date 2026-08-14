@@ -184,6 +184,26 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  dialogTitle(): string {
+    if (this.select_proyectos_act) {
+      return this.translate.instant('calendario.select_proyectos_actividades');
+    }
+    if (this.actividad_detalle_proyectos) {
+      return `${this.translate.instant('calendario.actividad')}: ${this.actividad || ''}`;
+    }
+    if (this.proceso_detalle) {
+      return this.translate.instant('calendario.proceso');
+    }
+    return this.translate.instant('calendario.edicion_actividades');
+  }
+
+  dialogSubtitle(): string {
+    if (this.editar_actividad) {
+      return [this.nombre_proceso, this.periodo].filter(Boolean).join(' - ');
+    }
+    return this.actividad_detalle_proyectos ? this.descripcion_actividad : '';
+  }
+
   guardar() {
     if (this.select_proyectos_act) {
       let selected_deps = this.programasSeleccionados();

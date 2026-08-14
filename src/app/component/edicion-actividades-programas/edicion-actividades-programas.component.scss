@@ -1,4 +1,9 @@
 //HOVER SOBRE LAS FILAS
+:host {
+  display: block;
+  height: 100%;
+}
+
 .mat-mdc-row:hover .mat-mdc-cell {
   background-color: var(--color100);
 }
@@ -65,16 +70,6 @@
   background: #fff8e1;
   border-left: 4px solid #ffb300;
   padding: 0.75rem;
-}
-
-.program-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.program-actions button {
-  min-width: 180px;
 }
 
 @media (max-width: 768px) {

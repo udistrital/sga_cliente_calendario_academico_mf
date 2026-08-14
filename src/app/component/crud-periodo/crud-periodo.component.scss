@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.period-dialog-content ngx-dinamicform {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep .period-dialog-content mat-card {
+  height: auto !important;
+  margin: 0;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .period-dialog-content .mat-mdc-card-content {
+  padding: 0 !important;
+}

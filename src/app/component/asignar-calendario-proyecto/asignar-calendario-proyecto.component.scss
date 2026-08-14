@@ -1,10 +1,6 @@
-.program-manager-card {
-  box-shadow: none;
-  margin: 0;
-}
-
-.program-manager-card mat-card-content {
-  padding-top: 1rem;
+:host {
+  display: block;
+  height: 100%;
 }
 
 .program-form {
@@ -57,8 +53,9 @@
 }
 
 .alert.info {
-  background: #e3f2fd;
-  border-left: 4px solid #2196f3;
+  color: var(--color900, #013960);
+  background: var(--color100, #e1edf2);
+  border-left: 4px solid var(--primary, #03678f);
   padding: 0.75rem;
 }
 
@@ -66,16 +63,6 @@
   background: #fff8e1;
   border-left: 4px solid #ffb300;
   padding: 0.75rem;
-}
-
-.program-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.program-actions button {
-  min-width: 180px;
 }
 
 @media (max-width: 768px) {

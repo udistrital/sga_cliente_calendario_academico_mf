@@ -60,6 +60,10 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
       });
   }
 
+  closeDialog() {
+    this.dialogRef.close();
+  }
+
   proyectosIniciales() {
     if (!this.dat.calendar?.DependenciaId || this.dat.calendar.DependenciaId === '{}') {
       return [];
