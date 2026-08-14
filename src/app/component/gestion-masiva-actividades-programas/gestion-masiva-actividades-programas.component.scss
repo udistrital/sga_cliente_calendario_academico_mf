@@ -6,23 +6,18 @@
 }
 
 .bulk-dialog {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: none;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-top: 0.5rem;
+  padding-top: 1rem !important;
 }
 
 .bulk-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
   padding: 1rem;
   border: 1px solid var(--color200);
-  border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), var(--color100));
+  border-radius: 8px;
+  background: #fff;
 }
 
 .bulk-hero h3 {
@@ -34,12 +29,9 @@
   margin: 0;
 }
 
-.eyebrow {
+.bulk-context {
+  margin: 0 0 0.75rem;
   color: var(--color600);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .program-selector {
@@ -54,6 +46,7 @@
 
 .program-selector-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.4rem;
 }
@@ -66,7 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  color: #16324f;
+  color: var(--color600);
   font-size: 0.78rem;
 }
 
@@ -85,10 +78,10 @@
   gap: 0.45rem;
   max-width: 100%;
   padding: 0.35rem 0.45rem 0.35rem 0.65rem;
-  border: 1px solid #c9dfef;
+  border: 1px solid var(--color200);
   border-radius: 999px;
-  color: #16324f;
-  background: #f8fbff;
+  color: var(--color600);
+  background: var(--color100);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -101,18 +94,22 @@
   height: 1.25rem;
   border: 0;
   border-radius: 50%;
-  color: #16324f;
-  background: #dceaf7;
+  color: var(--color600);
+  background: var(--color200);
   cursor: pointer;
   font-weight: 900;
   line-height: 1;
 }
 
 .program-chip button:hover,
-.program-chip button:focus {
+.program-chip button:focus-visible {
   color: #fff;
   background: var(--color600);
-  outline: none;
+}
+
+.program-chip button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .summary-grid {
@@ -125,8 +122,8 @@
 .summary-grid article {
   padding: 0.85rem;
   border: 1px solid var(--color200);
-  border-radius: 0.85rem;
-  background: #fff;
+  border-radius: 8px;
+  background: white;
 }
 
 .summary-grid span {
@@ -145,14 +142,14 @@
 .summary-detail {
   margin: 0.85rem 0 0.35rem;
   padding: 0.9rem 1rem;
-  border: 1px solid #dceaf7;
-  border-radius: 0.85rem;
-  background: #f8fbff;
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: var(--color100);
 }
 
 .summary-detail h3 {
   margin: 0 0 0.65rem;
-  color: #24364b;
+  color: var(--color600);
   font-size: 0.95rem;
 }
 
@@ -169,9 +166,9 @@
 
 .detail-chip,
 .detail-item {
-  border: 1px solid #d7e6f2;
-  border-radius: 0.75rem;
-  background: #fff;
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: white;
 }
 
 .detail-chip {
@@ -197,7 +194,7 @@
 
 .detail-item > span,
 .detail-item > small {
-  color: #5f6b7a;
+  color: var(--color600);
 }
 
 .detail-program-list {
@@ -212,10 +209,10 @@
 .detail-program-list span {
   max-width: 100%;
   padding: 0.25rem 0.45rem;
-  border: 1px solid #d7e6f2;
+  border: 1px solid var(--color200);
   border-radius: 999px;
-  color: #16324f;
-  background: #f8fbff;
+  color: var(--color600);
+  background: var(--color100);
   font-size: 0.72rem;
   font-weight: 700;
   overflow: hidden;
@@ -255,9 +252,9 @@
   margin: 1rem 0 0;
   padding: 1rem;
   border: 1px dashed var(--color300);
-  border-radius: 0.75rem;
-  color: #4f5965;
-  background: #f8fbfd;
+  border-radius: 8px;
+  color: var(--color600);
+  background: var(--color100);
 }
 
 .validation-state {
@@ -269,8 +266,8 @@
 .blocked-panel {
   margin-top: 1rem;
   padding: 1rem;
-  border: 1px solid #f4c15d;
-  border-radius: 0.85rem;
+  border: 1px solid var(--warning-main);
+  border-radius: 8px;
   background: #fff9eb;
 }
 
@@ -302,7 +299,7 @@
   gap: 0.75rem;
   align-items: center;
   padding: 0.7rem 0.25rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  border-top: 1px solid var(--color200);
 }
 
 .activity-copy {
@@ -319,13 +316,13 @@
 }
 
 .activity-copy span {
-  color: #5f6b7a;
+  color: var(--color600);
   font-size: 0.82rem;
 }
 
 .activity-copy small {
   margin-top: 0.4rem;
-  color: #7a3b00;
+  color: var(--color600);
   font-size: 0.76rem;
   font-weight: 800;
 }
@@ -360,11 +357,10 @@
 }
 
 .bulk-actions {
-  flex: 0 0 auto;
   gap: 0.5rem;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .bulk-hero,
   .summary-grid,
   .detail-list.vertical,

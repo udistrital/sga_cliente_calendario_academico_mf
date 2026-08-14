@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -12,6 +12,7 @@ import { NivelFormacion } from 'src/app/models/proyecto_academico/nivel_formacio
 import { UserService } from '../../services/users.service';
 import { ProyectoAcademicoService } from 'src/app/services/proyecto_academico.service';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
 import { SgaAdmisionesMidService } from 'src/app/services/sga_admisiones_mid.service';
 import { ImplicitAutenticationService } from 'src/app/services/implicit_autentication.service';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
@@ -24,13 +25,16 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
 import { EdicionActividadesProgramasComponent } from '../edicion-actividades-programas/edicion-actividades-programas.component';
 import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService, CalendarioProgramaOption } from 'src/app/services/calendario-filtros-alcance.service';
+import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'administracion-calendario',
   templateUrl: './administracion-calendario.component.html',
   styleUrls: ['./administracion-calendario.component.scss'],
 })
-export class AdministracionCalendarioComponent implements OnInit {
+export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -96,6 +100,7 @@ export class AdministracionCalendarioComponent implements OnInit {
   ];
   dataSource!: MatTableDataSource<Proceso>;
   datasourceActivity!: MatTableDataSource<Actividad>;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private translate: TranslateService,
@@ -105,12 +110,14 @@ export class AdministracionCalendarioComponent implements OnInit {
     private projectService: ProyectoAcademicoService,
     private sgaAdmisionesMidService: SgaAdmisionesMidService,
     private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
     private autenticationService: ImplicitAutenticationService,
     private configuracionService: ConfiguracionService,
     private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
     private parametrosService: ParametrosService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private calendarioActualizacionService: CalendarioActualizacionService
   ) {
     this.createProcessTable();
     this.createActivitiesTable();
@@ -118,6 +125,13 @@ export class AdministracionCalendarioComponent implements OnInit {
       this.createProcessTable();
       this.createActivitiesTable();
     });
+    this.calendarioActualizacionService.actualizacion$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((actualizacion) => {
+        if (this.idCalendario > 0 && Number(actualizacion.calendarioId) === Number(this.idCalendario)) {
+          this.getInfoPrograma(this.DependenciaID, this.periodoSelected?.Id);
+        }
+      });
   }
 
   ngOnInit() {
@@ -138,6 +152,11 @@ export class AdministracionCalendarioComponent implements OnInit {
         this.cargarAlcanceFiltros();
       });
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   createProcessTable() {
@@ -486,7 +505,7 @@ export class AdministracionCalendarioComponent implements OnInit {
       .subscribe(
         (res_proyecto: any) => {
           this.Proyecto_nombre = res_proyecto.Nombre;
-          this.sgaCalendarioMidService.get('calendario-academico/eventos/tipo_recurrencia?limit=0').subscribe(
+          this.eventoService.get('tipo_recurrencia?limit=0').subscribe(
             (res_recurrencia: any) => {
               this.periodicidad = res_recurrencia;
               this.sgaCalendarioMidService
@@ -748,6 +767,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     const dialogRef = this.dialog.open(template, {
       width: '1000px',
       height: '800px',
+      maxWidth: '94vw',
+      maxHeight: '92vh',
+      panelClass: 'sga-modal-panel',
     });
     this.calendarOptions = {
       customButtons: {
@@ -801,6 +823,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '600px';
     activityConfig.height = '370px';
+    activityConfig.maxWidth = '94vw';
+    activityConfig.maxHeight = '90vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = { process: event.data, vista: 'process' };
     const newActivity = this.dialog.open(
       EdicionActividadesProgramasComponent,
@@ -820,6 +845,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     const dialogRef = this.dialog.open(event.dialog, {
       width: '700px',
       height: '580px',
+      maxWidth: '94vw',
+      maxHeight: '90vh',
+      panelClass: 'sga-modal-panel',
     });
     this.calendarOptions = {
       customButtons: {
@@ -903,9 +931,9 @@ export class AdministracionCalendarioComponent implements OnInit {
     const activityConfig = new MatDialogConfig();
     activityConfig.width = 'min(1100px, 94vw)';
     activityConfig.maxWidth = '94vw';
-    activityConfig.height = 'auto';
+    activityConfig.height = '90vh';
     activityConfig.maxHeight = '92vh';
-    activityConfig.panelClass = 'activity-edit-dialog';
+    activityConfig.panelClass = ['activity-edit-dialog', 'sga-modal-panel'];
     activityConfig.data = {
       process: process,
       activity: event.data,
@@ -919,24 +947,27 @@ export class AdministracionCalendarioComponent implements OnInit {
     );
     newActivity.afterClosed().subscribe((activity: any) => {
       if (activity !== undefined) {
-        this.sgaCalendarioMidService
-          .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
+        this.eventoService
+          .get('calendario_evento/' + event.data.actividadId)
           .subscribe(
             (respGet: any) => {
-              respGet.DependenciaId = JSON.stringify(
-                activity.UpdateDependencias
-              );
-              this.sgaCalendarioMidService.put('calendario-academico/actividad/' + event.data.actividadId + '/dependencias', { DependenciaId: respGet.DependenciaId }).subscribe(
-                (respPut: any) => {
-                  this.popUpManager.showSuccessAlert(
-                    this.translate.instant('calendario.actividad_actualizada')
-                  );
-                  this.getInfoPrograma(this.DependenciaID, this.periodoSelected?.Id);
-                },
-                (error: any) => {
-                  this.popUpManager.showErrorToast(
+               respGet.DependenciaId = JSON.stringify(
+                 activity.UpdateDependencias
+               );
+               this.sgaCalendarioMidService.put('calendario-academico/actividad/' + event.data.actividadId + '/dependencias', { DependenciaId: respGet.DependenciaId }).subscribe(
+                 (respPut: any) => {
+                   this.calendarioActualizacionService.notificar({
+                     calendarioId: Number(this.idCalendario),
+                     actividadIds: [Number(event.data.actividadId)],
+                   });
+                   this.popUpManager.showSuccessAlert(
+                     this.translate.instant('calendario.fechas_particulares_actualizadas')
+                   );
+                 },
+                 (error: any) => {
+                   this.popUpManager.showErrorToast(
                     this.translate.instant(
-                      'calendario.error_registro_actividad'
+                       'calendario.error_actualizar_fechas_particulares'
                     )
                   );
                 }
@@ -944,7 +975,7 @@ export class AdministracionCalendarioComponent implements OnInit {
             },
             (error: any) => {
               this.popUpManager.showErrorToast(
-                this.translate.instant('calendario.error_registro_actividad')
+                 this.translate.instant('calendario.error_actualizar_fechas_particulares')
               );
             }
           );
@@ -961,8 +992,8 @@ export class AdministracionCalendarioComponent implements OnInit {
       .then((accion) => {
         if (accion.value) {
           if (event.data.Editable) {
-            this.sgaCalendarioMidService
-              .get('calendario-academico/eventos/calendario_evento/' + event.data.actividadId)
+            this.eventoService
+              .get('calendario_evento/' + event.data.actividadId)
               .subscribe(
                 (respGet: any) => {
                   const dep = JSON.parse(respGet.DependenciaId);
@@ -976,24 +1007,26 @@ export class AdministracionCalendarioComponent implements OnInit {
                         fd.Activo = !fd.Activo;
                         fd.Modificacion = this.fechaGMTMinus5();
                       }
-                    }
+                   }
                   );
-                  respGet.DependenciaId = JSON.stringify(dep);
-                  this.sgaCalendarioMidService
-                    .put('calendario-academico/eventos/calendario_evento/' + respGet.Id, respGet)
-                    .subscribe(
-                      (respPut: any) => {
-                        this.getInfoPrograma(this.DependenciaID, this.periodoSelected?.Id);
-                        this.popUpManager.showSuccessAlert(
+                   this.sgaCalendarioMidService
+                     .put('calendario-academico/actividad/' + respGet.Id + '/dependencias', { DependenciaId: JSON.stringify(dep) })
+                     .subscribe(
+                       (respPut: any) => {
+                         this.calendarioActualizacionService.notificar({
+                           calendarioId: Number(this.idCalendario),
+                           actividadIds: [Number(respGet.Id)],
+                         });
+                         this.popUpManager.showSuccessAlert(
                           this.translate.instant(
-                            'calendario.actividad_actualizada'
+                             'calendario.estado_actividad_actualizado'
                           )
                         );
-                      },
-                      (error: any) => {
-                        this.popUpManager.showErrorToast(
+                       },
+                       (error: any) => {
+                         this.popUpManager.showErrorToast(
                           this.translate.instant(
-                            'calendario.error_registro_actividad'
+                             'calendario.error_actualizar_estado_actividad'
                           )
                         );
                       }
@@ -1002,7 +1035,7 @@ export class AdministracionCalendarioComponent implements OnInit {
                 (error: any) => {
                   this.popUpManager.showErrorToast(
                     this.translate.instant(
-                      'calendario.error_registro_actividad'
+                       'calendario.error_actualizar_estado_actividad'
                     )
                   );
                 }
@@ -1056,8 +1089,8 @@ export class AdministracionCalendarioComponent implements OnInit {
         resolve();
         return;
       }
-      this.sgaCalendarioMidService
-        .get('calendario-academico/eventos/evento_catalogo_rol_gestion?query=Activo:true&limit=0')
+      this.eventoService
+        .get('evento_catalogo_rol_gestion?query=Activo:true&limit=0')
         .subscribe(
           (relaciones: any) => {
             const permitidos = this.normalizarListaRespuesta(relaciones)

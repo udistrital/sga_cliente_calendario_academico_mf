@@ -12,6 +12,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { EventoService } from 'src/app/services/evento.service';
+import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
 
 @Component({
   selector: 'list-calendario-academico',
@@ -43,7 +45,9 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     private proyectoService: ProyectoAcademicoService,
     private dialog: MatDialog,
     private popUpManager: PopUpManager,
-    private sgaCalendarioMidService: SgaCalendarioMidService
+    private sgaCalendarioMidService: SgaCalendarioMidService,
+    private eventoService: EventoService,
+    private calendarioActualizacionService: CalendarioActualizacionService
   ) { }
   recargarDespuesClon(newItem: any) {
     this.calendarForEditId = newItem;
@@ -184,13 +188,14 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     assignConfig.maxWidth = '95vw';
     assignConfig.height = '720px';
     assignConfig.maxHeight = '90vh';
+    assignConfig.panelClass = 'sga-modal-panel';
 
-    this.sgaCalendarioMidService.get('calendario-academico/eventos/proceso?limit=0&query=Activo:true,CalendarioID__Id:' + event.data.Id).subscribe(
+    this.eventoService.get('proceso?limit=0&query=Activo:true,CalendarioID__Id:' + event.data.Id).subscribe(
       (response: any) => {
         if (!Array.isArray(response) || response.length === 0 || Object.keys(response[0] || {}).length === 0) {
           this.popUpManager.showErrorAlert(this.translate.instant('calendario.no_asignable'))
         } else {
-          this.sgaCalendarioMidService.get('calendario-academico/eventos/calendario/' + event.data.Id).subscribe(
+          this.eventoService.get('calendario/' + event.data.Id).subscribe(
             (calendar: Calendario) => {
               assignConfig.data = { calendar: calendar, data: event.data };
               const newAssign = this.dialog.open(AsignarCalendarioProyectoComponent, assignConfig);
@@ -221,7 +226,10 @@ export class ListCalendarioAcademicoComponent implements OnInit {
     }).subscribe(
       response => {
         this.popUpManager.showSuccessAlert(this.translate.instant('calendario.proyectos_exito'));
-        this.ngOnInit();
+        this.calendarioActualizacionService.notificar({
+          calendarioId: Number(calendarioId),
+        });
+        this.cargarCalendarios();
       },
       error => {
         const impactos = this.impactosDesasociacion(error);
@@ -229,7 +237,7 @@ export class ListCalendarioAcademicoComponent implements OnInit {
           this.popUpManager.showErrorToast(error?.Message || error?.error?.Message || this.translate.instant('calendario.programas_no_desasociables'));
           return;
         }
-        this.popUpManager.showErrorToast(error?.error?.Message || error?.message || this.translate.instant('ERROR.general'));
+        this.popUpManager.showErrorToast(error?.error?.Message || error?.message || this.translate.instant('calendario.error_actualizar_programas_calendario'));
       },
     );
   }

@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
 
 @Component({
   selector: 'gestion-masiva-actividades-programas',
@@ -28,7 +29,9 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   validacionesPorActividad = new Map<number, any>();
   operacionTabIndex = 0;
   validando = false;
+  actualizando = false;
   actualizado = false;
+  private validacionSecuencia = 0;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -36,6 +39,7 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
     private translate: TranslateService,
     private popUpManager: PopUpManager,
     private sgaCalendarioMidService: SgaCalendarioMidService,
+    private calendarioActualizacionService: CalendarioActualizacionService,
   ) { }
 
   ngOnInit() {
@@ -49,6 +53,9 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   }
 
   cerrar() {
+    if (this.actualizando) {
+      return;
+    }
     this.dialogRef.close(this.actualizado);
   }
 
@@ -232,7 +239,7 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   }
 
   puedeAplicar(operacion: 'asociar' | 'desasociar'): boolean {
-    return this.actividadesConCambio(operacion).length > 0;
+    return !this.validando && !this.actualizando && this.actividadesConCambio(operacion).length > 0;
   }
 
   totalCruces(operacion: 'asociar' | 'desasociar'): number {
@@ -300,6 +307,9 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   }
 
   aplicar(operacion: 'asociar' | 'desasociar') {
+    if (this.actualizando) {
+      return;
+    }
     const actividadIds = this.actividadesConCambio(operacion);
     if (this.programaIdsSeleccionados.length === 0 || actividadIds.length === 0) {
       this.popUpManager.showErrorToast(this.translate.instant('calendario.masivo_programas_seleccion_requerida'));
@@ -309,30 +319,42 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
       if (!ok.value) {
         return;
       }
+      this.setUpdating(true);
       this.sgaCalendarioMidService.post('calendario-academico/calendario/' + this.calendar.calendarioId + '/actividades-programas/masivo', {
         ProgramaIds: this.programaIdsSeleccionados,
         ActividadIds: actividadIds,
         Operacion: operacion,
       }).subscribe(
-        (response: any) => {
-          const data = response?.Data || response;
-          const actualizadas = data?.Actualizadas ?? 0;
-          const sinCambios = data?.SinCambios ?? 0;
-          this.actividadIdsSeleccionadosPorOperacion[operacion].clear();
-          this.actualizado = true;
-          this.validarMasivo(false);
-          this.popUpManager.showSuccessAlert(
+          (response: any) => {
+            const data = response?.Data || response;
+            const actualizadas = data?.Actualizadas ?? 0;
+            const sinCambios = data?.SinCambios ?? 0;
+            this.setUpdating(false);
+            this.actualizado = true;
+            this.calendarioActualizacionService.notificar({
+              calendarioId: Number(this.calendar?.calendarioId),
+              actividadIds,
+            });
+            this.dialogRef.close(true);
+            this.popUpManager.showSuccessAlert(
             this.translate.instant('calendario.masivo_programas_exito', { actualizadas, sinCambios })
           );
         },
         (error: any) => {
+          this.setUpdating(false);
           this.popUpManager.showErrorToast(this.errorMessage(error, 'calendario.masivo_programas_error'));
         }
       );
     });
   }
 
+  private setUpdating(updating: boolean) {
+    this.actualizando = updating;
+    this.dialogRef.disableClose = updating;
+  }
+
   private validarMasivo(mostrarError: boolean = true) {
+    const validacionActual = ++this.validacionSecuencia;
     const actividadIds = this.todosLosIdsActividad();
     if (this.programaIdsSeleccionados.length === 0 || actividadIds.length === 0) {
       this.limpiarValidacion();
@@ -344,6 +366,9 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
       ActividadIds: actividadIds,
     }).subscribe(
       (response: any) => {
+        if (validacionActual !== this.validacionSecuencia) {
+          return;
+        }
         const data = response?.Data || response;
         const validaciones = Array.isArray(data?.Actividades) ? data.Actividades : [];
         this.validacionesPorActividad.clear();
@@ -356,6 +381,9 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
         this.validando = false;
       },
       (error: any) => {
+        if (validacionActual !== this.validacionSecuencia) {
+          return;
+        }
         this.validando = false;
         this.limpiarValidacion();
         if (mostrarError) {

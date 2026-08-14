@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 //import { LocalDataSource } from 'ng2-smart-table';
@@ -15,13 +15,16 @@ import { Actividad } from 'src/app/models/calendario-academico/actividad';
 import { NewNuxeoService } from 'src/app/services/new_nuxeo.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
+import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'detalle-calendario',
   templateUrl: './detalle-calendario.component.html',
   styleUrls: ['./detalle-calendario.component.scss'],
 })
-export class DetalleCalendarioComponent implements OnInit, OnChanges {
+export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy {
 
   activetab: boolean = false;
   calendarForEditId: number = 0;
@@ -37,6 +40,7 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
   fileResolucion: any;
   calendarForm!: FormGroup;
   responsable!: string;
+  private readonly destroy$ = new Subject<void>();
 
   @Input()
   calendarForProject: string = '0';
@@ -52,8 +56,17 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
     private dialog: MatDialog,
     private popUpManager: PopUpManager,
     private newNuxeoService: NewNuxeoService,
+    private calendarioActualizacionService: CalendarioActualizacionService,
   ) {
     this.createActivitiesTable();
+    this.calendarioActualizacionService.actualizacion$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((actualizacion) => {
+        const calendarioActual = Number(this.calendar?.calendarioId || this.idDetalle || this.calendarForProject);
+        if (calendarioActual > 0 && Number(actualizacion.calendarioId) === calendarioActual) {
+          this.loadSelects(calendarioActual);
+        }
+      });
   }
 
   loadSelects(id: any) {
@@ -120,6 +133,11 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
     if (this.calendarForProject != '0') {
       this.loadSelects(this.calendarForProject);
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   cambiarCalendario(id: any) {
@@ -302,17 +320,21 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges {
     activityConfig.maxWidth = '95vw';
     activityConfig.height = '820px';
     activityConfig.maxHeight = '92vh';
+    activityConfig.panelClass = 'sga-modal-panel';
     activityConfig.data = { process: process, calendar: this.calendar, editActivity: event.data };
     const editedActivity = this.dialog.open(ActividadCalendarioAcademicoComponent, activityConfig);
     editedActivity.afterClosed().subscribe((activity: any) => {
       if (activity !== undefined) {
-        this.SgaCalendarioMidServide.put('actividad-calendario/calendario/actividad/', { Id: event.data.actividadId, actividad: activity.Actividad, resp: activity.responsable }).subscribe(
+        this.SgaCalendarioMidServide.put('actividad-calendario/calendario/actividad/' + event.data.actividadId, { Id: event.data.actividadId, actividad: activity.Actividad, resp: activity.responsable }).subscribe(
           response => {
             this.popUpManager.showSuccessAlert(this.translate.instant('calendario.actividad_actualizada'));
-            this.loadSelects(this.calendar.calendarioId);
+            this.calendarioActualizacionService.notificar({
+              calendarioId: Number(this.calendar.calendarioId),
+              actividadIds: [Number(event.data.actividadId)],
+            });
           },
           error => {
-            this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));
+            this.popUpManager.showErrorToast(this.translate.instant('calendario.error_actualizar_actividad'));
           },
         );
       }

@@ -1,13 +1,26 @@
-<h2 mat-dialog-title>{{ 'calendario.masivo_programas_titulo' | translate }}</h2>
+<section class="sga-modal-shell">
+<header class="sga-modal-header">
+  <div class="sga-modal-heading">
+    <h2 id="bulk-programs-dialog-title" mat-dialog-title>{{ 'calendario.masivo_programas_titulo' | translate }}</h2>
+    <p>{{ 'calendario.masivo_programas_info' | translate }}</p>
+  </div>
+  <button
+    mat-icon-button
+    class="sga-modal-close"
+    type="button"
+    [disabled]="actualizando"
+    (click)="cerrar()"
+    [attr.aria-label]="'GLOBAL.cerrar' | translate"
+    [matTooltip]="'GLOBAL.cerrar' | translate"
+  >
+    <mat-icon fontIcon="close"></mat-icon>
+  </button>
+</header>
 
-<mat-dialog-content class="bulk-dialog">
+<mat-dialog-content class="bulk-dialog sga-modal-content">
   <section class="bulk-hero">
-    <div>
-      <p class="eyebrow">{{ 'calendario.masivo_asociacion' | translate }}</p>
-      <h3>{{ 'calendario.masivo_programas_info' | translate }}</h3>
-      <p>{{ 'calendario.masivo_programas_contexto' | translate }}</p>
-    </div>
     <div class="program-selector-wrap">
+      <p class="bulk-context">{{ 'calendario.masivo_programas_contexto' | translate }}</p>
       <mat-form-field class="program-selector" floatLabel="always">
         <mat-label>{{ 'calendario.programas_academicos' | translate }}</mat-label>
         <input
@@ -110,6 +123,7 @@
               <mat-checkbox
                 [checked]="actividadSeleccionada(actividad, 'asociar')"
                 (change)="toggleActividad(actividad, $event.checked, 'asociar')"
+                [attr.aria-label]="('calendario.masivo_asociar' | translate) + ': ' + actividad.Nombre"
               ></mat-checkbox>
               <div class="activity-copy">
                 <strong>{{ actividad.Nombre }}</strong>
@@ -169,6 +183,7 @@
               <mat-checkbox
                 [checked]="actividadSeleccionada(actividad, 'desasociar')"
                 (change)="toggleActividad(actividad, $event.checked, 'desasociar')"
+                [attr.aria-label]="('calendario.masivo_desasociar' | translate) + ': ' + actividad.Nombre"
               ></mat-checkbox>
               <div class="activity-copy">
                 <strong>{{ actividad.Nombre }}</strong>
@@ -207,14 +222,15 @@
   </mat-tab-group>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="bulk-actions">
-  <button mat-button type="button" (click)="cerrar()">
+<mat-dialog-actions align="end" class="bulk-actions sga-modal-actions">
+  <button mat-button type="button" (click)="cerrar()" [disabled]="actualizando">
     {{ 'GLOBAL.cerrar' | translate }}
   </button>
-  <button mat-flat-button color="accent" type="button" *ngIf="operacionTabIndex === 0" (click)="aplicar('asociar')" [disabled]="!puedeAplicar('asociar')">
+  <button mat-flat-button color="accent" type="button" *ngIf="operacionTabIndex === 0" (click)="aplicar('asociar')" [disabled]="actualizando || !puedeAplicar('asociar')">
     {{ 'calendario.masivo_asociar' | translate }}
   </button>
-  <button mat-stroked-button color="warn" type="button" *ngIf="operacionTabIndex === 1" (click)="aplicar('desasociar')" [disabled]="!puedeAplicar('desasociar')">
+  <button mat-stroked-button color="warn" type="button" *ngIf="operacionTabIndex === 1" (click)="aplicar('desasociar')" [disabled]="actualizando || !puedeAplicar('desasociar')">
     {{ 'calendario.masivo_desasociar' | translate }}
   </button>
 </mat-dialog-actions>
+</section>
