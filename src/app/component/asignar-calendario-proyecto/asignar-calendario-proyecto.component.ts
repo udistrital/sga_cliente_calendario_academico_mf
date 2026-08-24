@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
 import { PopUpManager } from '../../managers/popUpManager';
+import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from '../../services/calendario-filtros-alcance.service';
 
 @Component({
   selector: 'asignar-calendario-proyecto',
@@ -14,10 +15,13 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
 
   selectedProjects: FormControl;
   projects!: any[];
+  facultades: CalendarioFiltroOption[] = [];
+  facultadSeleccionada: number | null = null;
   filtroProgramasAsociados = '';
   filtroProgramasDisponibles = '';
   constructor(
     private projectService: ProyectoAcademicoService,
+    private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
     private popUpManager: PopUpManager,
     private translate: TranslateService,
     public dialogRef: MatDialogRef<AsignarCalendarioProyectoComponent>,
@@ -30,10 +34,11 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   ngOnInit() {
     this.projectService.get('proyecto_academico_institucion?limit=0&query=Activo:true').subscribe({
       next: response => {
-          this.projects = (<any[]><unknown>response).filter(
+        this.projects = (<any[]><unknown>response).filter(
           proyecto => this.filtrarProyecto(proyecto),
         );
         this.selectedProjects.setValue(this.proyectosIniciales());
+        this.cargarFacultades();
       },
       error: error => {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
@@ -78,12 +83,16 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
 
   programasAsociados() {
     const selectedIds = new Set((this.selectedProjects.value || []).map((id: any) => Number(id)));
-    return (this.projects || []).filter((project: any) => selectedIds.has(Number(project.Id)));
+    return this.programasPorFacultad().filter((project: any) => selectedIds.has(Number(project.Id)));
   }
 
   programasDisponibles() {
     const selectedIds = new Set((this.selectedProjects.value || []).map((id: any) => Number(id)));
-    return (this.projects || []).filter((project: any) => !selectedIds.has(Number(project.Id)));
+    return this.programasPorFacultad().filter((project: any) => !selectedIds.has(Number(project.Id)));
+  }
+
+  programasPorFacultad() {
+    return this.filtrosAlcanceService.filtrarProgramasPorFacultad(this.projects, this.facultadSeleccionada);
   }
 
   programasAsociadosFiltrados() {
@@ -124,6 +133,10 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
     const currentIds = (this.selectedProjects.value || []).map((id: any) => Number(id));
     this.selectedProjects.setValue(currentIds.filter((id: number) => !idsARetirar.has(id)));
     this.selectedProjects.markAsTouched();
+  }
+
+  private async cargarFacultades() {
+    this.facultades = await this.filtrosAlcanceService.facultadesDeProgramas(this.projects);
   }
 
 }

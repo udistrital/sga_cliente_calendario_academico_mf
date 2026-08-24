@@ -26,6 +26,13 @@
       <p class="alert warning" *ngIf="(selectedProjects.value?.length || 0) === 0">
         {{ "calendario.calendario_sin_programas_alerta" | translate }}
       </p>
+      <mat-form-field appearance="outline" class="program-search">
+        <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+        <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+          <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+          <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
       <p>
         <strong>{{ "calendario.programas_asociados" | translate:{ total: selectedProjects.value?.length || 0 } }}</strong>
       </p>

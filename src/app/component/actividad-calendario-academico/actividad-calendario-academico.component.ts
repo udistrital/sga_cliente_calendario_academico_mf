@@ -100,7 +100,11 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
         this.translate.instant('calendario.seguro_modificar_actividad')
     ).then((ok) => {
       if (ok.value) {
-        this.dialogRef.close({ 'Actividad': activity, 'responsable': responsables });
+        this.dialogRef.close({
+          'Actividad': activity,
+          'responsable': responsables,
+          'repetible': this.getSelectedEventoCatalogo()?.Repetible === true,
+        });
       }
     });
   }
@@ -236,7 +240,10 @@ export class ActividadCalendarioAcademicoComponent implements OnInit {
         const relaciones = Array.isArray(data) ? data : [];
         this.eventosCatalogo = relaciones
           .filter((relacion: any) => relacion.EventoCatalogoId !== undefined && relacion.EventoCatalogoId !== null && relacion.EventoCatalogoId.Activo === true)
-          .map((relacion: any) => relacion.EventoCatalogoId);
+          .map((relacion: any) => ({
+            ...relacion.EventoCatalogoId,
+            Repetible: relacion.Repetible === true,
+          }));
         this.ensureSelectedEventoCatalogoLoaded();
       },
       (error: any) => {

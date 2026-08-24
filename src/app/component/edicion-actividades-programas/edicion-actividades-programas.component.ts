@@ -3,7 +3,6 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 
-import { ProyectoAcademicoService } from '../../services/proyecto_academico.service';
 import { PopUpManager } from '../../managers/popUpManager';
 import * as moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,6 +10,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SgaCalendarioMidService } from '../../services/sga_calendario_mid.service';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
+import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from 'src/app/services/calendario-filtros-alcance.service';
 
 
 
@@ -25,6 +25,8 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   actividad_detalle_proyectos: boolean = false;
   vista: string;
   projects!: any[];
+  facultades: CalendarioFiltroOption[] = [];
+  facultadSeleccionada: number | null = null;
   actividad: string = "";
   descripcion_actividad: string = "";
   proceso_detalle: boolean = false;
@@ -59,7 +61,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   programasOriginales: number[] = [];
 
   constructor(
-    private projectService: ProyectoAcademicoService,
+    private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
     private popUpManager: PopUpManager,
     private builder: FormBuilder,
     private translate: TranslateService,
@@ -103,9 +105,13 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       this.SelectorDeps = this.builder.group({
         Dependencias: ['', Validators.required],
       });
-      this.projects = this.data.dependencias;
+      this.projects = this.programasAsociadosCalendario(this.data.dependencias, this.data.calendar);
+      this.cargarFacultades();
  
       let dependenciasJSON = this.normalizarDependenciaId(this.data.activity.DependenciaId);
+      const programasPermitidos = new Set(this.projects.map((project: any) => Number(project.Id)));
+      dependenciasJSON.proyectos = dependenciasJSON.proyectos.filter((id: any) => programasPermitidos.has(Number(id)));
+      dependenciasJSON.fechas = dependenciasJSON.fechas.filter((fecha: any) => programasPermitidos.has(Number(fecha.Id)));
       this.data.activity.DependenciaId = dependenciasJSON;
       this.SelectorDeps.patchValue({
         Dependencias: dependenciasJSON.proyectos,
@@ -352,10 +358,25 @@ export class EdicionActividadesProgramasComponent implements OnInit {
 
   projectsFiltrados(filtro: string) {
     const normalizedFilter = (filtro || '').toLowerCase().trim();
+    const projects = this.filtrosAlcanceService.filtrarProgramasPorFacultad(this.projects, this.facultadSeleccionada);
     if (!normalizedFilter) {
-      return this.projects || [];
+      return projects;
     }
-    return (this.projects || []).filter((project) => `${project.Nombre || ''} ${project.Id || ''}`.toLowerCase().includes(normalizedFilter));
+    return projects.filter((project) => `${project.Nombre || ''} ${project.Id || ''}`.toLowerCase().includes(normalizedFilter));
+  }
+
+  private programasAsociadosCalendario(programas: any[], calendario: any): any[] {
+    const disponibles = Array.isArray(programas) ? programas : [];
+    if (calendario?.DependenciaId === undefined || calendario?.DependenciaId === null) {
+      return disponibles;
+    }
+    const dependencia = this.normalizarDependenciaId(calendario?.DependenciaId);
+    const idsCalendario = new Set(dependencia.proyectos.map((id: any) => Number(id)));
+    return disponibles.filter((programa: any) => idsCalendario.has(Number(programa.Id)));
+  }
+
+  private async cargarFacultades() {
+    this.facultades = await this.filtrosAlcanceService.facultadesDeProgramas(this.projects);
   }
 
   togglePrograma(programaId: number, checked: boolean) {

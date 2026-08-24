@@ -34,6 +34,7 @@ export class CalendarioFiltrosAlcanceService {
   private readonly rolesSecretario = ['SECRETARIA_ACADEMICA', 'SECRETARIO_ACADEMICO'];
 
   private programasPermitidos: CalendarioProgramaOption[] = [];
+  private facultadesCache = new Map<number, Promise<CalendarioFiltroOption>>();
 
   constructor(
     private authService: ImplicitAutenticationService,
@@ -78,6 +79,22 @@ export class CalendarioFiltrosAlcanceService {
       .filter((programa) => !facultadId || programa.FacultadId === facultadId)
       .filter((programa) => !nivelId || this.programaPerteneceNivel(programa, nivelId))
       .sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+  }
+
+  facultadesDeProgramas(programas: any[]): Promise<CalendarioFiltroOption[]> {
+    return this.construirFacultades(Array.isArray(programas) ? programas : []);
+  }
+
+  filtrarProgramasPorFacultad(programas: any[], facultadId: number | null): any[] {
+    if (!facultadId) {
+      return Array.isArray(programas) ? programas : [];
+    }
+    return (Array.isArray(programas) ? programas : [])
+      .filter((programa: any) => this.facultadIdPrograma(programa) === Number(facultadId));
+  }
+
+  facultadIdPrograma(programa: any): number {
+    return this.obtenerId(programa?.FacultadId || programa?.facultad_id);
   }
 
   private async obtenerRoles(): Promise<string[]> {
@@ -175,13 +192,20 @@ export class CalendarioFiltrosAlcanceService {
     return Array.isArray(facultades) ? facultades.map((facultad: any) => Number(facultad)).filter((facultad: number) => facultad > 0) : [];
   }
 
-  private async construirFacultades(programas: CalendarioProgramaOption[]): Promise<CalendarioFiltroOption[]> {
-    const ids = Array.from(new Set(programas.map((programa) => programa.FacultadId))).filter((id) => id > 0);
+  private async construirFacultades(programas: any[]): Promise<CalendarioFiltroOption[]> {
+    const ids = Array.from(new Set(programas.map((programa) => this.facultadIdPrograma(programa)))).filter((id) => id > 0);
     const facultades = await Promise.all(ids.map((id) => this.facultadPorId(id)));
     return facultades.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
   }
 
-  private async facultadPorId(id: number): Promise<CalendarioFiltroOption> {
+  private facultadPorId(id: number): Promise<CalendarioFiltroOption> {
+    if (!this.facultadesCache.has(id)) {
+      this.facultadesCache.set(id, this.consultarFacultad(id));
+    }
+    return this.facultadesCache.get(id)!;
+  }
+
+  private async consultarFacultad(id: number): Promise<CalendarioFiltroOption> {
     try {
       const respuesta = await firstValueFrom(this.oikosService.get('dependencia/' + id));
       return { Id: id, Nombre: String(respuesta?.Nombre || respuesta?.Data?.Nombre || 'Facultad ' + id) };

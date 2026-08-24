@@ -1142,6 +1142,7 @@
         "nivel_academico": "Academic level",
         "seleccione_periodo_filtro": "Select the academic period",
         "seleccione_facultad_filtro": "Select the faculty",
+        "todas_facultades": "All faculties",
         "seleccione_nivel_filtro": "Select the academic level",
         "seleccione_programa_filtro": "Select the academic program",
         "sin_periodos_disponibles": "No active academic periods are available.",

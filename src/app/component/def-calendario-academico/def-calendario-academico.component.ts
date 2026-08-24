@@ -298,6 +298,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
               this.calendar.anno = calendar['resolucion']['Anno'];
               this.calendar.Nivel = calendar['Nivel'];
               this.calendar.Activo = calendar['Activo'];
+              this.calendar.DependenciaId = calendar['DependenciaId'];
               this.fileResolucion = calendar['resolucion']['Nombre'];
               this.projects = this.proyectos.filter((proyecto) =>
                 this.filterProject(
@@ -338,6 +339,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
                             Id: element['ProcesoId']['Id'],
                           };
                           loadedActivity.EventoCatalogoId = element['EventoCatalogoId'];
+                          loadedActivity.NumeroOcurrencia = element['NumeroOcurrencia'];
                           loadedActivity.Nombre = element['Nombre'];
                           loadedActivity.Descripcion = element['Descripcion'];
                           (loadedActivity as any).ProcesoNombre = loadedProcess.Nombre;
@@ -483,6 +485,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
                           Id: element['ProcesoId']['Id'],
                         };
                         loadedActivity.EventoCatalogoId = element['EventoCatalogoId'];
+                        loadedActivity.NumeroOcurrencia = element['NumeroOcurrencia'];
                         loadedActivity.Nombre = element['Nombre'];
                         loadedActivity.Descripcion = element['Descripcion'];
                         (loadedActivity as any).ProcesoNombre = loadedProcess.Nombre;
@@ -631,7 +634,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
       );
 
     this.proyectoService
-      .get('proyecto_academico_institucion?fields=Id,Nombre&limit=0')
+      .get('proyecto_academico_institucion?fields=Id,Nombre,FacultadId&limit=0')
       .subscribe(
         (res) => {
           this.proyectos = <any[]>(<any>res);
@@ -1163,46 +1166,61 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
     newActivity.afterClosed().subscribe((activity: any) => {
       if (activity !== undefined) {
         const eventoCatalogoId = Number(activity.Actividad.EventoCatalogoId?.Id || activity.Actividad.EventoCatalogoId);
-        const actividadDuplicada = process.actividades?.data?.some((actividad: Actividad) => {
+        const actividadPayload = { ...activity.Actividad };
+        delete actividadPayload.NumeroOcurrencia;
+        delete actividadPayload.Repetible;
+        const payload = {
+          Actividad: actividadPayload,
+          responsable: activity.responsable,
+        };
+        const registrarActividad = () => {
+          this.sgaCalendarioMidService
+            .post('actividad-calendario', payload)
+            .subscribe(
+              (response: any) => {
+                let actividad: Actividad = new Actividad();
+                actividad = payload.Actividad;
+                actividad.actividadId = response.Data['Id'];
+                actividad.NumeroOcurrencia = response.Data['NumeroOcurrencia'];
+                actividad.responsables = activity.responsable;
+                actividad.FechaInicio = this.formatDateTimeLocal(actividad.FechaInicio);
+                actividad.FechaFin = this.formatDateTimeLocal(actividad.FechaFin);
+                this.processes
+                  .filter(
+                    (proc: Proceso) => proc.procesoId === process.procesoId
+                  )[0]
+                  .actividades.data.push(actividad);
+                this.popUpManager.showSuccessAlert(
+                  this.translate.instant('calendario.actividad_exito')
+                );
+                this.loadCalendar();
+              },
+              (error: any) => {
+                this.popUpManager.showErrorToast(
+                  this.errorMessage(error, 'calendario.error_registro_actividad')
+                );
+              }
+            );
+        };
+        if (activity.repetible === true) {
+          registrarActividad();
+          return;
+        }
+        const actividadActiva = process.actividades?.data?.some((actividad: Actividad) => {
           const catalogoId = Number(actividad.EventoCatalogoId?.Id || actividad.EventoCatalogoId);
-          return catalogoId === eventoCatalogoId;
+          return actividad.Activo === true && catalogoId === eventoCatalogoId;
         });
-        if (actividadDuplicada) {
-          this.popUpManager.showErrorToast('La actividad ya existe en el proceso.');
+        if (actividadActiva) {
+          this.popUpManager.showErrorToast('La actividad ya tiene una ocurrencia activa en el proceso. Debe inactivarla antes de crear otra.');
           return;
         }
         this.eventoService.get('calendario_evento?query=Activo:true,ProcesoId__Id:' + process.procesoId + ',EventoCatalogoId__Id:' + eventoCatalogoId + '&limit=1').subscribe(
           (actividadesExistentes: any) => {
             if (Array.isArray(actividadesExistentes) && actividadesExistentes.length > 0 && Object.keys(actividadesExistentes[0]).length > 0) {
-              this.popUpManager.showErrorToast('La actividad ya existe en el proceso.');
+              this.popUpManager.showErrorToast('La actividad ya tiene una ocurrencia activa en el proceso. Debe inactivarla antes de crear otra.');
               return;
             }
-            this.sgaCalendarioMidService
-              .post('actividad-calendario', activity)
-              .subscribe(
-            (response: any) => {
-              let actividad: Actividad = new Actividad();
-              actividad = activity.Actividad;
-              actividad.actividadId = response.Data['Id'];
-              actividad.responsables = activity.responsable;
-              actividad.FechaInicio = this.formatDateTimeLocal(actividad.FechaInicio);
-              actividad.FechaFin = this.formatDateTimeLocal(actividad.FechaFin);
-              this.processes
-                .filter(
-                  (proc: Proceso) => proc.procesoId === process.procesoId
-                )[0]
-                .actividades.data.push(actividad);
-              this.popUpManager.showSuccessAlert(
-                this.translate.instant('calendario.actividad_exito')
-              );
-              this.loadCalendar();
-            },
-            (error: any) => {
-              this.popUpManager.showErrorToast(
-                this.translate.instant('calendario.error_registro_actividad')
-              );
-            }
-              );
+            registrarActividad();
           },
           (error: any) => {
             this.popUpManager.showErrorToast(this.translate.instant('calendario.error_registro_actividad'));

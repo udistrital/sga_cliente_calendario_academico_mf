@@ -8,4 +8,5 @@ export class CalendarioEvento {
     DependenciaId: any;
     ProcesoId: any;
     EventoCatalogoId?: any;
+    NumeroOcurrencia?: number;
 }

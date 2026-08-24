@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.service';
 import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
+import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from 'src/app/services/calendario-filtros-alcance.service';
 
 @Component({
   selector: 'gestion-masiva-actividades-programas',
@@ -13,6 +14,8 @@ import { CalendarioActualizacionService } from 'src/app/services/calendario-actu
 export class GestionMasivaActividadesProgramasComponent implements OnInit {
   calendar: any;
   projects: any[] = [];
+  facultades: CalendarioFiltroOption[] = [];
+  facultadSeleccionada: number | null = null;
   procesos: any[] = [];
   procesosCandidatosAsociar: any[] = [];
   procesosCandidatosDesasociar: any[] = [];
@@ -40,11 +43,13 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
     private popUpManager: PopUpManager,
     private sgaCalendarioMidService: SgaCalendarioMidService,
     private calendarioActualizacionService: CalendarioActualizacionService,
+    private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
   ) { }
 
   ngOnInit() {
     this.calendar = this.data?.calendar;
-    this.projects = Array.isArray(this.data?.projects) ? this.data.projects : [];
+    this.projects = this.programasAsociadosCalendario(this.data?.projects, this.calendar);
+    this.cargarFacultades();
     this.procesos = (Array.isArray(this.data?.processes) ? this.data.processes : []).map((proceso: any) => ({
       ...proceso,
       actividadesLista: Array.isArray(proceso?.actividades?.data) ? proceso.actividades.data : [],
@@ -68,7 +73,10 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   }
 
   onProgramasSeleccionadosChange(programaIds: number[]) {
-    this.programaIdsSeleccionados = Array.isArray(programaIds) ? programaIds.map((programaId: any) => Number(programaId)).filter((programaId: number) => programaId > 0) : [];
+    const idsPermitidos = new Set(this.projects.map((project: any) => Number(project.Id)));
+    this.programaIdsSeleccionados = Array.isArray(programaIds)
+      ? programaIds.map((programaId: any) => Number(programaId)).filter((programaId: number) => programaId > 0 && idsPermitidos.has(programaId))
+      : [];
     this.actividadIdsSeleccionadosPorOperacion.asociar.clear();
     this.actividadIdsSeleccionadosPorOperacion.desasociar.clear();
     if (this.programaIdsSeleccionados.length === 0) {
@@ -80,7 +88,7 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
 
   programasFiltrados(): any[] {
     const filtro = String(this.programaFiltro || '').trim().toLowerCase();
-    return this.projects.filter((project: any) => {
+    return this.programasPorFacultad().filter((project: any) => {
       const projectId = Number(project?.Id);
       const nombre = String(project?.Nombre || '').toLowerCase();
       return projectId > 0 && !this.programaIdsSeleccionados.includes(projectId) && (!filtro || nombre.includes(filtro));
@@ -108,8 +116,18 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   }
 
   seleccionarTodosProgramas() {
-    this.onProgramasSeleccionadosChange(this.projects.map((project: any) => Number(project.Id)).filter((projectId: number) => projectId > 0));
+    const idsVisibles = this.programasPorFacultad().map((project: any) => Number(project.Id)).filter((projectId: number) => projectId > 0);
+    this.onProgramasSeleccionadosChange(Array.from(new Set([...this.programaIdsSeleccionados, ...idsVisibles])));
     this.programaFiltro = '';
+  }
+
+  programasPorFacultad(): any[] {
+    return this.filtrosAlcanceService.filtrarProgramasPorFacultad(this.projects, this.facultadSeleccionada);
+  }
+
+  todosProgramasFacultadSeleccionados(): boolean {
+    const idsVisibles = this.programasPorFacultad().map((project: any) => Number(project.Id));
+    return idsVisibles.length === 0 || idsVisibles.every((id: number) => this.programaIdsSeleccionados.includes(id));
   }
 
   deseleccionarTodosProgramas() {
@@ -507,6 +525,20 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
     const proyectos = Array.isArray(dependencia.proyectos) ? dependencia.proyectos : [];
     const fechas = Array.isArray(dependencia.fechas) ? dependencia.fechas : [];
     return { ...dependencia, proyectos, fechas };
+  }
+
+  private programasAsociadosCalendario(programas: any[], calendario: any): any[] {
+    const disponibles = Array.isArray(programas) ? programas : [];
+    if (calendario?.DependenciaId === undefined || calendario?.DependenciaId === null) {
+      return disponibles;
+    }
+    const dependencia = this.normalizarDependenciaActividad(calendario.DependenciaId);
+    const idsCalendario = new Set(dependencia.proyectos.map((id: any) => Number(id)));
+    return disponibles.filter((programa: any) => idsCalendario.has(Number(programa.Id)));
+  }
+
+  private async cargarFacultades() {
+    this.facultades = await this.filtrosAlcanceService.facultadesDeProgramas(this.projects);
   }
 
   private errorMessage(error: any, fallbackKey: string): string {

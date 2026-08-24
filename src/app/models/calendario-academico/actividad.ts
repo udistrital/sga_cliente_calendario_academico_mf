@@ -7,6 +7,7 @@ export class Actividad {
     responsables!: any[];
     ProcesoId!: any;
     EventoCatalogoId?: any;
+    NumeroOcurrencia?: number;
     actividadId!: number;
     DependenciaId!: any;
     Editable!: any;

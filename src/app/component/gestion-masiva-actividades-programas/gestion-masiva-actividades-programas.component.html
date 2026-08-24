@@ -21,6 +21,13 @@
   <section class="bulk-hero">
     <div class="program-selector-wrap">
       <p class="bulk-context">{{ 'calendario.masivo_programas_contexto' | translate }}</p>
+      <mat-form-field class="program-selector" appearance="outline">
+        <mat-label>{{ 'calendario.facultad' | translate }}</mat-label>
+        <mat-select [(ngModel)]="facultadSeleccionada">
+          <mat-option [value]="null">{{ 'calendario.todas_facultades' | translate }}</mat-option>
+          <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
       <mat-form-field class="program-selector" floatLabel="always">
         <mat-label>{{ 'calendario.programas_academicos' | translate }}</mat-label>
         <input
@@ -47,7 +54,7 @@
         </span>
       </div>
       <div class="program-selector-actions">
-        <button mat-button type="button" (click)="seleccionarTodosProgramas()" [disabled]="projects.length === 0 || programaIdsSeleccionados.length === projects.length">
+        <button mat-button type="button" (click)="seleccionarTodosProgramas()" [disabled]="todosProgramasFacultadSeleccionados()">
           {{ 'calendario.masivo_seleccionar_todos_programas' | translate }}
         </button>
         <button mat-button type="button" (click)="deseleccionarTodosProgramas()" [disabled]="programaIdsSeleccionados.length === 0">

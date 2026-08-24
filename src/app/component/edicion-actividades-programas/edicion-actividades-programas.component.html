@@ -27,6 +27,13 @@
         <p>
           <strong>{{ "calendario.programas_asociados" | translate:{ total: programasAsociados } }}</strong>
         </p>
+        <mat-form-field appearance="outline" class="program-search">
+          <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+          <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+            <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+            <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
         <div class="program-manager">
           <section class="program-panel associated">
             <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
