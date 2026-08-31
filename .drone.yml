@@ -2,75 +2,24 @@ kind: pipeline
 name: oas_cliente_ci
 
 steps:
-# - name: check_readme
-#   image: jjvargass/qa_develoment:latest
-#   commands:
-#   - python /app/check_readme.py
-#   when:
-#     branch:
-#     - develop
-#     - feature/*
-#     - release/*
-#     event:
-#     - push
-
-# - name: check_branch
-#   image: jjvargass/qa_develoment:latest
-#   commands:
-#   - python /app/check_branch.py -H ${DRONE_GIT_HTTP_URL}
-#   when:
-#     branch:
-#     - develop
-#     - feature/*
-#     - release/*
-#     event:
-#     - push
-
-# - name: check_commits
-#   image: jjvargass/qa_develoment:latest
-#   failure: ignore
-#   commands:
-#   - python /app/check_commits.py
-#   when:
-#     branch:
-#     - develop
-#     - feature/*
-#     - release/*
-#     event:
-#     - push
-
-# - name: prueba_unitarias
-#   image: node:12.22.7
-#   commands:
-#   - npm i
-#   - npm run test
-#   when:
-#     branch:
-#     - unitest
-#
-# - name:  pruebas_linter
-#   image: node:12.22.7
-#   commands:
-#   - npm i
-#   - npm run lint
-#   when:
-#     branch:
-#     - unitest
 
 - name: run_sonar_scanner
-  image: aosapps/drone-sonar-plugin
-  settings:
-    sonar_host:
+  image: sonarsource/sonar-scanner-cli:latest
+  environment:
+    SONAR_HOST_URL:
       from_secret: SONAR_HOST
-    sonar_token:
+    SONAR_TOKEN:
       from_secret: SONAR_TOKEN
-    ver: 1.0
-    exclusions: "**/node_modules/**,**/*.spec.ts,documentation/**"
+    SONAR_SCANNER_OPTS: "-Dsonar.working.directory=/tmp/.scannerwork"
+  commands:
+    - sonar-scanner
   when:
     branch:
-    - develop
-    - feature/*
-    - release/*
+      - feature/*
+      - develop
+      - release/*
+      - hotfix/*
+      - master
     event:
     - push
 

@@ -1,5 +1,144 @@
 //HOVER SOBRE LAS FILAS
+:host {
+  display: block;
+  height: 100%;
+}
+
 .mat-mdc-row:hover .mat-mdc-cell {
     background-color: var(--color100);
   }
-  
+
+.public-actions {
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.abbreviation-cell {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.abbreviation-input {
+  max-width: 140px;
+}
+
+.public-table {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.public-directed-table {
+  width: 100%;
+}
+
+.public-directed-table th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.public-action-cell {
+  padding-right: 0.75rem;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.public-action-header {
+  text-align: right;
+}
+
+.public-action-group {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 52px 32px;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  min-height: 40px;
+}
+
+.public-action-group button {
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  line-height: 32px;
+  padding: 0;
+  width: 32px;
+}
+
+.public-action-group button mat-icon {
+  font-size: 20px;
+  height: 20px;
+  line-height: 20px;
+  width: 20px;
+}
+
+.public-action-group mat-slide-toggle {
+  align-items: center;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+}
+
+.activity-description {
+  margin: 0.75rem 0 1rem;
+}
+
+.activity-context-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+}
+
+.activity-context-grid .context-description {
+  grid-column: 1 / -1;
+}
+
+.activity-context-panel {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color200, #e2e8f0);
+  border-radius: 8px;
+  background: var(--color100, #f7f8fa);
+}
+
+:host ::ng-deep .mat-mdc-tab-body-content {
+  overflow: visible;
+}
+
+table {
+  width: 100%;
+}
+
+.public-directed-section {
+  padding: 1rem 0 0;
+}
+
+.public-directed-section h3 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .activity-context-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .public-action-group {
+    justify-content: flex-start;
+  }
+}

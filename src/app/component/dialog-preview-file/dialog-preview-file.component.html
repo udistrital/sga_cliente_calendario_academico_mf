@@ -1,10 +1,33 @@
-<h5 align="center">{{title}}</h5>
-<object [data]="ulrfileSafe" type="application/pdf" *ngIf="validsafe"></object>
-<div class="nofile" *ngIf="!validsafe">
-    {{ 'ERROR.error_previsualizar_doc' | translate }}
-</div>
-<mat-dialog-actions align="center">
-    <!-- <button mat-button mat-dialog-close style="background-color: var(--primary);color: white;" matTooltip="{{ 'GLOBAL.cerrar_visualizador' | translate }}">
-        {{ 'GLOBAL.cerrar_visualizador' | translate }}
-    </button> -->
-</mat-dialog-actions>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="file-preview-dialog-title" mat-dialog-title>
+        {{ title || ("calendario.documento" | translate) }}
+      </h2>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar_visualizador' | translate"
+      [matTooltip]="'GLOBAL.cerrar_visualizador' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="sga-modal-content preview-content">
+    <object [data]="ulrfileSafe" type="application/pdf" *ngIf="validsafe"></object>
+    <div class="nofile" *ngIf="!validsafe" role="status">
+      <mat-icon fontIcon="description"></mat-icon>
+      <span>{{ 'ERROR.error_previsualizar_doc' | translate }}</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sga-modal-actions">
+    <button mat-button type="button" (click)="closeDialog()">
+      {{ 'GLOBAL.cerrar_visualizador' | translate }}
+    </button>
+  </mat-dialog-actions>
+</section>

@@ -1,46 +1,92 @@
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="activity-program-dialog-title" mat-dialog-title>{{ dialogTitle() }}</h2>
+      <p *ngIf="dialogSubtitle()">{{ dialogSubtitle() }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+<mat-dialog-content class="sga-modal-content activity-program-dialog-content">
 <ng-container *ngIf="select_proyectos_act">
-  <mat-card style="margin: 1em">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.select_proyectos_actividades" | translate }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="program-manager-card sga-modal-flat-card">
     <mat-card-content>
       <form novalidate [formGroup]="SelectorDeps">
         <p class="alert info">
           {{ "calendario.seleccion_proyectos_info" | translate }}
         </p>
-        <br />
-        <mat-form-field style="width: 100%">
-          <mat-label
-            >{{ "calendario.seleccione_proyecto" | translate }}
-          </mat-label>
-          <mat-select formControlName="Dependencias" multiple>
-            <mat-option *ngFor="let project of projects" [value]="project.Id"
-              >{{ project.Nombre }}
-            </mat-option>
+        <p>
+          <strong>{{ "calendario.programas_asociados" | translate:{ total: programasAsociados } }}</strong>
+        </p>
+        <mat-form-field appearance="outline" class="program-search">
+          <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+          <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+            <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+            <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
           </mat-select>
         </mat-form-field>
-        <button
-          mat-flat-button
-          color="accent"
-          style="width: 100%"
-          (click)="guardar()"
-        >
-          {{ "GLOBAL.guardar" | translate }}
-        </button>
+        <div class="program-manager">
+          <section class="program-panel associated">
+            <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
+            <mat-form-field appearance="outline" class="program-search">
+              <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
+              <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
+            </mat-form-field>
+            <div class="program-list">
+              <div class="program-item" *ngFor="let project of programasAsociadosFiltrados()" [class.locked]="programaNoDesasociable(project.Id)">
+                <mat-checkbox
+                  [checked]="true"
+                  [disabled]="programaNoDesasociable(project.Id)"
+                  (change)="togglePrograma(project.Id, $event.checked)">
+                  {{ project.Nombre }}
+                </mat-checkbox>
+                <small *ngIf="programaNoDesasociable(project.Id)">{{ motivoBloqueoPrograma(project.Id) }}</small>
+              </div>
+              <p class="empty-list" *ngIf="programasAsociadosFiltrados().length === 0">
+                {{ "calendario.sin_programas_asociados" | translate }}
+              </p>
+            </div>
+          </section>
+
+          <section class="program-panel available">
+            <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
+            <mat-form-field appearance="outline" class="program-search">
+              <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
+              <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />
+            </mat-form-field>
+            <div class="program-list">
+              <div class="program-item" *ngFor="let project of programasDisponiblesFiltrados()">
+                <mat-checkbox
+                  [checked]="false"
+                  (change)="togglePrograma(project.Id, $event.checked)">
+                  {{ project.Nombre }}
+                </mat-checkbox>
+              </div>
+              <p class="empty-list" *ngIf="programasDisponiblesFiltrados().length === 0">
+                {{ "calendario.sin_programas_disponibles" | translate }}
+              </p>
+            </div>
+          </section>
+        </div>
+        <p class="alert warning">
+          {{ "calendario.programas_bloqueados_info" | translate }}
+        </p>
       </form>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="actividad_detalle_proyectos">
-  <mat-card style="margin: 1em">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.actividad" | translate }}: {{ actividad }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="sga-modal-flat-card">
     <mat-card-content>
       <h5>{{ "calendario.descripcion_actividad" | translate }}</h5>
       <p>{{ descripcion_actividad }}</p>
@@ -108,21 +154,12 @@
           </tr>
         </table>
       </div>
-      <br />
-      <button mat-flat-button color="primary" (click)="regresar()">
-        {{ "GLOBAL.regresar" | translate }}
-      </button>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="proceso_detalle">
-  <mat-card style="margin: 1em">
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.proceso" | translate }}
-      </mat-card-title>
-    </mat-card-header>
+  <mat-card class="sga-modal-flat-card">
     <mat-card-content>
       <br />
       <mat-form-field style="width: 100%">
@@ -160,25 +197,17 @@
           readonly
         />
       </mat-form-field>
-      <button mat-flat-button color="primary" (click)="regresar()">
-        {{ "GLOBAL.regresar" | translate }}
-      </button>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-container *ngIf="editar_actividad">
-  <mat-card class="mat-elevation-z8">
-    <mat-card-header>
-      <mat-card-title>{{
-        "calendario.edicion_actividades" | translate
-      }}</mat-card-title>
-    </mat-card-header>
+  <mat-card class="mat-elevation-z8 sga-modal-flat-card">
     <mat-card-content>
       <form novalidate [formGroup]="ActivityEditor">
         <mat-divider></mat-divider>
-        <div class="row" style="margin-top: 10px">
-          <div class="col-6">
+        <div class="edit-activity-grid" style="margin-top: 10px">
+          <div>
             <mat-form-field style="width: 100%">
               <mat-label> {{ "calendario.proceso" | translate }} </mat-label>
               <input
@@ -190,7 +219,7 @@
               />
             </mat-form-field>
           </div>
-          <div class="col-6">
+          <div>
             <mat-form-field style="width: 100%">
               <mat-label> {{ "calendario.periodo" | translate }} </mat-label>
               <input
@@ -202,9 +231,7 @@
               />
             </mat-form-field>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
+          <div>
             <mat-form-field style="width: 100%">
               <mat-label> {{ "calendario.actividad" | translate }} </mat-label>
               <input
@@ -216,9 +243,7 @@
               />
             </mat-form-field>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
+          <div class="full-row">
             <mat-form-field style="width: 100%">
               <mat-label>
                 {{ "calendario.descripcion" | translate }}
@@ -241,8 +266,8 @@
             }}</mat-card-subtitle>
           </div>
         </div>
-        <div class="row" style="margin-top: 10px">
-          <div class="col-6">
+        <div class="edit-activity-grid" style="margin-top: 10px">
+          <div>
             <mat-form-field style="width: 100%">
               <mat-label
                 >{{ "calendario.fecha_inicio" | translate }}:</mat-label
@@ -261,7 +286,13 @@
               <mat-datepicker #f_ini [disabled]="true"></mat-datepicker>
             </mat-form-field>
           </div>
-          <div class="col-6">
+          <div>
+            <mat-form-field style="width: 100%">
+              <mat-label>{{ "calendario.hora_inicio" | translate }}:</mat-label>
+              <input matInput type="time" formControlName="hora_inicio_org" readonly />
+            </mat-form-field>
+          </div>
+          <div>
             <mat-form-field style="width: 100%">
               <mat-label>{{ "calendario.fecha_fin" | translate }}:</mat-label>
               <input
@@ -278,6 +309,12 @@
               <mat-datepicker #f_fin [disabled]="true"></mat-datepicker>
             </mat-form-field>
           </div>
+          <div>
+            <mat-form-field style="width: 100%">
+              <mat-label>{{ "calendario.hora_fin" | translate }}:</mat-label>
+              <input matInput type="time" formControlName="hora_fin_org" readonly />
+            </mat-form-field>
+          </div>
         </div>
         <div *ngIf="ActividadEditable">
           <div class="alert warning">
@@ -290,8 +327,8 @@
               }}</mat-card-subtitle>
             </div>
           </div>
-          <div class="row">
-            <div class="col-6">
+          <div class="edit-activity-grid">
+            <div>
               <mat-form-field style="width: 100%">
                 <mat-label
                   >{{ "calendario.fecha_inicio" | translate }}:</mat-label
@@ -299,8 +336,8 @@
                 <input
                   matInput
                   [matDatepicker]="f_ini_n"
-                  [min]="ActivityEditor.get('fecha_inicio_org')?.value"
-                  [max]="ActivityEditor.get('fecha_fin_org')?.value"
+                  [min]="fecha_inicio_permitida"
+                  [max]="fecha_fin_permitida"
                   formControlName="fecha_inicio_new"
                 />
                 <mat-datepicker-toggle
@@ -310,14 +347,20 @@
                 <mat-datepicker #f_ini_n></mat-datepicker>
               </mat-form-field>
             </div>
-            <div class="col-6">
+            <div>
+              <mat-form-field style="width: 100%">
+                <mat-label>{{ "calendario.hora_inicio" | translate }}:</mat-label>
+                <input matInput type="time" formControlName="hora_inicio_new" />
+              </mat-form-field>
+            </div>
+            <div>
               <mat-form-field style="width: 100%">
                 <mat-label>{{ "calendario.fecha_fin" | translate }}:</mat-label>
                 <input
                   matInput
                   [matDatepicker]="f_fin_n"
                   [min]="ActivityEditor.get('fecha_inicio_new')?.value"
-                  [max]="ActivityEditor.get('fecha_fin_org')?.value"
+                  [max]="fecha_fin_permitida"
                   formControlName="fecha_fin_new"
                 />
                 <mat-datepicker-toggle
@@ -327,25 +370,22 @@
                 <mat-datepicker #f_fin_n></mat-datepicker>
               </mat-form-field>
             </div>
+            <div>
+              <mat-form-field style="width: 100%">
+                <mat-label>{{ "calendario.hora_fin" | translate }}:</mat-label>
+                <input matInput type="time" formControlName="hora_fin_new" />
+              </mat-form-field>
+            </div>
           </div>
         </div>
         <mat-divider></mat-divider>
         <div class="row" style="margin-top: 10px">
           <div class="col-12">
-            <mat-card-title>{{
+            <mat-card-subtitle>{{
               "calendario.dirigido" | translate
-            }}</mat-card-title>
-            <!-- Aquí puedes agregar el componente mat-table para mostrar la tabla -->
+            }}</mat-card-subtitle>
             <div class="table">
               <table mat-table [dataSource]="dataSource2" matSort>
-                <ng-container matColumnDef="responsableID">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    {{ "GLOBAL.id" | translate }}
-                  </th>
-                  <td mat-cell *matCellDef="let element">
-                    {{ element.responsableID }}
-                  </td>
-                </ng-container>
                 <ng-container matColumnDef="Nombre">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     {{ "calendario.nombre" | translate }}
@@ -365,30 +405,25 @@
           </div>
         </div>
         <mat-divider></mat-divider>
-        <div align="center" style="margin-top: 10px">
-          <div *ngIf="ActividadEditable">
-            <button
-              class="float-center"
-              mat-raised-button
-              color="primary"
-              (click)="guardar()"
-              [disabled]="ActivityEditor.invalid"
-            >
-              {{ "GLOBAL.guardar" | translate }}
-            </button>
-          </div>
-          <div *ngIf="!ActividadEditable">
-            <button
-              class="float-center"
-              mat-raised-button
-              color="accent"
-              (click)="regresar()"
-            >
-              {{ "GLOBAL.regresar" | translate }}
-            </button>
-          </div>
-        </div>
       </form>
     </mat-card-content>
   </mat-card>
 </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="sga-modal-actions">
+  <button mat-button type="button" (click)="closeDialog()">
+    {{ (select_proyectos_act || (editar_actividad && ActividadEditable) ? "GLOBAL.cancelar" : "GLOBAL.cerrar") | translate }}
+  </button>
+  <button
+    *ngIf="select_proyectos_act || (editar_actividad && ActividadEditable)"
+    mat-flat-button
+    color="accent"
+    type="button"
+    [disabled]="(select_proyectos_act && SelectorDeps.invalid) || (editar_actividad && ActivityEditor.invalid)"
+    (click)="guardar()"
+  >
+    {{ "GLOBAL.guardar" | translate }}
+  </button>
+</mat-dialog-actions>
+</section>
