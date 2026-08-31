@@ -1,0 +1,451 @@
+<section class="extensions-dialog sga-modal-shell" data-testid="extensions-dialog">
+  <header class="dialog-header sga-modal-header">
+    <div class="dialog-heading sga-modal-heading">
+      <h2 id="extensions-dialog-title" mat-dialog-title>{{ "calendario.gestionar_extensiones_actividad" | translate }}</h2>
+      <p>{{ "calendario.extension_dialog_subtitle" | translate }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      [disabled]="saving"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="dialog-content sga-modal-content">
+    <section class="activity-context" aria-labelledby="extension-activity-title">
+      <div class="activity-copy">
+        <span class="eyebrow">{{ "calendario.actividad" | translate }}</span>
+        <h3 id="extension-activity-title">{{ activityName() }}</h3>
+        <p>{{ activityDescription() || "-" }}</p>
+      </div>
+      <div class="range-card">
+        <span>{{ "calendario.rango_original" | translate }}</span>
+        <strong>{{ originalRange() }}</strong>
+      </div>
+    </section>
+
+    <div class="state-banner readonly" *ngIf="readOnly && !data.calendarViewMode" role="status">
+      <mat-icon fontIcon="lock"></mat-icon>
+      <div>
+        <strong>{{ "calendario.extension_modo_lectura" | translate }}</strong>
+        <span>{{ "calendario.actividad_inactiva_extensiones_lectura" | translate }}</span>
+      </div>
+    </div>
+
+    <section class="empty-state programs-empty" *ngIf="dependencias.length === 0">
+      <span class="empty-icon" aria-hidden="true">
+        <mat-icon fontIcon="account_tree"></mat-icon>
+      </span>
+      <div>
+        <h3>{{ "calendario.sin_programas_para_extension" | translate }}</h3>
+        <p>{{ "calendario.actividad_sin_programas_extension" | translate }}</p>
+      </div>
+      <button
+        *ngIf="!readOnly"
+        mat-flat-button
+        color="accent"
+        type="button"
+        data-testid="manage-activity-programs"
+        (click)="managePrograms()"
+      >
+        <mat-icon fontIcon="hub"></mat-icon>
+        {{ "calendario.gestionar_programas_actividad" | translate }}
+      </button>
+    </section>
+
+    <div class="command-bar">
+      <div>
+        <span class="eyebrow">{{ "calendario.historial_extensiones" | translate }}</span>
+        <p>{{ "calendario.historial_extensiones_ayuda" | translate }}</p>
+      </div>
+      <div class="command-actions">
+        <span class="current-count" [class.empty]="activeExtensionCount() === 0">
+          {{ "calendario.extensiones_vigentes_count" | translate:{ total: activeExtensionCount() } }}
+        </span>
+        <button
+          *ngIf="!readOnly && dependencias.length > 0 && !showEditor"
+          mat-flat-button
+          class="create-extension-button"
+          color="accent"
+          type="button"
+          data-testid="create-extension"
+          (click)="openCreateExtension()"
+        >
+          <mat-icon fontIcon="add"></mat-icon>
+          {{ "calendario.nueva_extension" | translate }}
+        </button>
+      </div>
+    </div>
+
+    <section class="editor-panel" *ngIf="showEditor" data-testid="extension-editor">
+      <header class="editor-header">
+        <div>
+          <span class="eyebrow">{{ "calendario.configuracion_extension" | translate }}</span>
+          <h3>
+            {{
+              extensionMode === "edit"
+                ? ("calendario.editar_extension" | translate:{ numero: editingExtension?.NumeroExtension })
+                : ("calendario.nueva_extension" | translate)
+            }}
+          </h3>
+        </div>
+        <button
+          mat-button
+          type="button"
+          [disabled]="saving"
+          (click)="cancelEditExtension()"
+        >
+          {{ "GLOBAL.cancelar" | translate }}
+        </button>
+      </header>
+
+      <form [formGroup]="extensionForm" (ngSubmit)="saveExtension()" novalidate>
+        <ol class="extension-steps">
+          <li class="extension-step" [class.complete]="selectedProgramIds().length > 0">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <div class="step-heading">
+                <div>
+                  <h4>{{ "calendario.paso_programas_extension" | translate }}</h4>
+                  <p>{{ "calendario.paso_programas_extension_ayuda" | translate }}</p>
+                </div>
+                <div class="selection-actions" *ngIf="extensionMode === 'create'">
+                  <button mat-button color="primary" type="button" (click)="selectAllPrograms()">
+                    {{ "calendario.seleccionar_todos" | translate }}
+                  </button>
+                  <button mat-button type="button" (click)="clearPrograms()">
+                    {{ "GLOBAL.Limpiar" | translate }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="state-banner info" *ngIf="extensionMode === 'edit'">
+                <mat-icon fontIcon="info"></mat-icon>
+                <span>{{ "calendario.edicion_extension_conserva_programas" | translate }}</span>
+              </div>
+
+              <div class="program-picker">
+                <mat-form-field appearance="outline" class="program-search-field">
+                  <mat-label>{{ "calendario.buscar_programa_extension" | translate }}</mat-label>
+                  <mat-icon matPrefix fontIcon="search"></mat-icon>
+                  <input
+                    matInput
+                    type="search"
+                    [(ngModel)]="programSearch"
+                    [ngModelOptions]="{ standalone: true }"
+                    [disabled]="extensionMode === 'edit'"
+                    [placeholder]="'calendario.buscar_programa_extension_placeholder' | translate"
+                  />
+                  <button
+                    *ngIf="programSearch"
+                    matSuffix
+                    mat-icon-button
+                    type="button"
+                    (click)="clearProgramSearch()"
+                    [attr.aria-label]="'GLOBAL.Limpiar' | translate"
+                    [matTooltip]="'GLOBAL.Limpiar' | translate"
+                  >
+                    <mat-icon fontIcon="close"></mat-icon>
+                  </button>
+                </mat-form-field>
+
+                <div class="program-picker-meta">
+                  <strong>{{ "calendario.programas_seleccionados_count" | translate:{ total: selectedProgramIds().length } }}</strong>
+                  <span>{{ "calendario.programas_resultados_count" | translate:{ visibles: filteredDependencies().length, total: dependencias.length } }}</span>
+                </div>
+
+                <mat-selection-list
+                  class="program-selection-list"
+                  data-testid="extension-programs"
+                  [multiple]="true"
+                  [disabled]="extensionMode === 'edit'"
+                  [attr.aria-label]="'calendario.programas_academicos_autorizados' | translate"
+                  (selectionChange)="onProgramSelectionChange($event)"
+                >
+                  <mat-list-option
+                    *ngFor="let dependencia of filteredDependencies()"
+                    [value]="dependencia.Id"
+                    [selected]="isProgramSelected(dependencia.Id)"
+                    togglePosition="before"
+                  >
+                    <span class="program-option-name">
+                      {{ dependencia.Nombre || (("calendario.programa_academico" | translate) + " " + dependencia.Id) }}
+                    </span>
+                  </mat-list-option>
+                </mat-selection-list>
+
+                <p class="program-picker-empty" *ngIf="filteredDependencies().length === 0">
+                  {{ "calendario.sin_programas_busqueda" | translate }}
+                </p>
+                <p class="program-picker-error" *ngIf="extensionForm.get('Dependencias')?.touched && selectedProgramIds().length === 0">
+                  {{ "calendario.error_extension_programas" | translate }}
+                </p>
+              </div>
+
+              <div class="range-loading" *ngIf="loadingRanges" role="status">
+                <span>{{ "calendario.consultando_rangos_programas" | translate }}</span>
+              </div>
+
+              <div class="range-overview" *ngIf="!loadingRanges && selectedDependencyRanges.length > 0">
+                <div class="range-overview-summary">
+                  <mat-icon fontIcon="event_available"></mat-icon>
+                  <div>
+                    <span>{{ "calendario.fecha_limite_extension" | translate }}</span>
+                    <strong>{{ latestCurrentEnd() }}</strong>
+                    <small *ngIf="!hasDifferentCurrentEnds()">
+                      {{ "calendario.programas_comparten_fecha_vigente" | translate:{ total: selectedProgramIds().length } }}
+                    </small>
+                    <small *ngIf="hasDifferentCurrentEnds()">
+                      {{ "calendario.programas_fechas_vigentes_diferentes" | translate:{ total: rangeDateGroups.length } }}
+                    </small>
+                  </div>
+                </div>
+
+                <mat-expansion-panel class="range-detail-panel" *ngIf="hasDifferentCurrentEnds()">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>{{ "calendario.ver_detalle_fechas_programa" | translate }}</mat-panel-title>
+                    <mat-panel-description>
+                      {{ "calendario.fechas_vigentes_count" | translate:{ total: rangeDateGroups.length } }}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <div class="range-date-group" *ngFor="let group of rangeDateGroups">
+                    <div>
+                      <strong>{{ group.date }}</strong>
+                      <span>{{ "calendario.programas_en_fecha_count" | translate:{ total: group.programNames.length } }}</span>
+                    </div>
+                    <p>{{ group.programNames.join(", ") }}</p>
+                  </div>
+                </mat-expansion-panel>
+              </div>
+            </div>
+          </li>
+
+          <li class="extension-step" [class.pending]="!canShowDateStep()" [class.complete]="canShowSupportStep()">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <h4>{{ "calendario.paso_fecha_extension" | translate }}</h4>
+              <p>{{ "calendario.paso_fecha_extension_ayuda" | translate }}</p>
+
+              <div class="date-grid" *ngIf="canShowDateStep()">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "calendario.fecha_fin_extension" | translate }}</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="extensionEndDatePicker"
+                    [min]="minExtensionDate"
+                    formControlName="FechaFin"
+                    data-testid="extension-end-date"
+                    required
+                  />
+                  <mat-datepicker-toggle matSuffix [for]="extensionEndDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #extensionEndDatePicker></mat-datepicker>
+                  <mat-error *ngIf="extensionForm.get('FechaFin')?.hasError('required')">
+                    {{ "calendario.error_extension_fecha" | translate }}
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "calendario.hora_fin_extension" | translate }}</mat-label>
+                  <input matInput type="time" formControlName="HoraFin" required />
+                </mat-form-field>
+              </div>
+
+              <div class="date-comparison" *ngIf="canShowSupportStep()">
+                <div>
+                  <span>{{ "calendario.ultima_fecha_vigente" | translate }}</span>
+                  <strong>{{ latestCurrentEnd() }}</strong>
+                </div>
+                <mat-icon fontIcon="arrow_forward"></mat-icon>
+                <div class="proposed-date">
+                  <span>{{ "calendario.fecha_extension_propuesta" | translate }}</span>
+                  <strong>{{ proposedEndFormatted() }}</strong>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li class="extension-step" [class.pending]="!canShowSupportStep()">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <h4>{{ "calendario.paso_soporte_extension" | translate }}</h4>
+              <p>{{ "calendario.paso_soporte_extension_ayuda" | translate }}</p>
+
+              <ng-container *ngIf="canShowSupportStep()">
+                <div class="support-grid">
+                  <div class="upload-field">
+                    <span>{{ "calendario.documento_soporte_opcional" | translate }}</span>
+                    <div class="upload-actions">
+                      <button mat-stroked-button color="primary" type="button" (click)="extensionFileInput.click()">
+                        <mat-icon fontIcon="attach_file"></mat-icon>
+                        {{ extensionFile ? ("calendario.cambiar_documento_soporte" | translate) : ("calendario.subir_documento_soporte" | translate) }}
+                      </button>
+                      <button
+                        *ngIf="extensionForm.get('DocumentoId')?.value && !extensionFile"
+                        mat-button
+                        color="primary"
+                        type="button"
+                        (click)="downloadExtensionFile(extensionForm.get('DocumentoId')?.value)"
+                      >
+                        <mat-icon fontIcon="cloud_download"></mat-icon>
+                        {{ "calendario.ver_documento_actual" | translate }}
+                      </button>
+                    </div>
+                    <input
+                      #extensionFileInput
+                      type="file"
+                      formControlName="DocumentoSoporte"
+                      accept="application/pdf"
+                      data-max-size="5120"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      (change)="onInputFileExtension($event)"
+                    />
+                    <small *ngIf="!extensionFile">{{ "calendario.documento_pdf_ayuda" | translate }}</small>
+                    <small class="selected-file" *ngIf="extensionFile">
+                      <mat-icon fontIcon="picture_as_pdf"></mat-icon>
+                      {{ extensionFile.file.name }}
+                    </small>
+                  </div>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ "calendario.descripcion" | translate }}</mat-label>
+                    <textarea
+                      matInput
+                      rows="4"
+                      formControlName="Descripcion"
+                      [placeholder]="'calendario.descripcion_extension_placeholder' | translate"
+                    ></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="review-strip">
+                  <div>
+                    <span>{{ "calendario.resumen_extension" | translate }}</span>
+                    <strong>
+                      {{ "calendario.resumen_extension_detalle" | translate:{ programas: selectedProgramIds().length, fecha: proposedEndFormatted() } }}
+                    </strong>
+                  </div>
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    type="submit"
+                    data-testid="save-extension"
+                    [disabled]="!canReviewExtension() || saving"
+                  >
+                    <mat-icon *ngIf="!saving" fontIcon="check"></mat-icon>
+                    {{
+                      saving
+                        ? ("calendario.guardando_extension" | translate)
+                        : extensionMode === "edit"
+                          ? ("calendario.guardar_cambios" | translate)
+                          : ("calendario.confirmar_extension" | translate)
+                    }}
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+          </li>
+        </ol>
+      </form>
+    </section>
+
+    <section class="history-panel" aria-live="polite">
+      <div class="history-loading" *ngIf="loadingHistory">
+        <span>{{ "calendario.cargando_historial_extensiones" | translate }}</span>
+      </div>
+
+      <div class="empty-state compact" *ngIf="!loadingHistory && extensiones.length === 0">
+        <span class="empty-icon" aria-hidden="true">
+          <mat-icon fontIcon="history"></mat-icon>
+        </span>
+        <div>
+          <h3>{{ "calendario.sin_extensiones_actividad" | translate }}</h3>
+          <p>{{ "calendario.sin_extensiones_actividad_ayuda" | translate }}</p>
+        </div>
+      </div>
+
+      <div class="extension-history" *ngIf="!loadingHistory && extensiones.length > 0">
+        <article
+          class="extension-record"
+          *ngFor="let extension of extensiones"
+          [class.current]="extensionHasCurrentPrograms(extension)"
+        >
+          <div class="record-number">
+            <span>#{{ extension.NumeroExtension || extensionId(extension) }}</span>
+            <small>{{ "calendario.extension" | translate }}</small>
+          </div>
+          <div class="record-main">
+            <div class="record-heading">
+              <strong>{{ formatExtensionDate(extension.FechaFin) }}</strong>
+              <span
+                class="status-pill"
+                [class.current]="extensionIsFullyCurrent(extension)"
+                [class.partial]="extensionIsPartiallyCurrent(extension)"
+              >
+                {{
+                  extensionIsFullyCurrent(extension)
+                    ? ("calendario.extension_vigente" | translate)
+                    : extensionIsPartiallyCurrent(extension)
+                      ? ("calendario.extension_vigente_parcial" | translate)
+                      : ("calendario.extension_no_vigente" | translate)
+                }}
+              </span>
+            </div>
+            <p>{{ extensionDependencyNames(extension) }}</p>
+            <small>{{ extension.Descripcion || ("calendario.sin_descripcion" | translate) }}</small>
+          </div>
+          <div class="record-actions">
+            <button
+              *ngIf="extension.DocumentoId"
+              mat-icon-button
+              color="primary"
+              type="button"
+              [disabled]="downloadingDocumentId === extension.DocumentoId"
+              (click)="downloadExtensionFile(extension.DocumentoId)"
+              [attr.aria-label]="'calendario.descargar_documento_soporte' | translate"
+              [matTooltip]="'calendario.descargar_documento_soporte' | translate"
+            >
+              <mat-icon fontIcon="cloud_download"></mat-icon>
+            </button>
+            <button
+              *ngIf="!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)"
+              mat-icon-button
+              color="primary"
+              type="button"
+              [disabled]="saving"
+              (click)="startEditExtension(extension)"
+              [attr.aria-label]="'GLOBAL.editar' | translate"
+              [matTooltip]="'GLOBAL.editar' | translate"
+            >
+              <mat-icon fontIcon="edit"></mat-icon>
+            </button>
+            <button
+              *ngIf="!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)"
+              mat-icon-button
+              color="warn"
+              type="button"
+              [disabled]="saving"
+              (click)="deleteExtension(extension)"
+              [attr.aria-label]="'calendario.anular_extension' | translate"
+              [matTooltip]="'calendario.anular_extension' | translate"
+            >
+              <mat-icon fontIcon="block"></mat-icon>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions sga-modal-actions">
+    <button mat-button type="button" [disabled]="saving" (click)="closeDialog()">
+      {{ "GLOBAL.cerrar" | translate }}
+    </button>
+  </mat-dialog-actions>
+</section>

@@ -1,9 +1,10 @@
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, firstValueFrom, of } from 'rxjs';
+import { catchError, filter, take, timeout } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { ImplicitAutenticationService } from './implicit_autentication.service';
 import { AnyService } from './any.service';
-import { decrypt } from '../../utils/util-encrypt';
+import { encrypt } from '../../utils/util-encrypt';
 
 const path = environment.TERCEROS_SERVICE;
 
@@ -16,6 +17,7 @@ export class UserService {
   private userSubject = new BehaviorSubject(null);
   public tercero$ = this.userSubject.asObservable();
   public user: any;
+  private personaId: number | null = null;
 
   constructor(private anyService: AnyService, private autenticationService: ImplicitAutenticationService) {
     if (window.localStorage.getItem('id_token') !== null && window.localStorage.getItem('id_token') !== undefined) {
@@ -48,7 +50,7 @@ export class UserService {
         }
 
         if (!foundId) {
-          window.localStorage.setItem('persona_id', '0');
+          // this.guardarPersonaId(0);
         }
 
       });
@@ -89,11 +91,11 @@ export class UserService {
           if (Object.keys(this.user).length !== 0) {
             this.user$.next(this.user);
             this.userSubject.next(this.user);              // window.localStorage.setItem('ente', res[0].Ente);
-            window.localStorage.setItem('persona_id', this.user.Id);
+            // this.guardarPersonaId(this.user.Id);
             resolve(true);
           } else {
             //this.user$.next(this.user);
-            window.localStorage.setItem('persona_id', '0');
+            // this.guardarPersonaId(0);
             reject(false);
           }
         } else {
@@ -112,17 +114,17 @@ export class UserService {
           if (Object.keys(this.user).length !== 0) {
             this.user$.next(this.user);
             this.userSubject.next(this.user);
-            window.localStorage.setItem('persona_id', this.user.Id);
+            // this.guardarPersonaId(this.user.Id);
             resolve(true);
           } else {
             //this.user$.next(this.user);
-            window.localStorage.setItem('persona_id', '0');
+            // this.guardarPersonaId(0);
             reject(false);
           }
         }
         else {
           //this.user$.next(this.user);
-          window.localStorage.setItem('persona_id', '0');
+          // this.guardarPersonaId(0);
           reject(false);
         }
       });
@@ -142,18 +144,48 @@ export class UserService {
   }
 
   public async getPersonaId(): Promise<number | null> {
-    return new Promise((resolve, reject) => {
-      const personaId = window.localStorage.getItem('persona_id');
-      if (personaId === null) {
-        resolve(null);
-      } else {
-        try {
-          resolve(decrypt(personaId));
-        } catch (error) {
-          reject(error);
-        }
-      }
-    });
+    if (this.personaId !== null) {
+      return this.personaId;
+    }
+    const personaIdUsuario = this.normalizarPersonaId(this.user?.Id);
+    if (personaIdUsuario !== null) {
+      this.personaId = personaIdUsuario;
+      return personaIdUsuario;
+    }
+    const tercero: any = await firstValueFrom(
+      this.tercero$.pipe(
+        filter((usuario: any) => !!usuario?.Id),
+        take(1),
+        timeout(3000),
+        catchError(() => of(null))
+      )
+    );
+    this.personaId = this.normalizarPersonaId(tercero?.Id);
+    return this.personaId;
+  }
+
+  public async getTerceroId(): Promise<number | null> {
+    const currentTerceroId = this.normalizarPersonaId(this.user?.Id);
+    if (currentTerceroId !== null) {
+      return currentTerceroId;
+    }
+    const tercero: any = await firstValueFrom(
+      this.tercero$.pipe(
+        filter((usuario: any) => !!usuario?.Id),
+        take(1),
+        timeout(3000),
+        catchError(() => of(null))
+      )
+    );
+    return this.normalizarPersonaId(tercero?.Id);
+  }
+
+  private normalizarPersonaId(valor: any): number | null {
+    if (valor === null || valor === undefined || valor === '') {
+      return null;
+    }
+    const id = Number(valor);
+    return id > 0 ? id : null;
   }
 
   public getPeriodo(): number {

@@ -1,0 +1,378 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.bulk-dialog {
+  padding-top: 1rem !important;
+}
+
+.bulk-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.bulk-hero h3 {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.bulk-hero p {
+  margin: 0;
+}
+
+.bulk-context {
+  margin: 0 0 0.75rem;
+  color: var(--color600);
+}
+
+.program-selector {
+  width: 100%;
+}
+
+.program-selector-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.program-selector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.program-selector-actions button {
+  line-height: 2rem;
+}
+
+.program-selection-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--color600);
+  font-size: 0.78rem;
+}
+
+.program-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 9rem;
+  overflow-y: auto;
+  padding: 0.25rem 0.1rem;
+}
+
+.program-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  padding: 0.35rem 0.45rem 0.35rem 0.65rem;
+  border: 1px solid var(--color200);
+  border-radius: 999px;
+  color: var(--color600);
+  background: var(--color100);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.program-chip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color600);
+  background: var(--color200);
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.program-chip button:hover,
+.program-chip button:focus-visible {
+  color: #fff;
+  background: var(--color600);
+}
+
+.program-chip button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.summary-grid article {
+  padding: 0.85rem;
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: white;
+}
+
+.summary-grid span {
+  display: block;
+  color: var(--color600);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.summary-grid strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.35rem;
+}
+
+.summary-detail {
+  margin: 0.85rem 0 0.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: var(--color100);
+}
+
+.summary-detail h3 {
+  margin: 0 0 0.65rem;
+  color: var(--color600);
+  font-size: 0.95rem;
+}
+
+.detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-list.vertical {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-chip,
+.detail-item {
+  border: 1px solid var(--color200);
+  border-radius: 8px;
+  background: white;
+}
+
+.detail-chip {
+  padding: 0.45rem 0.7rem;
+  font-weight: 700;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.7rem;
+}
+
+.detail-item strong,
+.detail-item > span,
+.detail-item > small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-item > span,
+.detail-item > small {
+  color: var(--color600);
+}
+
+.detail-program-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-height: 4.6rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.detail-program-list span {
+  max-width: 100%;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--color200);
+  border-radius: 999px;
+  color: var(--color600);
+  background: var(--color100);
+  font-size: 0.72rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blocked-programs {
+  margin-top: 0.35rem;
+  max-height: 5.5rem;
+}
+
+.empty-state.compact {
+  width: 100%;
+  margin: 0;
+  padding: 0.7rem;
+}
+
+.activity-matrix {
+  display: block;
+}
+
+.operation-tabs {
+  margin-top: 0.75rem;
+}
+
+.operation-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.85rem 0 0.5rem;
+  color: var(--color600);
+  font-weight: 700;
+}
+
+.empty-state {
+  margin: 1rem 0 0;
+  padding: 1rem;
+  border: 1px dashed var(--color300);
+  border-radius: 8px;
+  color: var(--color600);
+  background: var(--color100);
+}
+
+.validation-state {
+  margin: 0.75rem 0 0;
+  color: var(--color600);
+  font-weight: 700;
+}
+
+.blocked-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--warning-main);
+  border-radius: 8px;
+  background: #fff9eb;
+}
+
+.blocked-panel h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.blocked-panel p {
+  margin: 0 0 0.75rem;
+}
+
+.activity-row.blocked {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.blocked-pill {
+  color: #7a3b00;
+  background-color: #ffe8c2;
+}
+
+.process-toolbar {
+  padding: 0.35rem 0 0.75rem;
+}
+
+.activity-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.25rem;
+  border-top: 1px solid var(--color200);
+}
+
+.activity-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.activity-copy strong,
+.activity-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-copy span {
+  color: var(--color600);
+  font-size: 0.82rem;
+}
+
+.activity-copy small {
+  margin-top: 0.4rem;
+  color: var(--color600);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.coverage-pill {
+  min-width: 7.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.coverage-pill.full {
+  color: #155724;
+  background-color: #d4edda;
+}
+
+.coverage-pill.partial {
+  color: #0b4f71;
+  background-color: #d8eefb;
+}
+
+.coverage-pill.empty {
+  color: #5f4b00;
+  background-color: #fff3cd;
+}
+
+.coverage-pill.neutral {
+  color: #4f5965;
+  background-color: #edf2f7;
+}
+
+.bulk-actions {
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .bulk-hero,
+  .summary-grid,
+  .detail-list.vertical,
+  .activity-row {
+    grid-template-columns: 1fr;
+  }
+
+  .program-selector-actions {
+    justify-content: flex-start;
+  }
+
+  .coverage-pill {
+    justify-self: start;
+  }
+}

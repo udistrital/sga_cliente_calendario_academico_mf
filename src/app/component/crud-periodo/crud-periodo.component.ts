@@ -1,10 +1,12 @@
 import { Periodo } from 'src/app/models/periodo/periodo';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Optional, ViewChild } from '@angular/core';
 import { ParametrosService } from 'src/app/services/parametros.service';
 import { PopUpManager } from 'src/app/managers/popUpManager';
 import { FORM_PERIODO } from './form-periodo';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import * as moment from 'moment';
+import { MatDialogRef } from '@angular/material/dialog';
+import { DinamicformComponent } from '../dinamicform/dinamicform.component';
 
 
 @Component({
@@ -13,6 +15,7 @@ import * as moment from 'moment';
   styleUrls: ['./crud-periodo.component.scss'],
 })
 export class CrudPeriodoComponent implements OnInit {
+  @ViewChild(DinamicformComponent) dynamicForm!: DinamicformComponent;
   periodo_id!: number;
 
   @Input('periodo_id')
@@ -33,6 +36,7 @@ export class CrudPeriodoComponent implements OnInit {
     private translate: TranslateService,
     private parametrosService: ParametrosService,
     private popUpManager: PopUpManager,
+    @Optional() public dialogRef: MatDialogRef<CrudPeriodoComponent> | null,
   ) {
     this.formPeriodo = FORM_PERIODO;
     this.construirForm();
@@ -107,13 +111,8 @@ export class CrudPeriodoComponent implements OnInit {
           this.info_periodo.Descripcion =
             'Periodo académico ' + this.info_periodo.Nombre;
           this.info_periodo.Activo = true;
-          this.info_periodo.InicioVigencia =
-            moment(this.info_periodo.InicioVigencia).format(
-              'YYYY-MM-DDTHH:mm',
-            ) + ':00Z';
-          this.info_periodo.FinVigencia =
-            moment(this.info_periodo.FinVigencia).format('YYYY-MM-DDTHH:mm') +
-            ':00Z';
+          this.info_periodo.InicioVigencia = this.formatUtc(this.info_periodo.InicioVigencia);
+          this.info_periodo.FinVigencia = this.formatUtc(this.info_periodo.FinVigencia);
           this.parametrosService
             .put('periodo', this.info_periodo)
             .subscribe(res => {
@@ -122,6 +121,7 @@ export class CrudPeriodoComponent implements OnInit {
               this.popUpManager.showSuccessAlert(
                 this.translate.instant('periodo.periodo_actualizado'),
               );
+              this.dialogRef?.close(true);
             });
         }
       });
@@ -143,23 +143,18 @@ export class CrudPeriodoComponent implements OnInit {
             'Periodo académico ' + this.info_periodo.Nombre;
           this.info_periodo.CodigoAbreviacion = 'PA';
           this.info_periodo.Activo = true;
-          this.info_periodo.InicioVigencia =
-            moment(this.info_periodo.InicioVigencia).format(
-              'YYYY-MM-DDTHH:mm',
-            ) + ':00Z';
-          this.info_periodo.FinVigencia =
-            moment(this.info_periodo.FinVigencia).format('YYYY-MM-DDTHH:mm') +
-            ':00Z';
+          this.info_periodo.InicioVigencia = this.formatUtc(this.info_periodo.InicioVigencia);
+          this.info_periodo.FinVigencia = this.formatUtc(this.info_periodo.FinVigencia);
           this.info_periodo.AplicacionId = 41; // ID de SGA en Configuracion_CRUD
           this.parametrosService
             .post('periodo', this.info_periodo)
             .subscribe((res:any) => {
               this.info_periodo = <Periodo>res['Data'];
               this.eventChange.emit(true);
-              window.location.href = '#/pages/periodo/list-periodo';
               this.popUpManager.showSuccessAlert(
                 this.translate.instant('periodo.periodo_creado'),
               );
+              this.dialogRef?.close(true);
             });
         }
       });
@@ -177,5 +172,17 @@ export class CrudPeriodoComponent implements OnInit {
         this.updatePeriodo(event.data.Periodo);
       }
     }
+  }
+
+  closeDialog() {
+    this.dialogRef?.close();
+  }
+
+  submitForm() {
+    this.dynamicForm.validForm();
+  }
+
+  formatUtc(date: any) {
+    return moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
   }
 }

@@ -1,68 +1,80 @@
-<mat-card>
-  <mat-card-content>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="activity-dialog-title" mat-dialog-title>
+        {{ activityTitle() || ("calendario.actividad" | translate) }}
+      </h2>
+      <p>{{ processName || "-" }} - {{ period || "-" }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
     <form
       novalidate
       [formGroup]="activityForm"
       #fform="ngForm"
       (ngSubmit)="saveActivity()"
-      class="form-horizontal"
-      [hidden]="addPublic"
+      class="form-horizontal sga-modal-form"
     >
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>
-            {{ "calendario.actividad" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-subtitle>
-          <div class="form-grid2" style="margin-left: 1rem">
-            <div class="form-col1">
-              <p>{{ "calendario.proceso" | translate }}: {{ processName }}</p>
-            </div>
-            <div class="form-col1">
-              <p>{{ "calendario.periodo" | translate }}: {{ period }}</p>
-            </div>
+      <mat-dialog-content class="sga-modal-content activity-dialog-content">
+        <section class="activity-context-panel">
+          <div class="activity-context-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ "calendario.proceso" | translate }}</mat-label>
+              <input matInput [value]="processName || '-'" readonly />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ "calendario.periodo" | translate }}</mat-label>
+              <input matInput [value]="period || '-'" readonly />
+            </mat-form-field>
+            <mat-form-field appearance="outline" *ngIf="activityTitle()">
+              <mat-label>{{ "calendario.actividad" | translate }}</mat-label>
+              <input matInput [value]="activityTitle()" readonly />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="context-description">
+              <mat-label>{{ "calendario.descripcion_proceso" | translate }}</mat-label>
+              <textarea matInput [value]="processDescription || '-'" readonly rows="2"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="context-description">
+              <mat-label>{{ "calendario.descripcion_evento" | translate }}</mat-label>
+              <textarea matInput [value]="activityDescription()" readonly rows="2"></textarea>
+            </mat-form-field>
           </div>
-        </mat-card-subtitle>
-        <mat-card-content>
-          <div class="form-grid2">
+        </section>
+          <mat-tab-group [(selectedIndex)]="activeTab">
+            <mat-tab label="{{ 'calendario.fechas_globales' | translate }}">
+          <div class="form-grid2" *ngIf="data.editActivity === undefined">
             <div class="form-col2">
               <mat-form-field floatLabel="always" style="width: 100%">
-                <mat-label>{{ "calendario.actividad" | translate }}</mat-label>
-                <input
-                  matInput
-                  type="text"
-                  formControlName="Nombre"
-                  placeholder="*{{ 'calendario.actividad' | translate }} "
+                <mat-label>{{ "calendario.evento_catalogo" | translate }}</mat-label>
+                <mat-select
+                  formControlName="EventoCatalogoId"
+                  placeholder="*{{ 'calendario.evento_catalogo' | translate }}"
                   required
-                />
+                >
+                  <mat-option
+                    *ngFor="let evento of eventosCatalogo"
+                    [value]="evento.Id"
+                  >
+                    {{ evento.Nombre }}
+                  </mat-option>
+                </mat-select>
                 <mat-error
                   *ngIf="
-                    activityForm.get('Nombre')?.hasError('required') &&
-                    activityForm.get('Nombre')?.touched
+                    activityForm.get('EventoCatalogoId')?.hasError('required') &&
+                    activityForm.get('EventoCatalogoId')?.touched
                   "
                 >
-                  {{ "calendario.error_nombre_actividad" | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-            <div class="form-col2">
-              <mat-form-field floatLabel="always" style="width: 100%">
-                <mat-label>{{ "GLOBAL.descripcion" | translate }}</mat-label>
-                <input
-                  matInput
-                  type="text"
-                  formControlName="Descripcion"
-                  placeholder="*{{ 'GLOBAL.descripcion' | translate }} "
-                  required
-                />
-                <mat-error
-                  *ngIf="
-                    activityForm.get('Descripcion')?.hasError('required') &&
-                    activityForm.get('Descripcion')?.touched
-                  "
-                >
-                  {{ "calendario.error_desc_actividad" | translate }}
+                  {{ "calendario.error_evento_catalogo" | translate }}
                 </mat-error>
               </mat-form-field>
             </div>
@@ -103,6 +115,17 @@
               <mat-form-field floatLabel="always" style="width: 100%">
                 <input
                   matInput
+                  type="time"
+                  formControlName="HoraInicio"
+                  placeholder="*{{ 'calendario.hora_inicio' | translate }}"
+                  required
+                />
+              </mat-form-field>
+            </div>
+            <div class="form-col1">
+              <mat-form-field floatLabel="always" style="width: 100%">
+                <input
+                  matInput
                   [min]="minDate"
                   [max]="maxDate"
                   [matDatepicker]="fechaFinPicker"
@@ -125,47 +148,60 @@
                 </mat-error>
               </mat-form-field>
             </div>
+            <div class="form-col1">
+              <mat-form-field floatLabel="always" style="width: 100%">
+                <input
+                  matInput
+                  type="time"
+                  formControlName="HoraFin"
+                  placeholder="*{{ 'calendario.hora_fin' | translate }}"
+                  required
+                />
+              </mat-form-field>
+            </div>
           </div>
 
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>
-                {{ "calendario.dirigido" | translate }}
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <mat-form-field style="width: 100%" floatLabel="always">
+            </mat-tab>
+
+            <mat-tab label="{{ 'calendario.publico_dirigido' | translate }}">
+          <section class="public-directed-section">
+              <h3>{{ "calendario.dirigido" | translate }}</h3>
+              <div class="form-grid2">
+                <div class="form-col2">
+                  <mat-form-field style="width: 100%" floatLabel="always">
                 <mat-label
                   >*{{ "calendario.dirigido_label" | translate }}
                 </mat-label>
                 <mat-select
-                  placeholder="Coordinadores/Estudiantes"
+                  placeholder="{{ 'calendario.coordinadores_estudiantes' | translate }}"
+                  [(value)]="selectedResponsableId"
                   (selectionChange)="onSelectChange($event)"
                   required
                 >
                   <mat-option
-                    *ngFor="let resp of responsables"
-                    [value]="resp.Id"
+                    *ngFor="let resp of availableResponsables"
+                    [value]="resp.Id || resp.id"
                   >
-                    {{ resp.Nombre }}
+                    {{ resp.Nombre || resp.nombre }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
-              <div class="table">
+                </div>
+              </div>
+              <div class="public-table">
                 <table
                   mat-table
                   [dataSource]="tableSource"
-                  class="demo-table"
+                  class="demo-table public-directed-table"
                   matSort
                 >
-                  <!-- ID Column -->
                   <ng-container matColumnDef="Nombre" sticky>
                     <th
                       class="text-left"
                       mat-header-cell
                       *matHeaderCellDef
                       mat-sort-header
-                      style="width: 90%"
+                      style="width: 70%"
                     >
                       {{ "calendario.nombre" | translate }}
                     </th>
@@ -176,28 +212,32 @@
                     <th
                       mat-header-cell
                       *matHeaderCellDef
-                      mat-sort-header
-                      style="width: 90%"
+                      class="public-action-header"
+                      style="width: 30%"
                     >
                       {{ "GLOBAL.acciones" | translate }}
                     </th>
-                    <td mat-cell *matCellDef="let row">
-                      <button
-                        mat-icon-button
-                        color="warn"
-                        (click)="deletePublic($event)"
-                        style="border: none"
-                      >
-                        <mat-icon
-                          aria-hidden="false"
-                          title="{{
-                            'calendario.tooltip_detalle_proceso' | translate
-                          }}"
-                          fontIcon="delete"
+                    <td mat-cell *matCellDef="let row" class="public-action-cell">
+                      <div class="public-action-group">
+                        <mat-slide-toggle
+                          [checked]="row.Activo !== false"
+                          [matTooltip]="(row.Activo !== false ? 'calendario.tooltip_desactivar_responsable' : 'calendario.tooltip_activar_responsable') | translate"
+                          (change)="togglePublic(row, $event.checked)"
                         >
-                        </mat-icon>
-                      </button></td
-                  ></ng-container>
+                        </mat-slide-toggle>
+                        <button
+                          mat-icon-button
+                          color="warn"
+                          type="button"
+                          (click)="deletePublic(row)"
+                          [attr.aria-label]="'GLOBAL.eliminar' | translate"
+                          [matTooltip]="'GLOBAL.eliminar' | translate"
+                        >
+                          <mat-icon aria-hidden="false" fontIcon="delete"></mat-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </ng-container>
 
                   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                   <tr
@@ -213,207 +253,17 @@
                   </tr>
                 </table>
               </div>
-            </mat-card-content>
-          </mat-card>
+          </section>
 
-          <br />
-          <div class="row">
-            <div class="col-12">
-              <button
-                (click)="saveActivity()"
-                mat-flat-button
-                color="accent"
-                type="submit"
-                [disabled]="activityForm.invalid"
-              >
-                {{ "GLOBAL.guardar" | translate }}
-              </button>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <br />
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="openForm()"
-        [hidden]="addPublic"
-      >
-        {{ "calendario.actividad_dirigido" | translate }}
-      </button>
+            </mat-tab>
+          </mat-tab-group>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end" class="sga-modal-actions">
+        <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+        <button mat-flat-button color="accent" type="submit">
+          {{ data.editActivity === undefined ? ("GLOBAL.guardar" | translate) : ("calendario.guardar_cambios" | translate) }}
+        </button>
+      </mat-dialog-actions>
     </form>
-
-    <form
-      novalidate
-      [formGroup]="publicTypeForm"
-      #pform="ngForm"
-      (ngSubmit)="addPublicType()"
-      class="form-horizontal"
-      *ngIf="addPublic"
-    >
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>
-            {{ "calendario.actividad_dirigido" | translate }}
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-grid2">
-            <div class="form-col2">
-              <mat-form-field floatLabel="always" style="width: 100%">
-                <input
-                  matInput
-                  type="text"
-                  formControlName="Nombre"
-                  placeholder="{{ 'calendario.nombre' | translate }}"
-                  required
-                />
-                <mat-error
-                  *ngIf="
-                    publicTypeForm.get('Nombre')?.hasError('required') &&
-                    publicTypeForm.get('Nombre')?.touched
-                  "
-                >
-                  {{ "calendario.nombre" | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="form-grid2">
-            <div class="form-col1">
-              <mat-form-field floatLabel="always" style="width: 100%">
-                <input
-                  matInput
-                  type="text"
-                  formControlName="CodigoAbreviacion"
-                  placeholder="{{ 'GLOBAL.codigo_abreviacion' | translate }}"
-                  required
-                />
-                <mat-error
-                  *ngIf="
-                    publicTypeForm
-                      .get('CodigoAbreviacion')
-                      ?.hasError('required') &&
-                    publicTypeForm.get('CodigoAbreviacion')?.touched
-                  "
-                >
-                  {{ "calendario.error_dirigido_codigo" | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-            <div class="form-col1">
-              <mat-form-field floatLabel="always" style="width: 100%">
-                <input
-                  matInput
-                  type="number"
-                  formControlName="NumeroOrden"
-                  placeholder="{{ 'GLOBAL.numero_orden' | translate }}"
-                  required
-                />
-                <mat-error
-                  *ngIf="
-                    publicTypeForm.get('NumeroOrden')?.hasError('required') &&
-                    publicTypeForm.get('NumeroOrden')?.touched
-                  "
-                >
-                  {{ "calendario.error_dirigido_orden" | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="form-grid2">
-            <div class="form-col2">
-              <mat-checkbox formControlName="Activo" style="width: 100%"
-                >{{ "GLOBAL.activo" | translate }}
-              </mat-checkbox>
-            </div>
-          </div>
-
-          <div class="form-grid2">
-            <div class="form-col2">
-              <button
-                style="width: 100%"
-                mat-flat-button
-                color="accent"
-                type="submit"
-                [disabled]="publicTypeForm.invalid"
-              >
-                {{ "evento.agregar_encargado" | translate }}
-              </button>
-            </div>
-          </div>
-          <br />
-          <div class="table">
-            <table
-              mat-table
-              [dataSource]="responsables"
-              class="demo-table"
-              matSort
-            >
-              <!-- ID Column -->
-              <ng-container matColumnDef="Nombre" sticky>
-                <th
-                  class="text-left"
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 90%"
-                >
-                  {{ "calendario.nombre" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.Nombre }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="Acciones">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 90%"
-                >
-                  {{ "GLOBAL.acciones" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    (click)="onDeletePublic({ data: row })"
-                  >
-                    <mat-icon
-                      aria-hidden="false"
-                      title="{{
-                        'calendario.tooltip_detalle_proceso' | translate
-                      }}"
-                      fontIcon="delete"
-                    >
-                    </mat-icon>
-                  </button></td
-              ></ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-              <!-- Row shown when there is no matching data. -->
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="4">
-                  {{ "calendario.sin_procesos" | translate }}
-                </td>
-              </tr>
-            </table>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <br />
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="closeForm()"
-      >
-        <i class="nb-arrow-dropleft"></i>
-        {{ "GLOBAL.regresar" | translate }}
-      </button>
-    </form>
-  </mat-card-content>
-</mat-card>
+</section>

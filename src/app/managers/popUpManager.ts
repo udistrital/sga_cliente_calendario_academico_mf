@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 // @ts-ignore
 import Swal from 'sweetalert2/dist/sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
+import { GlobalLoadingStateService } from '../services/global-loading-state.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,62 +11,75 @@ import { TranslateService } from '@ngx-translate/core';
 export class PopUpManager {
   constructor(
     private snackBar: MatSnackBar,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private loadingState: GlobalLoadingStateService,
   ) {}
 
   showToast(message: string, duration: number = 3000) {
     this.translate.get(message).subscribe((translatedMessage: string) => {
-      this.snackBar.open(translatedMessage, 'Cerrar', {
-        duration: duration,
-        horizontalPosition: 'center',
-        verticalPosition: 'bottom',
-        panelClass: ['success-snackbar'],
+      this.loadingState.runWhenIdle(() => {
+        this.snackBar.open(translatedMessage, 'Cerrar', {
+          duration: duration,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['success-snackbar'],
+        });
       });
     });
   }
 
   showErrorToast(message: string) {
     this.translate.get(message).subscribe((translatedMessage: string) => {
-      this.snackBar.open(translatedMessage, 'Cerrar', {
-        duration: 5000, // Ejemplo de duración
-        panelClass: ['error-snackbar'], // Clase CSS personalizada para el toast de error
+      this.loadingState.runWhenIdle(() => {
+        this.snackBar.open(translatedMessage, 'Cerrar', {
+          duration: 5000,
+          panelClass: ['error-snackbar'],
+        });
       });
     });
   }
 
   showInfoToast(message: string, duration: number = 0) {
     this.translate.get(message).subscribe((translatedMessage: string) => {
-      this.snackBar.open(translatedMessage, 'Cerrar', {
-        duration: duration,
-        panelClass: ['info-snackbar'], // Clase CSS personalizada para el toast de información
+      this.loadingState.runWhenIdle(() => {
+        this.snackBar.open(translatedMessage, 'Cerrar', {
+          duration: duration,
+          panelClass: ['info-snackbar'],
+        });
       });
     });
   }
 
   showAlert(title: string, text: string) {
-    Swal.fire({
-      icon: 'info',
-      title: title,
-      text: text,
-      confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+    this.loadingState.runWhenIdle(() => {
+      Swal.fire({
+        icon: 'info',
+        title: title,
+        text: text,
+        confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+      });
     });
   }
 
   showSuccessAlert(text: string) {
-    Swal.fire({
-      icon: 'success',
-      title: this.translate.instant('GLOBAL.operacion_exitosa'),
-      text: text,
-      confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+    this.loadingState.runWhenIdle(() => {
+      Swal.fire({
+        icon: 'success',
+        title: this.translate.instant('GLOBAL.operacion_exitosa'),
+        text: text,
+        confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+      });
     });
   }
 
   showErrorAlert(text: string) {
-    Swal.fire({
-      icon: 'error',
-      title: this.translate.instant('GLOBAL.error'),
-      text: text,
-      confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+    this.loadingState.runWhenIdle(() => {
+      Swal.fire({
+        icon: 'error',
+        title: this.translate.instant('GLOBAL.error'),
+        text: text,
+        confirmButtonText: this.translate.instant('GLOBAL.aceptar'),
+      });
     });
   }
 

@@ -37,4 +37,8 @@ export class DialogPreviewFileComponent implements OnInit {
     }
   }
 
+  closeDialog() {
+    this.dialogRef.close();
+  }
+
 }
