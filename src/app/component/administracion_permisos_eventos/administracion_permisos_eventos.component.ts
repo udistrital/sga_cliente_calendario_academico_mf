@@ -259,16 +259,19 @@ export class AdministracionPermisosEventosComponent implements OnInit {
   }
 
   private normalizarLista(respuesta: any): any[] {
+    let lista: any[] = [];
     if (Array.isArray(respuesta)) {
-      return respuesta;
+      lista = respuesta;
+    } else if (Array.isArray(respuesta?.Data?.Data)) {
+      lista = respuesta.Data.Data;
+    } else if (Array.isArray(respuesta?.Data)) {
+      lista = respuesta.Data;
     }
-    if (Array.isArray(respuesta?.Data?.Data)) {
-      return respuesta.Data.Data;
-    }
-    if (Array.isArray(respuesta?.Data)) {
-      return respuesta.Data;
-    }
-    return [];
+    return lista.filter((item: any) =>
+      item !== null &&
+      item !== undefined &&
+      !(typeof item === 'object' && !Array.isArray(item) && Object.keys(item).length === 0)
+    );
   }
 
   private extraerEntidad(respuesta: any): any {
