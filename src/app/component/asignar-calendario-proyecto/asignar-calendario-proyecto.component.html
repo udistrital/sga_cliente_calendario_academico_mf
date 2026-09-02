@@ -1,41 +1,94 @@
-<mat-card style="height: 100%;">
-  <mat-card-header>
-    <mat-card-title>
-      {{ "calendario.para" | translate }} {{ dat.data.Dependencia }}
-    </mat-card-title>
-    <mat-card-subtitle>
-      <p>{{ "calendario.periodo" | translate }}</p>
-      <p>{{ dat.data.Periodo }}</p>
-    </mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content style="display: flex; align-items: center; height: 100%; width: 100%;">
-    <form novalidate (ngSubmit)="register()" class="margin-y" style="width: 100%;">
-      <mat-form-field style="width: 100%">
-        <mat-label
-          >{{ "calendario.seleccione_proyecto" | translate }}
-        </mat-label>
-        <mat-select [formControl]="selectedProjects" multiple>
-          <mat-option *ngFor="let project of projects" [value]="project.Id"
-            >{{ project.Nombre }}
-          </mat-option>
+<section class="sga-modal-shell">
+  <header class="sga-modal-header">
+    <div class="sga-modal-heading">
+      <h2 id="assign-programs-dialog-title" mat-dialog-title>
+        {{ "calendario.para" | translate }} {{ dat.data.NivelNombre }}
+      </h2>
+      <p>{{ "calendario.periodo" | translate }}: {{ dat.data.Periodo }}</p>
+    </div>
+    <button
+      mat-icon-button
+      class="sga-modal-close"
+      type="button"
+      (click)="closeDialog()"
+      [attr.aria-label]="'GLOBAL.cerrar' | translate"
+      [matTooltip]="'GLOBAL.cerrar' | translate"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="sga-modal-content">
+    <form novalidate (ngSubmit)="register()" class="program-form">
+      <p class="alert info">
+        {{ "calendario.seleccion_proyectos_calendario_info" | translate }}
+      </p>
+      <p class="alert warning" *ngIf="(selectedProjects.value?.length || 0) === 0">
+        {{ "calendario.calendario_sin_programas_alerta" | translate }}
+      </p>
+      <mat-form-field appearance="outline" class="program-search">
+        <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+        <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+          <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+          <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
         </mat-select>
-        <mat-error
-          *ngIf="
-            selectedProjects.hasError('required') && selectedProjects.touched
-          "
-          >{{ "calendario.error_select_proyecto" | translate }}</mat-error
-        >
       </mat-form-field>
-      <button
-        class="margin-y"
-        style="width: 100%;"
-        mat-flat-button
-        color="accent"
-        type="submit"
-        [disabled]="selectedProjects.invalid"
-      >
-        {{ "GLOBAL.guardar" | translate }}
-      </button>
+      <p>
+        <strong>{{ "calendario.programas_asociados" | translate:{ total: selectedProjects.value?.length || 0 } }}</strong>
+      </p>
+
+      <div class="program-manager">
+        <section class="program-panel associated">
+          <div class="program-panel-header">
+            <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
+            <button mat-button color="warn" type="button" (click)="deseleccionarProgramasAsociadosFiltrados()" [disabled]="programasAsociadosFiltrados().length === 0">
+              {{ "calendario.masivo_deseleccionar_todos_programas" | translate }}
+            </button>
+          </div>
+          <mat-form-field appearance="outline" class="program-search">
+            <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
+            <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
+          </mat-form-field>
+          <div class="program-list">
+            <div class="program-item" *ngFor="let project of programasAsociadosFiltrados()">
+              <mat-checkbox [checked]="true" (change)="togglePrograma(project.Id, $event.checked)">
+                {{ project.Nombre }}
+              </mat-checkbox>
+            </div>
+            <p class="empty-list" *ngIf="programasAsociadosFiltrados().length === 0">
+              {{ "calendario.sin_programas_asociados" | translate }}
+            </p>
+          </div>
+        </section>
+
+        <section class="program-panel available">
+          <div class="program-panel-header">
+            <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
+            <button mat-button color="accent" type="button" (click)="seleccionarProgramasDisponiblesFiltrados()" [disabled]="programasDisponiblesFiltrados().length === 0">
+              {{ "calendario.masivo_seleccionar_todos_programas" | translate }}
+            </button>
+          </div>
+          <mat-form-field appearance="outline" class="program-search">
+            <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
+            <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />
+          </mat-form-field>
+          <div class="program-list">
+            <div class="program-item" *ngFor="let project of programasDisponiblesFiltrados()">
+              <mat-checkbox [checked]="false" (change)="togglePrograma(project.Id, $event.checked)">
+                {{ project.Nombre }}
+              </mat-checkbox>
+            </div>
+            <p class="empty-list" *ngIf="programasDisponiblesFiltrados().length === 0">
+              {{ "calendario.sin_programas_disponibles" | translate }}
+            </p>
+          </div>
+        </section>
+      </div>
     </form>
-  </mat-card-content>
-</mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sga-modal-actions">
+    <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+    <button mat-flat-button color="accent" type="button" (click)="register()">{{ "GLOBAL.guardar" | translate }}</button>
+  </mat-dialog-actions>
+</section>

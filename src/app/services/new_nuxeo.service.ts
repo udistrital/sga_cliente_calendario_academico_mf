@@ -137,21 +137,28 @@ export class NewNuxeoService {
         const documentos :any[] = [];
 
         files.map(async (file:any) => {
-            const sendFileData = [{
-                IdTipoDocumento: file.IdDocumento,
-                nombre: file.nombre.replace(/[\.]/g),
-                metadatos: file.metadatos ? file.metadatos : {},
-                descripcion: file.descripcion ? file.descripcion : "",
-                file: await this.fileToBase64(file.file)
-            }]
+            try {
+                const sendFileData = [{
+                    IdTipoDocumento: file.IdDocumento,
+                    nombre: file.nombre.replace(/[\.]/g),
+                    metadatos: file.metadatos ? file.metadatos : {},
+                    descripcion: file.descripcion ? file.descripcion : "",
+                    file: await this.fileToBase64(file.file)
+                }]
 
-            this.anyService.post(environment.NUXEO_SERVICE, 'document/uploadAnyFormat', sendFileData)
-                .subscribe((dataResponse) => {
-                    documentos.push(dataResponse);
-                    if (documentos.length === files.length) {
-                        documentsSubject.next(documentos);
-                    }
-                })
+                this.anyService.post(environment.NUXEO_SERVICE, 'document/uploadAnyFormat', sendFileData)
+                    .subscribe(
+                        (dataResponse) => {
+                            documentos.push(dataResponse);
+                            if (documentos.length === files.length) {
+                                documentsSubject.next(documentos);
+                            }
+                        },
+                        (error: any) => documentsSubject.error(error),
+                    )
+            } catch (error) {
+                documentsSubject.error(error);
+            }
         });
 
         return documents$;
@@ -197,15 +204,24 @@ export class NewNuxeoService {
             this.documentService.get('documento/' + file.Id)
             .subscribe((doc:any) => {
                 this.anyService.get(environment.NUXEO_SERVICE, 'document/' + doc.Enlace)
-                .subscribe(async (f: any) => {
-                    const url = await this.getUrlFile(f.file, file.ContentType ? file.ContentType : f['file:content']['mime-type'])
-                    documentos[index] = { ...documentos[index], ...{ url: url }, ...{ Documento: this.sanitization.bypassSecurityTrustUrl(url) },
-                                          ...{ Nombre: doc.Nombre }, ...{ Metadatos: doc.Metadatos } }           
-                    i+=1;
-                    if(i === files.length){
-                        documentsSubject.next(documentos);
-                    }
-                })
+                .subscribe(
+                    async (f: any) => {
+                        try {
+                            const url = await this.getUrlFile(f.file, file.ContentType ? file.ContentType : f['file:content']['mime-type'])
+                            documentos[index] = { ...documentos[index], ...{ url: url }, ...{ Documento: this.sanitization.bypassSecurityTrustUrl(url) },
+                                                  ...{ Nombre: doc.Nombre }, ...{ Metadatos: doc.Metadatos } }
+                            i+=1;
+                            if(i === files.length){
+                                documentsSubject.next(documentos);
+                            }
+                        } catch (error) {
+                            documentsSubject.error(error);
+                        }
+                    },
+                    (error: any) => documentsSubject.error(error),
+                )
+            }, (error: any) => {
+                documentsSubject.error(error);
             })
         });
         return documents$;

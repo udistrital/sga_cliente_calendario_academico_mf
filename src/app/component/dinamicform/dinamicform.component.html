@@ -18,7 +18,7 @@
   <!-- Form  basic -->
   <form class="form-horizontal" *ngSwitchCase="'basic'">
     <mat-card>
-      <mat-card-header>
+      <mat-card-header *ngIf="showHeader">
         <mat-card-title>
           {{ normalform.titulo }}
         </mat-card-title>
@@ -174,7 +174,7 @@
     </mat-card>
     <br />
     <!-- Botones de form con acción de botones -->
-    <div align="center">
+    <div align="center" *ngIf="showActions">
       <button
         class="btn btn-success btn-tiny"
         (click)="validForm()"
@@ -343,7 +343,7 @@
       </div>
     </fieldset>
     <br />
-    <div align="center">
+    <div align="center" *ngIf="showActions">
       <button
         class="btn btn-success btn-tiny"
         (click)="validForm()"
@@ -519,7 +519,7 @@
     </div>
     <br />
     <!-- Botones de form con accaión de botones -->
-    <div align="center">
+    <div align="center" *ngIf="showActions">
       <button
         class="btn btn-success btn-tiny"
         (click)="validForm()"
@@ -541,7 +541,7 @@
   <!-- Form  mini -->
   <form class="form-horizontal" *ngSwitchCase="'mini'" style="height: 100%;">
     <mat-card style="height: 100%;">
-      <mat-card-header>
+      <mat-card-header *ngIf="showHeader">
         <mat-card-title>
           {{ normalform.titulo }}
         </mat-card-title>
@@ -1023,7 +1023,7 @@
         <ng-content></ng-content>
         <div
           class="buttons-container"
-          *ngIf="normalform.btnLimpiar || normalform.btn"
+          *ngIf="showActions && (normalform.btnLimpiar || normalform.btn)"
         >
           <button
             style="width: 100%;"

@@ -5,34 +5,49 @@
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <div class="form-grid2">
-      <div class="form-col1">
-        <mat-form-field style="width: 100%">
-          <mat-select
-            [formControl]="selectedLevel"
-            placeholder="{{ 'calendario.para' | translate }}"
-            (selectionChange)="onSelectLevel()"
-          >
-            <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">{{
-              nivel.Nombre
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="form-col1">
-        <mat-form-field style="width: 100%">
-          <mat-select
-            [formControl]="selectedProject"
-            placeholder="{{ 'oferta.proyecto' | translate }}"
-            (selectionChange)="onSelectProject()"
-          >
-            <mat-option *ngFor="let project of projects" [value]="project.Id">{{
-              project.Nombre
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    </div>
+    <mat-form-field class="full-width">
+      <mat-label>{{ 'calendario.seleccione_periodo_filtro' | translate }}</mat-label>
+      <mat-select
+        [formControl]="selectedPeriod"
+        (selectionChange)="onSelectPeriod()"
+      >
+        <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">{{ periodo.Nombre }}</mat-option>
+        <mat-option *ngIf="!periodos.length" disabled>{{ 'calendario.sin_periodos_disponibles' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>{{ 'calendario.seleccione_facultad_filtro' | translate }}</mat-label>
+      <mat-select
+        [formControl]="selectedFaculty"
+        (selectionChange)="onSelectFaculty()"
+      >
+        <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+        <mat-option *ngIf="!facultades.length" disabled>{{ 'calendario.sin_facultades_disponibles' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>{{ 'calendario.seleccione_nivel_filtro' | translate }}</mat-label>
+      <mat-select
+        [formControl]="selectedLevel"
+        (selectionChange)="onSelectLevel()"
+      >
+        <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
+        <mat-option *ngIf="!niveles.length" disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>{{ 'calendario.seleccione_programa_filtro' | translate }}</mat-label>
+      <mat-select
+        [formControl]="selectedProject"
+        (selectionChange)="onSelectProject()"
+      >
+        <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }}</mat-option>
+        <mat-option *ngIf="!projects.length" disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <div *ngIf="showCalendar" class="margin-y">
       <detalle-calendario

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { PopUpManager } from 'src/app/managers/popUpManager';
+import { getCookie } from 'src/utils/cookie';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +16,7 @@ export class AuthGuard implements CanActivate {
     private translate: TranslateService,
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> {
     const menuInfo = localStorage.getItem('menu');
     const menuPermisos = menuInfo ? JSON.parse(atob(menuInfo)) : null;
     const fullUrl = window.location.href;
@@ -30,11 +33,20 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    this.popUpManager.showErrorAlert(this.translate.instant('ERROR.rol_insuficiente_titulo'));
-    return false;
+    const lang = this.translate.currentLang || getCookie('lang') || 'es';
+    return this.translate.use(lang).pipe(
+      map(() => {
+        this.popUpManager.showErrorAlert(this.translate.instant('ERROR.rol_insuficiente_titulo'));
+        return false;
+      }),
+      catchError(() => {
+        this.popUpManager.showErrorAlert('El usuario no cuenta con permisos');
+        return of(false);
+      }),
+    );
   }
 
-  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> {
     return this.canActivate(route, state);
   }
 }

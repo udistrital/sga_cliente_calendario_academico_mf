@@ -57,12 +57,12 @@
                     <td mat-cell *matCellDef="let row">{{ row.Periodo }}</td>
                   </ng-container>
 
-                  <ng-container matColumnDef="Tipo_de_dependencia">
+                  <ng-container matColumnDef="Nivel">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                      {{ "calendario.dependencia" | translate }}
+                      {{ "calendario.nivel" | translate }}
                     </th>
                     <td mat-cell *matCellDef="let row">
-                      {{ row.Dependencia }}
+                      {{ row.NivelNombre }}
                     </td>
                   </ng-container>
 
@@ -74,11 +74,11 @@
                       <div
                         class="status-indicator"
                         [ngClass]="{
-                          active: row.Estado === 'Activo',
-                          inactive: row.Estado === 'Inactivo'
+                          active: row.Activo,
+                          inactive: !row.Activo
                         }"
                       >
-                        {{ row.Estado === 'Activo' ? "Activo" : "Inactivo" }}
+                        {{ row.Activo ? "Activo" : "Inactivo" }}
                       </div>
                   </ng-container>
 
@@ -158,11 +158,11 @@
                           (click)="onAction({ action: 'delete', data: row })"
                         >
                           <mat-icon
-                            fontIcon="unpublished"
-                            color="warn"
+                            [fontIcon]="row.Activo ? 'unpublished' : 'restore'"
+                            [color]="row.Activo ? 'warn' : 'accent'"
                           ></mat-icon>
                           <span>{{
-                            "calendario.tooltip_inactivar" | translate
+                            "calendario.tooltip_estado_calendario" | translate
                           }}</span>
                         </button>
                       </mat-menu>
@@ -198,6 +198,7 @@
                 [view]="view"
                 [calendarForEditId]="calendarForEditId"
                 [calendarForNew]="calendarForNew"
+                (newCalendar)="actualizarListadoCalendarios()"
                 (calendarCloneOut)="recargarDespuesClon($event)"
               ></def-calendario-academico>
             </mat-card-content>

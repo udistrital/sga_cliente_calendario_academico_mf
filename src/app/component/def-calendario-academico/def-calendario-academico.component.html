@@ -17,7 +17,7 @@
                 formControlName="Nivel"
                 placeholder="Pregrado/Posgrado"
                 required
-                [disabled]="view"
+                [disabled]="view || editMode"
                 [(ngModel)]="nivelSeleccionado"
                 (selectionChange)="
                   cambiarSelectPeriodoSegunNivel(nivelSeleccionado)
@@ -42,49 +42,15 @@
             <mat-form-field style="width: 100%" floatLabel="always">
               <mat-label>*{{ "calendario.periodo" | translate }}: </mat-label>
               <mat-select
-                *ngIf="!selectMultipleNivel"
                 formControlName="PeriodoId"
                 placeholder="2020-I, 2020-II, 2020-III"
                 required
-                [disabled]="view"
+                [disabled]="view || editMode"
               >
                 <mat-option value="" disabled>--Seleccionar--</mat-option>
                 <mat-option
                   *ngFor="let periodo of periodos"
                   [value]="periodo.Id"
-                >
-                  <div
-                    style="display: flex; flex-wrap: wrap; align-items: center"
-                  >
-                    <div
-                      class="badge"
-                      [ngStyle]="{
-                        backgroundColor: periodo.Activo
-                          ? 'var(--success-accent)'
-                          : 'var(--danger-base)'
-                      }"
-                    ></div>
-                    <b>{{ periodo.Nombre }}</b>
-                    <small
-                      style="margin-left: 5px; font-size: 0.8em; color: gray"
-                    >
-                      (Inicio vigencia:
-                      {{ periodo.InicioVigencia | date : "yyyy-MM-dd" }})
-                    </small>
-                  </div>
-                </mat-option>
-              </mat-select>
-              <mat-select
-                *ngIf="selectMultipleNivel"
-                formControlName="PeriodoId"
-                placeholder="2020-I, 2020-II, 2020-III"
-                required
-                multiple
-              >
-                <mat-option
-                  *ngFor="let periodo of periodos"
-                  [value]="periodo.Id"
-                  [disabled]="view"
                 >
                   <div
                     style="display: flex; flex-wrap: wrap; align-items: center"
@@ -134,6 +100,7 @@
                 formControlName="resolucion"
                 placeholder="{{ 'calendario.numero_resolucion' | translate }} "
                 required
+                [readonly]="view || editMode"
               />
               <mat-error
                 *ngIf="
@@ -159,6 +126,7 @@
                 pattern="^[0-9]*$"
                 placeholder="{{ 'calendario.anno_resolucion' | translate }}"
                 required
+                [readonly]="view || editMode"
               />
               <mat-error
                 *ngIf="
@@ -176,11 +144,12 @@
           <p>{{ "calendario.etiqueta_documento" | translate }}</p>
         </div>
         <div class="margin-y">
-          <div *ngIf="uploadMode">
+          <div *ngIf="uploadMode && !editMode">
             <button
               mat-flat-button
               color="accent"
               type="button"
+              [disabled]="view || editMode"
               (click)="fileInput.click()"
               title="{{ 'calendario.subir_resolucion' | translate }}"
             >
@@ -335,6 +304,7 @@
                   mat-flat-button
                   color="accent"
                   type="button"
+                  [disabled]="calendarFormClone.invalid"
                   (click)="clonarCalendario()"
                 >
                   {{ "calendario.clonar_calendario" | translate }}
@@ -407,6 +377,17 @@
                     </td>
                   </ng-container>
 
+                  <ng-container matColumnDef="Activo">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ "calendario.estado" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                      <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                        {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                      </span>
+                    </td>
+                  </ng-container>
+
                   <ng-container matColumnDef="Acciones">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>
                       {{ "GLOBAL.acciones" | translate }}
@@ -424,6 +405,7 @@
                         <button
                           mat-menu-item
                           (click)="editProcess({ data: row })"
+                          [disabled]="view"
                         >
                           <mat-icon
                             color="accent"
@@ -441,14 +423,14 @@
                           (click)="deleteProcess({ data: row })"
                         >
                           <mat-icon
-                            color="warn"
+                            [color]="row.Activo ? 'warn' : 'accent'"
                             aria-hidden="false"
-                            fontIcon="delete"
+                            [fontIcon]="row.Activo ? 'delete' : 'restore'"
                             class="icon"
                           >
                           </mat-icon>
                           <span>{{
-                            "calendario.tooltip_eliminar_proceso" | translate
+                            "calendario.tooltip_estado_proceso" | translate
                           }}</span>
                         </button>
                       </mat-menu>
@@ -472,6 +454,17 @@
             </mat-tab>
 
             <mat-tab label="{{ 'calendario.actividades' | translate }}">
+              <mat-toolbar *ngIf="!view" class="activities-toolbar">
+                <button
+                  mat-flat-button
+                  color="accent"
+                  type="button"
+                  (click)="abrirGestionMasivaProgramas()"
+                >
+                  <mat-icon fontIcon="hub"></mat-icon>
+                  {{ 'calendario.masivo_programas_abrir' | translate }}
+                </button>
+              </mat-toolbar>
               <mat-accordion>
                 <mat-expansion-panel
                   *ngFor="let process of processes; index as i"
@@ -589,7 +582,9 @@
                           {{ "calendario.estado" | translate }}
                         </th>
                         <td mat-cell *matCellDef="let row">
-                          {{ row.Activo }}
+                          <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                            {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                          </span>
                         </td>
                       </ng-container>
 
@@ -643,13 +638,13 @@
                               [disabled]="view"
                             >
                               <mat-icon
-                                color="warn"
+                                [color]="row.Activo ? 'warn' : 'accent'"
                                 aria-hidden="false"
-                                fontIcon="delete"
+                                [fontIcon]="row.Activo ? 'delete' : 'restore'"
                               >
                               </mat-icon>
                               <span>{{
-                                "calendario.tooltip_eliminar_actividad"
+                                "calendario.tooltip_estado_actividad"
                                   | translate
                               }}</span>
                             </button>
@@ -673,6 +668,34 @@
                                 "calendario.tooltip_seleccionar_proyectos"
                                   | translate
                               }}</span>
+                            </button>
+                            <button
+                              mat-menu-item
+                              data-testid="manage-extensions-action"
+                              [attr.data-activity-id]="row.actividadId"
+                              (click)="
+                                onAction(
+                                  { action: 'extensions', data: row },
+                                  process
+                                )
+                              "
+                            >
+                              <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                              <span class="extension-menu-label">
+                                <span>{{
+                                  (extensionsReadOnly(row)
+                                    ? "calendario.consultar_extensiones"
+                                    : "calendario.gestionar_extensiones")
+                                    | translate
+                                }}</span>
+                                <span
+                                  class="extension-count-badge"
+                                  [class.empty]="activeExtensionCount(row) === 0"
+                                  [attr.aria-label]="('calendario.extensiones_vigentes_count' | translate:{ total: activeExtensionCount(row) })"
+                                >
+                                  {{ activeExtensionCount(row) }}
+                                </span>
+                              </span>
                             </button>
                             <button
                               mat-menu-item
@@ -732,7 +755,7 @@
 
   <!-- ///////////// No tocar de aqui para arriba ///////////// -->
 
-  <mat-tab label="{{ 'calendario.formulario_extension' | translate }}">
+  <mat-tab *ngIf="false" label="{{ 'calendario.formulario_extension' | translate }}">
     <div class="margin-y">
       <h3 class="margin-y">{{ "calendario.title" | translate }}</h3>
       <ng-container *ngIf="showList">
@@ -793,7 +816,6 @@
               <mat-form-field style="width: 100%" floatLabel="always">
                 <mat-label>*{{ "calendario.periodo" | translate }}: </mat-label>
                 <mat-select
-                  *ngIf="!selectMultipleNivel"
                   formControlName="PeriodoId"
                   placeholder="2020-I, 2020-II, 2020-III"
                   required
@@ -802,21 +824,6 @@
                   <mat-option value="" disabled>--Seleccionar--</mat-option>
                   <mat-option
                     *ngFor="let periodo of periodos"
-                    [value]="periodo.Id"
-                  >
-                    {{ periodo.Nombre }}
-                  </mat-option>
-                </mat-select>
-                <mat-select
-                  *ngIf="selectMultipleNivel"
-                  formControlName="PeriodoId"
-                  placeholder="2020-I, 2020-II, 2020-III"
-                  required
-                  multiple
-                >
-                  <mat-option
-                    *ngFor="let periodo of periodos"
-                    [disabled]="view"
                     [value]="periodo.Id"
                   >
                     {{ periodo.Nombre }}
@@ -1050,6 +1057,17 @@
                         </td>
                       </ng-container>
 
+                      <ng-container matColumnDef="Activo">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          {{ "calendario.estado" | translate }}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                          <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                            {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                          </span>
+                        </td>
+                      </ng-container>
+
                       <ng-container matColumnDef="Acciones">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                           {{ "GLOBAL.acciones" | translate }}
@@ -1077,15 +1095,13 @@
                             </button>
                             <button
                               mat-menu-item
-                              (click)="
-                                onAction({ action: 'view', data: row }, null)
-                              "
+                              (click)="deleteProcess({ data: row })"
                               [disabled]="view"
                             >
-                              <mat-icon color="warn" fontIcon="delete">
+                              <mat-icon [color]="row.Activo ? 'warn' : 'accent'" [fontIcon]="row.Activo ? 'delete' : 'restore'">
                               </mat-icon>
                               <span>{{
-                                "calendario.tooltip_detalle_proceso" | translate
+                                "calendario.tooltip_estado_proceso" | translate
                               }}</span>
                             </button>
                           </mat-menu>
@@ -1239,7 +1255,9 @@
                                   {{ "calendario.estado" | translate }}
                                 </th>
                                 <td mat-cell *matCellDef="let row">
-                                  {{ row.Activo }}
+                                  <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                                    {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                                  </span>
                                 </td>
                               </ng-container>
 
@@ -1282,14 +1300,14 @@
                                       }}</span>
                                     </button>
                                     <button
-                                      (click)="onAction( {action: 'disable', }, process )"
+                                      (click)="onAction( { action: 'delete', data: row }, process )"
                                       mat-menu-item
                                       [disabled]="view"
                                     >
-                                      <mat-icon color="warn" fontIcon="delete">
+                                      <mat-icon [color]="row.Activo ? 'warn' : 'accent'" [fontIcon]="row.Activo ? 'delete' : 'restore'">
                                       </mat-icon>
                                       <span>{{
-                                        "calendario.tooltip_eliminar_actividad"
+                                        "calendario.tooltip_estado_actividad"
                                           | translate
                                       }}</span>
                                     </button>
@@ -1309,6 +1327,31 @@
                                         "calendario.tooltip_seleccionar_proyectos"
                                           | translate
                                       }}</span>
+                                    </button>
+                                    <button
+                                      mat-menu-item
+                                      (click)="
+                                        onAction(
+                                          { action: 'extensions', data: row },
+                                          process
+                                        )
+                                      "
+                                    >
+                                      <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                                      <span class="extension-menu-label">
+                                        <span>{{
+                                          (extensionsReadOnly(row)
+                                            ? "calendario.consultar_extensiones"
+                                            : "calendario.gestionar_extensiones")
+                                            | translate
+                                        }}</span>
+                                        <span
+                                          class="extension-count-badge"
+                                          [class.empty]="activeExtensionCount(row) === 0"
+                                        >
+                                          {{ activeExtensionCount(row) }}
+                                        </span>
+                                      </span>
                                     </button>
                                     <button
                                       (click)="
@@ -1434,6 +1477,17 @@
                         </td>
                       </ng-container>
 
+                      <ng-container matColumnDef="Activo">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          {{ "calendario.estado" | translate }}
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                          <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                            {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                          </span>
+                        </td>
+                      </ng-container>
+
                       <ng-container matColumnDef="Acciones">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                           {{ "GLOBAL.acciones" | translate }}
@@ -1462,13 +1516,13 @@
                             </button>
                             <button
                               mat-menu-item
-                              (click)="deleteProcess($event)"
+                              (click)="deleteProcess({ data: row })"
                               [disabled]="view"
                             >
-                              <mat-icon color="accent" fontIcon="delete">
+                              <mat-icon [color]="row.Activo ? 'warn' : 'accent'" [fontIcon]="row.Activo ? 'delete' : 'restore'">
                               </mat-icon>
                               <span>{{
-                                "calendario.tooltip_detalle_proceso" | translate
+                                "calendario.tooltip_estado_proceso" | translate
                               }}</span>
                             </button>
                           </mat-menu>
@@ -1620,7 +1674,9 @@
                               {{ "calendario.estado" | translate }}
                             </th>
                             <td mat-cell *matCellDef="let row">
-                              {{ row.Activo }}
+                              <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
+                                {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                              </span>
                             </td>
                           </ng-container>
 
@@ -1666,13 +1722,13 @@
                                 </button>
                                 <button
                                   mat-menu-item
-                                  (click)="onAction( {action: 'disable', }, process )"
+                                  (click)="onAction( { action: 'delete', data: row }, process )"
                                   [disabled]="view"
                                 >
-                                  <mat-icon color="warn" fontIcon="delete">
+                                  <mat-icon [color]="row.Activo ? 'warn' : 'accent'" [fontIcon]="row.Activo ? 'delete' : 'restore'">
                                   </mat-icon>
                                   <span>{{
-                                    "calendario.tooltip_eliminar_actividad"
+                                    "calendario.tooltip_estado_actividad"
                                       | translate
                                   }}</span>
                                 </button>
@@ -1692,6 +1748,31 @@
                                     "calendario.tooltip_seleccionar_proyectos"
                                       | translate
                                   }}</span>
+                                </button>
+                                <button
+                                  mat-menu-item
+                                  (click)="
+                                    onAction(
+                                      { action: 'extensions', data: row },
+                                      process
+                                    )
+                                  "
+                                >
+                                  <mat-icon color="accent" fontIcon="more_time"></mat-icon>
+                                  <span class="extension-menu-label">
+                                    <span>{{
+                                      (extensionsReadOnly(row)
+                                        ? "calendario.consultar_extensiones"
+                                        : "calendario.gestionar_extensiones")
+                                        | translate
+                                    }}</span>
+                                    <span
+                                      class="extension-count-badge"
+                                      [class.empty]="activeExtensionCount(row) === 0"
+                                    >
+                                      {{ activeExtensionCount(row) }}
+                                    </span>
+                                  </span>
                                 </button>
                                 <button
                                   mat-menu-item

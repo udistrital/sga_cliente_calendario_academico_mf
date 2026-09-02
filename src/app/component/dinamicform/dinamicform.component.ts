@@ -18,6 +18,8 @@ export class DinamicformComponent implements OnInit, OnChanges {
   @Input('normalform') normalform: any;
   @Input('modeloData') modeloData: any;
   @Input('clean') clean!: boolean;
+  @Input() showHeader = true;
+  @Input() showActions = true;
   @Output() result: EventEmitter<any> = new EventEmitter();
   @Output() resultAux: EventEmitter<any> = new EventEmitter();
   @Output() resultSmart: EventEmitter<any> = new EventEmitter();
@@ -189,6 +191,9 @@ export class DinamicformComponent implements OnInit, OnChanges {
     const dialogDoc = new MatDialogConfig();
     dialogDoc.width = '80vw';
     dialogDoc.height = '90vh';
+    dialogDoc.maxWidth = '96vw';
+    dialogDoc.maxHeight = '94vh';
+    dialogDoc.panelClass = 'sga-modal-panel';
     dialogDoc.data = {url, title, message};
     this.matDialog.open(DialogPreviewFileComponent, dialogDoc);
   }
