@@ -234,8 +234,16 @@ export class AdministracionPermisosEventosComponent implements OnInit {
       payload.FechaCreacion = relacion.FechaCreacion;
     }
     this.eventoService.put('evento_catalogo_rol_gestion/' + relacion.Id, payload).subscribe(
-      () => {
-        relacion.Activo = activo;
+      (respuesta: any) => {
+        const relacionActualizada = this.normalizarRelacion(this.extraerEntidad(respuesta));
+        if (relacionActualizada.Id <= 0 || relacionActualizada.PerfilId <= 0) {
+          this.guardandoPerfilId = null;
+          this.popUpManager.showErrorToast(this.translate.instant('calendario.error_guardar_roles_gestion'));
+          return;
+        }
+        this.relaciones = this.relaciones.map((item) =>
+          item.Id === relacionActualizada.Id ? relacionActualizada : item
+        );
         this.relaciones = this.consolidarRelaciones(this.relaciones);
         this.guardandoPerfilId = null;
         this.popUpManager.showSuccessAlert(
