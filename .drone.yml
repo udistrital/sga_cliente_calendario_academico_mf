@@ -31,6 +31,7 @@ steps:
   - npm run build
   when:
     branch:
+    - feature/*
     - develop
     event:
     - push     
@@ -62,14 +63,15 @@ steps:
 - name: publish_s3_release
   image: plugins/s3
   settings:
-    bucket: cliente-pruebas-sga
+    bucket:
+      from_secret: BUCKET_CLIENTES_TEST
     access_key:
       from_secret: aws_access_key_id
     secret_key:
       from_secret: aws_secret_access_key
     region: us-east-1
     source: dist/**/*
-    target: /${DRONE_REPO_NAME}
+    target: /sga/${DRONE_REPO_NAME}
     strip_prefix: dist/
   when:
     branch:
@@ -80,14 +82,15 @@ steps:
 - name: publish_s3_master
   image: plugins/s3
   settings:
-    bucket: cliente-prod-sga
+    bucket:
+      from_secret: BUCKET_CLIENTES_PROD
     access_key:
       from_secret: aws_access_key_id
     secret_key:
       from_secret: aws_secret_access_key
     region: us-east-1
     source: dist/**/*
-    target: /${DRONE_REPO_NAME}
+    target: /sga/${DRONE_REPO_NAME}
     strip_prefix: dist/
   when:
     branch:
