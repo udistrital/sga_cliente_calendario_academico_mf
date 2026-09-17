@@ -165,8 +165,17 @@ export class CalendarioFiltrosAlcanceService {
       return [];
     }
     const respuesta: any = await firstValueFrom(this.sgaAdmisionesMidService.get('admision/dependencia_vinculacion_tercero/' + personaId));
-    const dependencias = respuesta?.Data?.Data?.DependenciaId || respuesta?.Data?.DependenciaId || [];
-    return Array.isArray(dependencias) ? dependencias.map((id: any) => Number(id)).filter((id: number) => id > 0) : [];
+    const dependenciasCodigo = respuesta?.Data?.Data?.DependenciaId || respuesta?.Data?.DependenciaId || [];
+    if (!Array.isArray(dependenciasCodigo) || dependenciasCodigo.length === 0) {
+      return [];
+    }
+    const proyectosResp: any = await firstValueFrom(this.proyectoAcademicoService.get('proyecto_academico_institucion?query=Activo:true&limit=0'));
+    const proyectos = this.normalizarLista(proyectosResp);
+    const ids = dependenciasCodigo.map((depCode: number) => {
+      const proyecto = proyectos.find((p: any) => p.DependenciaId === depCode);
+      return proyecto ? this.obtenerId(proyecto.Id) : 0;
+    }).filter((id: number) => id > 0);
+    return ids;
   }
 
   private async facultadesSecretario(): Promise<number[]> {

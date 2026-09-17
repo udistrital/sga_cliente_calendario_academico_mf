@@ -379,13 +379,13 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
   getListaProyectosPorDependencias(dependencias: []) {
     this.projectService
       .get(
-        'proyecto_academico_institucion?query=Activo:true&limit=0&fields=Id,Nombre,NivelFormacionId'
+        'proyecto_academico_institucion?query=Activo:true&limit=0&fields=Id,Nombre,NivelFormacionId,DependenciaId'
       )
       .subscribe(
         (response: any) => {
           const proyectos = response.filter((proyecto: any) =>
             dependencias.some(
-              (dependencia: number) => dependencia === proyecto.Id
+              (dependencia: number) => dependencia === proyecto.DependenciaId
             )
           );
           this.Proyectos = proyectos;
@@ -413,7 +413,7 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
     if (this.EsSecretariaAcademica) {
       proyectos = proyectos.filter((proyecto: any) => this.facultadesSecretaria.includes(Number(proyecto.FacultadId)));
     } else if (!this.IsAdmin && this.programasUsuario.length > 0) {
-      proyectos = proyectos.filter((proyecto: any) => this.programasUsuario.includes(Number(proyecto.Id)));
+      proyectos = proyectos.filter((proyecto: any) => this.programasUsuario.includes(Number(proyecto.DependenciaId)));
     }
 
     this.Proyectos = proyectos;
@@ -455,13 +455,26 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
         .subscribe(
           (respDependencia: any) => {
             const dependencias = <number[]>(
-              respDependencia.Data.Data.DependenciaId
+              respDependencia.Data.DependenciaId
             );
-            if (dependencias.length === 1) {
-              resolve(dependencias[0]);
-            } else {
-              reject(dependencias);
-            }
+            this.projectService
+              .get('proyecto_academico_institucion?query=Activo:true&limit=0')
+              .subscribe(
+                (response: any) => {
+                  const ids = dependencias.map((depCode: number) => {
+                    const proyecto = response.find((p: any) => p.DependenciaId === depCode);
+                    return proyecto ? proyecto.Id : null;
+                  }).filter((id: number | null) => id !== null);
+                  if (ids.length === 1) {
+                    resolve(ids[0]);
+                  } else {
+                    reject(ids);
+                  }
+                },
+                (error: any) => {
+                  reject(null);
+                }
+              );
           },
           (error: any) => {
             reject(null);
@@ -478,14 +491,27 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
           .get('admision/dependencia_vinculacion_tercero/' + this.userId)
           .subscribe(
             (respDependencia: any) => {
-              const dependencias = <number[]>(
-                respDependencia.Data.Data.DependenciaId
+              const dependenciasCodigo = <number[]>(
+                respDependencia.Data.DependenciaId
               );
-              if (dependencias.length >= 1) {
-                resolve(dependencias);
-              } else {
-                reject(null);
-              }
+              this.projectService
+                .get('proyecto_academico_institucion?query=Activo:true&limit=0')
+                .subscribe(
+                  (response: any) => {
+                    const ids = dependenciasCodigo.map((depCode: number) => {
+                      const proyecto = response.find((p: any) => p.DependenciaId === depCode);
+                      return proyecto ? proyecto.Id : null;
+                    }).filter((id: number | null) => id !== null);
+                    if (ids.length >= 1) {
+                      resolve(ids);
+                    } else {
+                      reject(null);
+                    }
+                  },
+                  (error: any) => {
+                    reject(null);
+                  }
+                );
             },
             (error: any) => {
               reject(null);
