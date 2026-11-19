@@ -15,9 +15,10 @@ import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from 'src/app
 
 
 @Component({
-  selector: 'edicion-actividades-programas',
-  templateUrl: './edicion-actividades-programas.component.html',
-  styleUrls: ['./edicion-actividades-programas.component.scss']
+    selector: 'edicion-actividades-programas',
+    templateUrl: './edicion-actividades-programas.component.html',
+    styleUrls: ['./edicion-actividades-programas.component.scss'],
+    standalone: false
 })
 export class EdicionActividadesProgramasComponent implements OnInit {
 

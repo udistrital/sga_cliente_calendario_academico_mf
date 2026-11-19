@@ -13,7 +13,7 @@
       (click)="closeDialog()"
       [attr.aria-label]="'GLOBAL.cerrar' | translate"
       [matTooltip]="'GLOBAL.cerrar' | translate"
-    >
+      >
       <mat-icon fontIcon="close"></mat-icon>
     </button>
   </header>
@@ -23,14 +23,18 @@
       <p class="alert info">
         {{ "calendario.seleccion_proyectos_calendario_info" | translate }}
       </p>
-      <p class="alert warning" *ngIf="(selectedProjects.value?.length || 0) === 0">
-        {{ "calendario.calendario_sin_programas_alerta" | translate }}
-      </p>
+      @if ((selectedProjects.value?.length || 0) === 0) {
+        <p class="alert warning">
+          {{ "calendario.calendario_sin_programas_alerta" | translate }}
+        </p>
+      }
       <mat-form-field appearance="outline" class="program-search">
         <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
         <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
           <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
-          <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+          @for (facultad of facultades; track facultad) {
+            <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <p>
@@ -50,14 +54,18 @@
             <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
           </mat-form-field>
           <div class="program-list">
-            <div class="program-item" *ngFor="let project of programasAsociadosFiltrados()">
-              <mat-checkbox [checked]="true" (change)="togglePrograma(project.Id, $event.checked)">
-                {{ project.Nombre }}
-              </mat-checkbox>
-            </div>
-            <p class="empty-list" *ngIf="programasAsociadosFiltrados().length === 0">
-              {{ "calendario.sin_programas_asociados" | translate }}
-            </p>
+            @for (project of programasAsociadosFiltrados(); track project) {
+              <div class="program-item">
+                <mat-checkbox [checked]="true" (change)="togglePrograma(project.Id, $event.checked)">
+                  {{ project.Nombre }}
+                </mat-checkbox>
+              </div>
+            }
+            @if (programasAsociadosFiltrados().length === 0) {
+              <p class="empty-list">
+                {{ "calendario.sin_programas_asociados" | translate }}
+              </p>
+            }
           </div>
         </section>
 
@@ -73,14 +81,18 @@
             <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />
           </mat-form-field>
           <div class="program-list">
-            <div class="program-item" *ngFor="let project of programasDisponiblesFiltrados()">
-              <mat-checkbox [checked]="false" (change)="togglePrograma(project.Id, $event.checked)">
-                {{ project.Nombre }}
-              </mat-checkbox>
-            </div>
-            <p class="empty-list" *ngIf="programasDisponiblesFiltrados().length === 0">
-              {{ "calendario.sin_programas_disponibles" | translate }}
-            </p>
+            @for (project of programasDisponiblesFiltrados(); track project) {
+              <div class="program-item">
+                <mat-checkbox [checked]="false" (change)="togglePrograma(project.Id, $event.checked)">
+                  {{ project.Nombre }}
+                </mat-checkbox>
+              </div>
+            }
+            @if (programasDisponiblesFiltrados().length === 0) {
+              <p class="empty-list">
+                {{ "calendario.sin_programas_disponibles" | translate }}
+              </p>
+            }
           </div>
         </section>
       </div>

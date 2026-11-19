@@ -16,9 +16,10 @@ import { EventoService } from 'src/app/services/evento.service';
 import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
 
 @Component({
-  selector: 'list-calendario-academico',
-  templateUrl: './list-calendario-academico.component.html',
-  styleUrls: ['./list.calendario-academico.component.scss'],
+    selector: 'list-calendario-academico',
+    templateUrl: './list-calendario-academico.component.html',
+    styleUrls: ['./list.calendario-academico.component.scss'],
+    standalone: false
 })
 export class ListCalendarioAcademicoComponent implements OnInit {
 

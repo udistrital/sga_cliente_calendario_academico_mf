@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AdministracionCalendarioComponent } from './component/administracion-calendario/administracion-calendario.component';
-import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -65,82 +65,71 @@ export function createTranslateLoader(http: HttpClient) {
 }
  
 
-@NgModule({
-  declarations: [
-    
-    AppComponent,
-    DinamicformComponent,
-    CrudPeriodoComponent,
-    DialogPreviewFileComponent,
-    DetalleCalendarioComponent,
-    CalendarioProyectoComponent,
-    DefCalendarioAcademicoComponent,
-    ListCalendarioAcademicoComponent,
-    AdministracionCalendarioComponent,
-    AsignarCalendarioProyectoComponent,
-    ProcesoCalendarioAcademicoComponent,
-    EdicionActividadesProgramasComponent,
-    ActividadCalendarioAcademicoComponent,
-    AdministracionPermisosEventosComponent,
-    GestionMasivaActividadesProgramasComponent,
-    GestionExtensionesActividadComponent,
-
-
-
-    
-  ],
-  imports: [
-    ReactiveFormsModule,
-    FormsModule,
-    BrowserModule,
-    AppRoutingModule,
-    MatNativeDateModule,
-    MatDialogModule,
-    MatInputModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatCheckboxModule,
-    MatSelectModule,
-    MatAutocompleteModule,
-    MatTableModule,
-    MatDatepickerModule,
-    MatTabsModule,
-    MatPaginatorModule,
-    BrowserAnimationsModule,
-    MatExpansionModule,
-    MatIconModule,
-    HttpClientModule,
-    SpinnerUtilModule,
-    FullCalendarModule,
-    MatDividerModule,
-    MatButtonModule,
-    MatToolbarModule,
-    MatTooltipModule,
-    MatMenuModule,
-    MatSlideToggleModule,
-    MatListModule,
-    TranslateModule.forRoot({
-      loader:{
-        provide:TranslateLoader,
-        useFactory: (createTranslateLoader),
-        deps:[HttpClient]
-      }
-    })
-  ],
-  providers: [
-    SgaCalendarioMidService,
-    EventoService,
-    SgaAdmisionesMidService,
-    MatSnackBar,
-    HttpErrorManager,
-    DocumentoService,
-    RequestManager,
-    ParametrosService,
-    PopUpManager,
-    { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
-    { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilCounterInterceptor, multi: true },
-    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        DinamicformComponent,
+        CrudPeriodoComponent,
+        DialogPreviewFileComponent,
+        DetalleCalendarioComponent,
+        CalendarioProyectoComponent,
+        DefCalendarioAcademicoComponent,
+        ListCalendarioAcademicoComponent,
+        AdministracionCalendarioComponent,
+        AsignarCalendarioProyectoComponent,
+        ProcesoCalendarioAcademicoComponent,
+        EdicionActividadesProgramasComponent,
+        ActividadCalendarioAcademicoComponent,
+        AdministracionPermisosEventosComponent,
+        GestionMasivaActividadesProgramasComponent,
+        GestionExtensionesActividadComponent,
+    ],
+    bootstrap: [AppComponent], imports: [ReactiveFormsModule,
+        FormsModule,
+        BrowserModule,
+        AppRoutingModule,
+        MatNativeDateModule,
+        MatDialogModule,
+        MatInputModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        MatAutocompleteModule,
+        MatTableModule,
+        MatDatepickerModule,
+        MatTabsModule,
+        MatPaginatorModule,
+        BrowserAnimationsModule,
+        MatExpansionModule,
+        MatIconModule,
+        SpinnerUtilModule,
+        FullCalendarModule,
+        MatDividerModule,
+        MatButtonModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        MatMenuModule,
+        MatSlideToggleModule,
+        MatListModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: (createTranslateLoader),
+                deps: [HttpClient]
+            }
+        })], providers: [
+        SgaCalendarioMidService,
+        EventoService,
+        SgaAdmisionesMidService,
+        MatSnackBar,
+        HttpErrorManager,
+        DocumentoService,
+        RequestManager,
+        ParametrosService,
+        PopUpManager,
+        { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
+        { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilCounterInterceptor, multi: true },
+        { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

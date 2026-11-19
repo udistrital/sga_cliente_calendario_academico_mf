@@ -20,9 +20,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'detalle-calendario',
-  templateUrl: './detalle-calendario.component.html',
-  styleUrls: ['./detalle-calendario.component.scss'],
+    selector: 'detalle-calendario',
+    templateUrl: './detalle-calendario.component.html',
+    styleUrls: ['./detalle-calendario.component.scss'],
+    standalone: false
 })
 export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy {
 
