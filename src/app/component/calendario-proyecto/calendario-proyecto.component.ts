@@ -6,9 +6,10 @@ import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.ser
 import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService, CalendarioProgramaOption } from 'src/app/services/calendario-filtros-alcance.service';
 
 @Component({
-  selector: 'calendario-proyecto',
-  templateUrl: './calendario-proyecto.component.html',
-  styleUrls: ['./calendario-proyecto.component.scss'],
+    selector: 'calendario-proyecto',
+    templateUrl: './calendario-proyecto.component.html',
+    styleUrls: ['./calendario-proyecto.component.scss'],
+    standalone: false
 })
 export class CalendarioProyectoComponent {
 

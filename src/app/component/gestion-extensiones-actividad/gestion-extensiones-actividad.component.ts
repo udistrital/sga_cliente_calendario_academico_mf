@@ -26,9 +26,10 @@ export interface GestionExtensionesActividadResult {
 }
 
 @Component({
-  selector: 'gestion-extensiones-actividad',
-  templateUrl: './gestion-extensiones-actividad.component.html',
-  styleUrls: ['./gestion-extensiones-actividad.component.scss'],
+    selector: 'gestion-extensiones-actividad',
+    templateUrl: './gestion-extensiones-actividad.component.html',
+    styleUrls: ['./gestion-extensiones-actividad.component.scss'],
+    standalone: false
 })
 export class GestionExtensionesActividadComponent implements OnInit {
   @ViewChild('extensionFileInput') extensionFileInput?: ElementRef<HTMLInputElement>;

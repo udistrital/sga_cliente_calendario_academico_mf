@@ -10,9 +10,13 @@
       <mat-select
         [formControl]="selectedPeriod"
         (selectionChange)="onSelectPeriod()"
-      >
-        <mat-option *ngFor="let periodo of periodos" [value]="periodo.Id">{{ periodo.Nombre }}</mat-option>
-        <mat-option *ngIf="!periodos.length" disabled>{{ 'calendario.sin_periodos_disponibles' | translate }}</mat-option>
+        >
+        @for (periodo of periodos; track periodo) {
+          <mat-option [value]="periodo.Id">{{ periodo.Nombre }}</mat-option>
+        }
+        @if (!periodos.length) {
+          <mat-option disabled>{{ 'calendario.sin_periodos_disponibles' | translate }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -21,9 +25,13 @@
       <mat-select
         [formControl]="selectedFaculty"
         (selectionChange)="onSelectFaculty()"
-      >
-        <mat-option *ngFor="let facultad of facultades" [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
-        <mat-option *ngIf="!facultades.length" disabled>{{ 'calendario.sin_facultades_disponibles' | translate }}</mat-option>
+        >
+        @for (facultad of facultades; track facultad) {
+          <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+        }
+        @if (!facultades.length) {
+          <mat-option disabled>{{ 'calendario.sin_facultades_disponibles' | translate }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -32,9 +40,13 @@
       <mat-select
         [formControl]="selectedLevel"
         (selectionChange)="onSelectLevel()"
-      >
-        <mat-option *ngFor="let nivel of niveles" [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
-        <mat-option *ngIf="!niveles.length" disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
+        >
+        @for (nivel of niveles; track nivel) {
+          <mat-option [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
+        }
+        @if (!niveles.length) {
+          <mat-option disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -43,17 +55,23 @@
       <mat-select
         [formControl]="selectedProject"
         (selectionChange)="onSelectProject()"
-      >
-        <mat-option *ngFor="let project of projects" [value]="project.Id">{{ project.Nombre }}</mat-option>
-        <mat-option *ngIf="!projects.length" disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
+        >
+        @for (project of projects; track project) {
+          <mat-option [value]="project.Id">{{ project.Nombre }}</mat-option>
+        }
+        @if (!projects.length) {
+          <mat-option disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
-    <div *ngIf="showCalendar" class="margin-y">
-      <detalle-calendario
-        [calendarForProject]="calendarioId"
-        [projectId]="projectId"
-      ></detalle-calendario>
-    </div>
+    @if (showCalendar) {
+      <div class="margin-y">
+        <detalle-calendario
+          [calendarForProject]="calendarioId"
+          [projectId]="projectId"
+        ></detalle-calendario>
+      </div>
+    }
   </mat-card-content>
 </mat-card>

@@ -30,9 +30,10 @@ import { firstValueFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'administracion-calendario',
-  templateUrl: './administracion-calendario.component.html',
-  styleUrls: ['./administracion-calendario.component.scss'],
+    selector: 'administracion-calendario',
+    templateUrl: './administracion-calendario.component.html',
+    styleUrls: ['./administracion-calendario.component.scss'],
+    standalone: false
 })
 export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

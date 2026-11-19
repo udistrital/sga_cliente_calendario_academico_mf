@@ -7,9 +7,10 @@ import { PopUpManager } from '../../managers/popUpManager';
 import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from '../../services/calendario-filtros-alcance.service';
 
 @Component({
-  selector: 'asignar-calendario-proyecto',
-  templateUrl: './asignar-calendario-proyecto.component.html',
-  styleUrls: ['./asignar-calendario-proyecto.component.scss'],
+    selector: 'asignar-calendario-proyecto',
+    templateUrl: './asignar-calendario-proyecto.component.html',
+    styleUrls: ['./asignar-calendario-proyecto.component.scss'],
+    standalone: false
 })
 export class AsignarCalendarioProyectoComponent implements OnInit {
 
