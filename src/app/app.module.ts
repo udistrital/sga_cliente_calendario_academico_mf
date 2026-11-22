@@ -7,6 +7,7 @@ import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromD
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatDialogModule } from '@angular/material/dialog';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { ParametrosService } from './services/parametros.service';
 import { RequestManager } from './managers/requestManager';
 import { HttpErrorManager } from './managers/errorManager';
@@ -27,6 +28,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatIconModule} from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import {MatNativeDateModule, MAT_DATE_LOCALE} from '@angular/material/core';
 import { ListCalendarioAcademicoComponent } from './component/list-calendario-academico/list-calendario-academico.component';
@@ -56,6 +58,7 @@ import { MatListModule } from '@angular/material/list';
 import { CustomPaginatorIntl } from './services/CustomPaginatorIntl.service';
 import { AdministracionPermisosEventosComponent } from './component/administracion_permisos_eventos/administracion_permisos_eventos.component';
 import { SpinnerUtilCounterInterceptor } from './interceptors/spinner-util-counter.interceptor';
+import { CargandoComponent } from './component/cargando/cargando.component';
 import { GestionMasivaActividadesProgramasComponent } from './component/gestion-masiva-actividades-programas/gestion-masiva-actividades-programas.component';
 import { GestionExtensionesActividadComponent } from './component/gestion-extensiones-actividad/gestion-extensiones-actividad.component';
 
@@ -66,6 +69,7 @@ export function createTranslateLoader(http: HttpClient) {
  
 
 @NgModule({ declarations: [
+        CargandoComponent,
         AppComponent,
         DinamicformComponent,
         CrudPeriodoComponent,
@@ -96,6 +100,7 @@ export function createTranslateLoader(http: HttpClient) {
         MatSelectModule,
         MatAutocompleteModule,
         MatTableModule,
+        MatSortModule,
         MatDatepickerModule,
         MatTabsModule,
         MatPaginatorModule,
@@ -130,6 +135,7 @@ export function createTranslateLoader(http: HttpClient) {
         { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
         { provide: HTTP_INTERCEPTORS, useClass: SpinnerUtilCounterInterceptor, multi: true },
         { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl },
+        { provide: OVERLAY_DEFAULT_CONFIG, useValue: { usePopover: false } },
         provideHttpClient(withInterceptorsFromDi())
     ] })
 export class AppModule { }

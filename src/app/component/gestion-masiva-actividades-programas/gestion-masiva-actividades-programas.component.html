@@ -2,7 +2,7 @@
   <header class="sga-modal-header">
     <div class="sga-modal-heading">
       <h2 id="bulk-programs-dialog-title" mat-dialog-title>{{ 'calendario.masivo_programas_titulo' | translate }}</h2>
-      <p>{{ 'calendario.masivo_programas_info' | translate }}</p>
+      <p>{{ 'calendario.masivo_programas_info_corto' | translate }}</p>
     </div>
     <button
       mat-icon-button
@@ -18,262 +18,274 @@
   </header>
 
   <mat-dialog-content class="bulk-dialog sga-modal-content">
-    <section class="bulk-hero">
-      <div class="program-selector-wrap">
-        <p class="bulk-context">{{ 'calendario.masivo_programas_contexto' | translate }}</p>
-        <mat-form-field class="program-selector" appearance="outline">
-          <mat-label>{{ 'calendario.facultad' | translate }}</mat-label>
-          <mat-select [(ngModel)]="facultadSeleccionada">
-            <mat-option [value]="null">{{ 'calendario.todas_facultades' | translate }}</mat-option>
-            @for (facultad of facultades; track facultad) {
-              <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field class="program-selector" floatLabel="always">
-          <mat-label>{{ 'calendario.programas_academicos' | translate }}</mat-label>
-          <input
-            #programaInput
-            type="text"
-            matInput
-            [(ngModel)]="programaFiltro"
-            [matAutocomplete]="programasAuto"
-            [placeholder]="'calendario.masivo_buscar_programa' | translate"
-            >
-          <mat-autocomplete #programasAuto="matAutocomplete" (optionSelected)="seleccionarProgramaAutocomplete($event, programaInput)">
-            @for (project of programasFiltrados(); track project) {
-              <mat-option [value]="project.Id">
-                {{ project.Nombre }}
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        @if (programasSeleccionadosDetalle().length > 0) {
-          <div class="program-selection-summary">
-            <strong>{{ 'calendario.masivo_programas_seleccionados' | translate }}: {{ programaIdsSeleccionados.length }}</strong>
+    @if (projects.length === 0) {
+      <section class="aviso-sin-programas">
+        <mat-icon>school</mat-icon>
+        <h3>{{ 'calendario.masivo_sin_programas_titulo' | translate }}</h3>
+        <p>{{ 'calendario.masivo_sin_programas_detalle' | translate }}</p>
+      </section>
+    } @else {
+      @let op = operacionActual();
+      <div class="pasos-masivo">
+        <section class="paso paso-programas">
+          <h3 class="titulo-paso">
+            <span class="numero-paso">1</span>
+            {{ 'calendario.masivo_paso_programas' | translate }}
+          </h3>
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>{{ 'calendario.facultad' | translate }}</mat-label>
+            <mat-select [(ngModel)]="facultadSeleccionada">
+              <mat-option [value]="null">{{ 'calendario.todas_facultades' | translate }}</mat-option>
+              @for (facultad of facultades; track facultad.Id) {
+                <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>{{ 'calendario.buscar_programa' | translate }}</mat-label>
+            <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+            <input
+              #programaInput
+              type="text"
+              matInput
+              [(ngModel)]="programaFiltro"
+              [matAutocomplete]="programasAuto"
+              >
+            <mat-autocomplete #programasAuto="matAutocomplete" (optionSelected)="seleccionarProgramaAutocomplete($event, programaInput)">
+              @for (project of programasFiltrados(); track project.Id) {
+                <mat-option [value]="project.Id">
+                  {{ project.Nombre }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <div class="cabecera-elegidos">
+            <span>{{ 'calendario.masivo_programas_seleccionados' | translate }}</span>
+            <span class="contador-elegidos">{{ programaIdsSeleccionados.length }}</span>
           </div>
-        }
-        @if (programasSeleccionadosDetalle().length > 0) {
-          <div class="program-chip-list">
-            @for (programa of programasSeleccionadosDetalle(); track programa) {
-              <span class="program-chip">
-                {{ programa.Nombre }}
-                <button type="button" (click)="quitarPrograma(programa.Id)" [attr.aria-label]="'GLOBAL.eliminar' | translate">×</button>
-              </span>
-            }
+          @if (programasSeleccionadosDetalle().length > 0) {
+            <div class="program-chip-list">
+              @for (programa of programasSeleccionadosDetalle(); track programa.Id) {
+                <span class="program-chip">
+                  {{ programa.Nombre }}
+                  <button type="button" (click)="quitarPrograma(programa.Id)" [attr.aria-label]="'GLOBAL.eliminar' | translate">×</button>
+                </span>
+              }
+            </div>
+          } @else {
+            <p class="sin-elegidos">{{ 'calendario.masivo_sin_programas_elegidos' | translate }}</p>
+          }
+          <div class="acciones-programas">
+            <button mat-button type="button" class="boton-todos" (click)="seleccionarTodosProgramas()" [disabled]="todosProgramasFacultadSeleccionados()">
+              <mat-icon>playlist_add</mat-icon>
+              {{ 'calendario.masivo_todos_facultad' | translate }}
+            </button>
+            <button mat-button type="button" class="boton-limpiar" (click)="deseleccionarTodosProgramas()" [disabled]="programaIdsSeleccionados.length === 0">
+              <mat-icon>clear_all</mat-icon>
+              {{ 'calendario.masivo_limpiar' | translate }}
+            </button>
           </div>
-        }
-        <div class="program-selector-actions">
-          <button mat-button type="button" (click)="seleccionarTodosProgramas()" [disabled]="todosProgramasFacultadSeleccionados()">
-            {{ 'calendario.masivo_seleccionar_todos_programas' | translate }}
-          </button>
-          <button mat-button type="button" (click)="deseleccionarTodosProgramas()" [disabled]="programaIdsSeleccionados.length === 0">
-            {{ 'calendario.masivo_deseleccionar_todos_programas' | translate }}
-          </button>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="summary-grid">
-      <article>
-        <span>{{ 'calendario.masivo_programas_seleccionados' | translate }}</span>
-        <strong>{{ programaIdsSeleccionados.length }}</strong>
-      </article>
-      <article>
-        <span>{{ 'calendario.masivo_candidatas_asociar' | translate }}</span>
-        <strong>{{ totalCandidatasAsociar }}</strong>
-      </article>
-      <article>
-        <span>{{ 'calendario.masivo_candidatas_desasociar' | translate }}</span>
-        <strong>{{ totalCandidatasDesasociar }}</strong>
-      </article>
-      <article>
-        <span>{{ 'calendario.masivo_cruces_existentes' | translate }}</span>
-        <strong>{{ totalAsociacionesExistentes() }}</strong>
-      </article>
-    </section>
+        <section class="paso paso-actividades">
+          <h3 class="titulo-paso">
+            <span class="numero-paso">2</span>
+            {{ 'calendario.masivo_paso_operacion' | translate }}
+          </h3>
+          <div class="selector-operacion" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              class="opcion-operacion asociar"
+              [class.activa]="op === 'asociar'"
+              [attr.aria-selected]="op === 'asociar'"
+              (click)="onOperacionTabChange(0)"
+              >
+              <mat-icon>link</mat-icon>
+              {{ 'calendario.masivo_asociar' | translate }}
+              <span class="contador-operacion">{{ totalCandidatasAsociar }}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              class="opcion-operacion desasociar"
+              [class.activa]="op === 'desasociar'"
+              [attr.aria-selected]="op === 'desasociar'"
+              (click)="onOperacionTabChange(1)"
+              >
+              <mat-icon>link_off</mat-icon>
+              {{ 'calendario.masivo_desasociar' | translate }}
+              <span class="contador-operacion">{{ totalCandidatasDesasociar }}</span>
+            </button>
+          </div>
+          @if (programaIdsSeleccionados.length > 0 && totalAsociacionesExistentes() > 0) {
+            <p class="nota-cruces">
+              <mat-icon>info_outline</mat-icon>
+              {{ 'calendario.masivo_cruces_existentes_nota' | translate:{ total: totalAsociacionesExistentes() } }}
+            </p>
+          }
 
-    @if (validando) {
-      <p class="validation-state">
-        {{ 'calendario.masivo_validando' | translate }}
-      </p>
-    }
-
-    <mat-tab-group class="operation-tabs" [selectedIndex]="operacionTabIndex" (selectedIndexChange)="onOperacionTabChange($event)">
-      <mat-tab label="{{ 'calendario.masivo_asociar' | translate }}">
-        <section class="summary-detail">
-          <h3>{{ 'calendario.masivo_detalle_asociar' | translate }}</h3>
-          <div class="detail-list vertical">
-            @if (actividadesDetalleResumen('asociar').length === 0) {
-              <p class="empty-state compact">{{ 'calendario.masivo_detalle_sin_actividades' | translate }}</p>
-            }
-            @for (item of actividadesDetalleResumen('asociar'); track item) {
-              <article class="detail-item">
-                <strong>{{ item.actividad.Nombre }}</strong>
-                <span>{{ 'calendario.masivo_detalle_proceso' | translate }}: {{ item.proceso }}</span>
-                <small>{{ 'calendario.masivo_detalle_faltantes' | translate }}:</small>
-                <div class="detail-program-list">
-                  @for (programa of item.programas; track programa) {
-                    <span>{{ programa }}</span>
+          <h3 class="titulo-paso paso-tres">
+            <span class="numero-paso">3</span>
+            {{ 'calendario.masivo_paso_actividades' | translate }}
+          </h3>
+          @if (validando) {
+            <p class="validation-state">
+              <mat-icon>sync</mat-icon>
+              {{ 'calendario.masivo_validando' | translate }}
+            </p>
+          }
+          @if (programaIdsSeleccionados.length === 0) {
+            <div class="estado-vacio">
+              <mat-icon>school</mat-icon>
+              {{ 'calendario.masivo_elige_programa' | translate }}
+            </div>
+          } @else if (procesosOperacion().length === 0) {
+            <div class="estado-vacio">
+              <mat-icon>event_available</mat-icon>
+              {{ (op === 'asociar' ? 'calendario.masivo_sin_candidatas_asociar' : 'calendario.masivo_sin_candidatas_desasociar') | translate }}
+            </div>
+          } @else {
+            <div class="grupos-procesos">
+              @for (proceso of procesosOperacion(); track proceso.procesoId ?? $index) {
+                <div class="grupo-proceso">
+                  <div class="cabecera-proceso-masivo">
+                    <mat-checkbox
+                      [checked]="procesoSeleccionado(proceso, op)"
+                      [indeterminate]="procesoParcial(proceso, op)"
+                      (change)="toggleProceso(proceso, $event.checked, op)"
+                      >
+                      {{ proceso.Nombre }}
+                    </mat-checkbox>
+                    <small>
+                      {{ 'calendario.masivo_seleccionadas_de' | translate:{ seleccionadas: seleccionadasEnProceso(proceso), total: proceso.actividadesCandidatas.length } }}
+                    </small>
+                  </div>
+                  @for (actividad of proceso.actividadesCandidatas; track actividad.actividadId) {
+                    <div
+                      class="fila-actividad-masivo"
+                      [class.seleccionada]="actividadSeleccionada(actividad, op)"
+                      [class.desasociar]="op === 'desasociar'"
+                      (click)="alternarActividad(actividad)"
+                      >
+                      <mat-checkbox
+                        [checked]="actividadSeleccionada(actividad, op)"
+                        (click)="$event.stopPropagation()"
+                        (change)="toggleActividad(actividad, $event.checked, op)"
+                        [attr.aria-label]="(op === 'asociar' ? 'calendario.masivo_asociar' : 'calendario.masivo_desasociar') | translate"
+                      ></mat-checkbox>
+                      <div class="texto-actividad-masivo">
+                        <strong>{{ actividad.Nombre }}</strong>
+                        @if (actividad.Descripcion) {
+                          <span>{{ actividad.Descripcion }}</span>
+                        }
+                      </div>
+                      <span class="coverage-pill" [ngClass]="claseCobertura(actividad)">
+                        {{ textoCobertura(actividad) }}
+                      </span>
+                    </div>
                   }
                 </div>
-              </article>
-            }
-          </div>
-        </section>
+              }
+            </div>
+          }
 
-        <section class="operation-summary">
-          <span>{{ 'calendario.masivo_actividades_seleccionadas' | translate }}: {{ actividadesSeleccionadas('asociar').length }}</span>
-          <span>{{ 'calendario.masivo_cruces_totales' | translate }}: {{ totalCruces('asociar') }}</span>
-        </section>
-        @if (procesosCandidatosAsociar.length > 0) {
-          <mat-accordion class="activity-matrix">
-            @for (proceso of procesosCandidatosAsociar; track proceso) {
-              <mat-expansion-panel [expanded]="true">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>{{ proceso.Nombre }}</mat-panel-title>
-                  <mat-panel-description>{{ proceso.actividadesCandidatas.length }} {{ 'calendario.actividades' | translate }}</mat-panel-description>
-                </mat-expansion-panel-header>
-                <div class="process-toolbar">
-                  <mat-checkbox
-                    [checked]="procesoSeleccionado(proceso, 'asociar')"
-                    [indeterminate]="procesoParcial(proceso, 'asociar')"
-                    (change)="toggleProceso(proceso, $event.checked, 'asociar')"
-                    >
-                    {{ 'calendario.masivo_seleccionar_proceso' | translate }}
-                  </mat-checkbox>
-                </div>
-                @for (actividad of proceso.actividadesCandidatas; track actividad) {
-                  <div class="activity-row">
-                    <mat-checkbox
-                      [checked]="actividadSeleccionada(actividad, 'asociar')"
-                      (change)="toggleActividad(actividad, $event.checked, 'asociar')"
-                      [attr.aria-label]="('calendario.masivo_asociar' | translate) + ': ' + actividad.Nombre"
-                    ></mat-checkbox>
-                    <div class="activity-copy">
+          @if (op === 'desasociar' && bloqueadasDesasociacion.length > 0) {
+            <div class="aviso-bloqueadas">
+              <button
+                type="button"
+                class="cabecera-bloqueadas"
+                (click)="mostrarBloqueadas = !mostrarBloqueadas"
+                [attr.aria-expanded]="mostrarBloqueadas"
+                >
+                <mat-icon>lock</mat-icon>
+                <span>{{ 'calendario.masivo_bloqueadas_total' | translate:{ total: bloqueadasDesasociacion.length } }}</span>
+                <mat-icon>{{ mostrarBloqueadas ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+              @if (mostrarBloqueadas) {
+                <p class="info-bloqueadas">{{ 'calendario.masivo_bloqueadas_info' | translate }}</p>
+                @for (actividad of bloqueadasDesasociacion; track actividad.actividadId) {
+                  <div class="fila-bloqueada">
+                    <div class="texto-actividad-masivo">
                       <strong>{{ actividad.Nombre }}</strong>
-                      <span>{{ actividad.Descripcion }}</span>
-                    </div>
-                    <span class="coverage-pill" [ngClass]="claseCobertura(actividad)">
-                      {{ textoCobertura(actividad) }}
-                    </span>
-                  </div>
-                }
-              </mat-expansion-panel>
-            }
-          </mat-accordion>
-        } @else {
-          <p class="empty-state">{{ 'calendario.masivo_sin_candidatas_asociar' | translate }}</p>
-        }
-      </mat-tab>
-
-      <mat-tab label="{{ 'calendario.masivo_desasociar' | translate }}">
-        <section class="summary-detail">
-          <h3>{{ 'calendario.masivo_detalle_desasociar' | translate }}</h3>
-          <div class="detail-list vertical">
-            @if (actividadesDetalleResumen('desasociar').length === 0) {
-              <p class="empty-state compact">{{ 'calendario.masivo_detalle_sin_actividades' | translate }}</p>
-            }
-            @for (item of actividadesDetalleResumen('desasociar'); track item) {
-              <article class="detail-item">
-                <strong>{{ item.actividad.Nombre }}</strong>
-                <span>{{ 'calendario.masivo_detalle_proceso' | translate }}: {{ item.proceso }}</span>
-                <small>{{ 'calendario.masivo_detalle_asociados' | translate }}:</small>
-                <div class="detail-program-list">
-                  @for (programa of item.programas; track programa) {
-                    <span>{{ programa }}</span>
-                  }
-                </div>
-              </article>
-            }
-          </div>
-        </section>
-
-        <section class="operation-summary">
-          <span>{{ 'calendario.masivo_actividades_seleccionadas' | translate }}: {{ actividadesSeleccionadas('desasociar').length }}</span>
-          <span>{{ 'calendario.masivo_cruces_totales' | translate }}: {{ totalCruces('desasociar') }}</span>
-        </section>
-        @if (procesosCandidatosDesasociar.length > 0) {
-          <mat-accordion class="activity-matrix">
-            @for (proceso of procesosCandidatosDesasociar; track proceso) {
-              <mat-expansion-panel [expanded]="true">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>{{ proceso.Nombre }}</mat-panel-title>
-                  <mat-panel-description>{{ proceso.actividadesCandidatas.length }} {{ 'calendario.actividades' | translate }}</mat-panel-description>
-                </mat-expansion-panel-header>
-                <div class="process-toolbar">
-                  <mat-checkbox
-                    [checked]="procesoSeleccionado(proceso, 'desasociar')"
-                    [indeterminate]="procesoParcial(proceso, 'desasociar')"
-                    (change)="toggleProceso(proceso, $event.checked, 'desasociar')"
-                    >
-                    {{ 'calendario.masivo_seleccionar_proceso' | translate }}
-                  </mat-checkbox>
-                </div>
-                @for (actividad of proceso.actividadesCandidatas; track actividad) {
-                  <div class="activity-row">
-                    <mat-checkbox
-                      [checked]="actividadSeleccionada(actividad, 'desasociar')"
-                      (change)="toggleActividad(actividad, $event.checked, 'desasociar')"
-                      [attr.aria-label]="('calendario.masivo_desasociar' | translate) + ': ' + actividad.Nombre"
-                    ></mat-checkbox>
-                    <div class="activity-copy">
-                      <strong>{{ actividad.Nombre }}</strong>
-                      <span>{{ actividad.Descripcion }}</span>
-                    </div>
-                    <span class="coverage-pill" [ngClass]="claseCobertura(actividad)">
-                      {{ textoCobertura(actividad) }}
-                    </span>
-                  </div>
-                }
-              </mat-expansion-panel>
-            }
-          </mat-accordion>
-        } @else {
-          <p class="empty-state">{{ 'calendario.masivo_sin_candidatas_desasociar' | translate }}</p>
-        }
-
-        @if (bloqueadasDesasociacion.length > 0) {
-          <section class="blocked-panel">
-            <h3>{{ 'calendario.masivo_bloqueadas_titulo' | translate }}</h3>
-            <p>{{ 'calendario.masivo_bloqueadas_info' | translate }}</p>
-            @for (actividad of bloqueadasDesasociacion; track actividad) {
-              <div class="activity-row blocked">
-                <div class="activity-copy">
-                  <strong>{{ actividad.Nombre }}</strong>
-                  <span>{{ actividad.Descripcion }}</span>
-                  @if (programasBloqueo(actividad).length > 0) {
-                    <div class="detail-program-list blocked-programs">
-                      @for (programa of programasBloqueo(actividad); track programa) {
-                        <span>{{ programa }}</span>
+                      @if (actividad.Descripcion) {
+                        <span>{{ actividad.Descripcion }}</span>
+                      }
+                      @if (programasBloqueo(actividad).length > 0) {
+                        <div class="detail-program-list blocked-programs">
+                          @for (programa of programasBloqueo(actividad); track $index) {
+                            <span>{{ programa }}</span>
+                          }
+                        </div>
                       }
                     </div>
-                  }
-                </div>
-                <span class="coverage-pill blocked-pill">
-                  {{ textoBloqueo(actividad) }}
-                </span>
-              </div>
-            }
-          </section>
-        }
-      </mat-tab>
-    </mat-tab-group>
+                    <span class="coverage-pill blocked-pill">
+                      {{ textoBloqueo(actividad) }}
+                    </span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </section>
+      </div>
+    }
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="bulk-actions sga-modal-actions">
-    <button mat-button type="button" (click)="cerrar()" [disabled]="actualizando">
-      {{ 'GLOBAL.cerrar' | translate }}
-    </button>
-    @if (operacionTabIndex === 0) {
-      <button mat-flat-button color="accent" type="button" (click)="aplicar('asociar')" [disabled]="actualizando || !puedeAplicar('asociar')">
-        {{ 'calendario.masivo_asociar' | translate }}
-      </button>
-    }
-    @if (operacionTabIndex === 1) {
-      <button mat-stroked-button color="warn" type="button" (click)="aplicar('desasociar')" [disabled]="actualizando || !puedeAplicar('desasociar')">
-        {{ 'calendario.masivo_desasociar' | translate }}
-      </button>
+  <mat-dialog-actions class="bulk-actions sga-modal-actions">
+    @if (projects.length > 0) {
+      @let opPie = operacionActual();
+      @if (mostrarDetalle && actividadesDetalleResumen(opPie).length > 0) {
+        <div class="panel-detalle">
+          @for (item of actividadesDetalleResumen(opPie); track item.actividad.actividadId) {
+            <article class="detail-item">
+              <strong>{{ item.actividad.Nombre }}</strong>
+              <span>{{ 'calendario.masivo_detalle_proceso' | translate }}: {{ item.proceso }}</span>
+              <small>{{ (opPie === 'asociar' ? 'calendario.masivo_detalle_faltantes' : 'calendario.masivo_detalle_asociados') | translate }}:</small>
+              <div class="detail-program-list">
+                @for (programa of item.programas; track $index) {
+                  <span>{{ programa }}</span>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+      <div class="fila-pie">
+        <span class="resumen-pie">
+          @if (actividadesSeleccionadas(opPie).length > 0 && programaIdsSeleccionados.length > 0) {
+            {{ 'calendario.masivo_resumen_operacion' | translate:{ actividades: actividadesSeleccionadas(opPie).length, programas: programaIdsSeleccionados.length, cruces: totalCruces(opPie) } }}
+            <button type="button" class="enlace-detalle" (click)="mostrarDetalle = !mostrarDetalle">
+              {{ (mostrarDetalle ? 'calendario.masivo_ocultar_detalle' : 'calendario.masivo_ver_detalle') | translate }}
+            </button>
+          } @else {
+            {{ 'calendario.masivo_resumen_vacio' | translate }}
+          }
+        </span>
+        <div class="botones-pie">
+          <button mat-stroked-button type="button" class="boton-cerrar" (click)="cerrar()" [disabled]="actualizando">
+            {{ 'GLOBAL.cerrar' | translate }}
+          </button>
+          @if (opPie === 'asociar') {
+            <button mat-flat-button type="button" class="boton-asociar" (click)="aplicar('asociar')" [disabled]="actualizando || !puedeAplicar('asociar')">
+              <mat-icon>link</mat-icon>
+              {{ 'calendario.masivo_boton_asociar' | translate:{ total: actividadesConCambio('asociar').length } }}
+            </button>
+          } @else {
+            <button mat-flat-button type="button" class="boton-desasociar" (click)="aplicar('desasociar')" [disabled]="actualizando || !puedeAplicar('desasociar')">
+              <mat-icon>link_off</mat-icon>
+              {{ 'calendario.masivo_boton_desasociar' | translate:{ total: actividadesConCambio('desasociar').length } }}
+            </button>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="fila-pie solo-cerrar">
+        <button mat-stroked-button type="button" class="boton-cerrar" (click)="cerrar()">
+          {{ 'GLOBAL.cerrar' | translate }}
+        </button>
+      </div>
     }
   </mat-dialog-actions>
 </section>

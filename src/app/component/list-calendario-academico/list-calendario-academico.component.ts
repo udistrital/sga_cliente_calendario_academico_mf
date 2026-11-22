@@ -91,7 +91,9 @@ export class ListCalendarioAcademicoComponent implements OnInit {
             };
           });
 
-          this.dataSource = new MatTableDataSource(this.data)
+          this.data.sort((a: any, b: any) => this.compararCalendarios(a, b));
+          this.dataSource = new MatTableDataSource(this.data);
+          this.dataSource.sortingDataAccessor = (row: any, columna: string) => this.valorOrden(row, columna);
           setTimeout(() => {
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
@@ -103,6 +105,41 @@ export class ListCalendarioAcademicoComponent implements OnInit {
         this.popUpManager.showErrorToast(this.translate.instant('ERROR.general'));
       },
     });
+  }
+
+  compararCalendarios(a: any, b: any): number {
+    const periodo = this.clavePeriodo(b.Periodo) - this.clavePeriodo(a.Periodo);
+    if (periodo !== 0) {
+      return periodo;
+    }
+    const estado = Number(!!b.Activo) - Number(!!a.Activo);
+    if (estado !== 0) {
+      return estado;
+    }
+    return String(a.Nombre || '').localeCompare(String(b.Nombre || ''));
+  }
+
+  clavePeriodo(periodo: any): number {
+    const coincidencia = String(periodo || '').toUpperCase().match(/(\d{4})\s*[-_ ]?\s*([0-9]+|I{1,3})?/);
+    if (!coincidencia) {
+      return 0;
+    }
+    const romanos: { [clave: string]: number } = { I: 1, II: 2, III: 3 };
+    const termino = coincidencia[2] ? (romanos[coincidencia[2]] ?? Number(coincidencia[2])) : 0;
+    return Number(coincidencia[1]) * 10 + termino;
+  }
+
+  valorOrden(row: any, columna: string): string | number {
+    switch (columna) {
+      case 'Periodo_Académico':
+        return this.clavePeriodo(row.Periodo);
+      case 'Nivel':
+        return String(row.NivelNombre || '').toLowerCase();
+      case 'Estado':
+        return row.Activo ? 1 : 0;
+      default:
+        return String(row[columna] ?? '').toLowerCase();
+    }
   }
 
   applyFilterProces(event: Event) {

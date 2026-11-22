@@ -18,8 +18,8 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   projects!: any[];
   facultades: CalendarioFiltroOption[] = [];
   facultadSeleccionada: number | null = null;
-  filtroProgramasAsociados = '';
-  filtroProgramasDisponibles = '';
+  filtroProgramas = '';
+  idsIniciales = new Set<number>();
   constructor(
     private projectService: ProyectoAcademicoService,
     private filtrosAlcanceService: CalendarioFiltrosAlcanceService,
@@ -38,7 +38,9 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
         this.projects = (<any[]><unknown>response).filter(
           proyecto => this.filtrarProyecto(proyecto),
         );
-        this.selectedProjects.setValue(this.proyectosIniciales());
+        const iniciales = this.proyectosIniciales();
+        this.idsIniciales = new Set(iniciales);
+        this.selectedProjects.setValue(iniciales);
         this.cargarFacultades();
       },
       error: error => {
@@ -97,11 +99,11 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
   }
 
   programasAsociadosFiltrados() {
-    return this.filterPrograms(this.programasAsociados(), this.filtroProgramasAsociados);
+    return this.filterPrograms(this.programasAsociados(), this.filtroProgramas);
   }
 
   programasDisponiblesFiltrados() {
-    return this.filterPrograms(this.programasDisponibles(), this.filtroProgramasDisponibles);
+    return this.filterPrograms(this.programasDisponibles(), this.filtroProgramas);
   }
 
   filterPrograms(programs: any[], filter: string) {
@@ -134,6 +136,38 @@ export class AsignarCalendarioProyectoComponent implements OnInit {
     const currentIds = (this.selectedProjects.value || []).map((id: any) => Number(id));
     this.selectedProjects.setValue(currentIds.filter((id: number) => !idsARetirar.has(id)));
     this.selectedProjects.markAsTouched();
+  }
+
+  idsSeleccionados(): number[] {
+    return (this.selectedProjects.value || []).map((id: any) => Number(id));
+  }
+
+  esNuevo(projectId: any): boolean {
+    const id = Number(projectId);
+    return !this.idsIniciales.has(id) && this.idsSeleccionados().includes(id);
+  }
+
+  seRetirara(projectId: any): boolean {
+    const id = Number(projectId);
+    return this.idsIniciales.has(id) && !this.idsSeleccionados().includes(id);
+  }
+
+  totalNuevos(): number {
+    return this.idsSeleccionados().filter((id: number) => !this.idsIniciales.has(id)).length;
+  }
+
+  totalRetirados(): number {
+    const seleccionados = new Set(this.idsSeleccionados());
+    return Array.from(this.idsIniciales).filter((id: number) => !seleccionados.has(id)).length;
+  }
+
+  hayCambios(): boolean {
+    return this.totalNuevos() > 0 || this.totalRetirados() > 0;
+  }
+
+  nombreFacultad(project: any): string {
+    const facultadId = this.filtrosAlcanceService.facultadIdPrograma(project);
+    return this.facultades.find((facultad: CalendarioFiltroOption) => Number(facultad.Id) === facultadId)?.Nombre || '';
   }
 
   private async cargarFacultades() {

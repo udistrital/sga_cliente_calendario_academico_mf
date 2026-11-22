@@ -71,7 +71,7 @@
           <mat-card-title>{{ 'calendario.procesos_actividades' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <mat-tab-group>
+          <mat-tab-group class="pestanas-destacadas">
             <mat-tab label="{{ 'calendario.procesos' | translate }}">
               <br />
               <mat-card>
@@ -94,7 +94,7 @@
                         <td mat-cell *matCellDef="let row">{{ row.Descripcion }}</td>
                       </ng-container>
                       <ng-container matColumnDef="Acciones">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.acciones' | translate }}</th>
+                        <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.acciones' | translate }}</th>
                         <td mat-cell *matCellDef="let row">
                           <button mat-icon-button color="accent" (click)="onAction({ action: 'view', data: row }, null)">
                             <mat-icon aria-hidden="false" title="{{ 'calendario.tooltip_detalle_proceso' | translate }}" fontIcon="search"></mat-icon>
@@ -130,35 +130,35 @@
                               <mat-icon class="icon-search" matPrefix>search</mat-icon>
                             </mat-form-field>
                             <div class="table">
-                              <table mat-table [dataSource]="process.actividades" matSort>
+                              <table mat-table [dataSource]="process.actividades">
                                 <!-- ID Column -->
                                 <ng-container matColumnDef="Nombre">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.nombre' | translate }}</th>
+                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.nombre' | translate }}</th>
                                   <td mat-cell *matCellDef="let row">{{ row.Nombre }}</td>
                                 </ng-container>
                                 <!-- Progress Column -->
                                 <ng-container matColumnDef="Descripcion">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.descripcion' | translate }}</th>
+                                  <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.descripcion' | translate }}</th>
                                   <td mat-cell *matCellDef="let row">{{ row.Descripcion }}</td>
                                 </ng-container>
                                 <ng-container matColumnDef="FechaInicio">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.fecha_inicio' | translate }}</th>
+                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.fecha_inicio' | translate }}</th>
                                   <td mat-cell *matCellDef="let row">{{ row.FechaInicio }}</td>
                                 </ng-container>
                                 <ng-container matColumnDef="FechaFin">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.fecha_fin' | translate }}</th>
+                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.fecha_fin' | translate }}</th>
                                   <td mat-cell *matCellDef="let row">{{ row.FechaFin }}</td>
                                 </ng-container>
                                 <ng-container matColumnDef="Activo">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.estado' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">
+                                  <th class="encabezado-centrado" mat-header-cell *matHeaderCellDef>{{ 'calendario.estado' | translate }}</th>
+                                  <td mat-cell *matCellDef="let row" class="celda-estado">
                                     <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
-                                      {{ row.Activo ? 'Activo' : 'Inactivo' }}
+                                      {{ (row.Activo ? 'GLOBAL.activo' : 'GLOBAL.inactivo') | translate }}
                                     </span>
                                   </td>
                                 </ng-container>
                                 <ng-container matColumnDef="Acciones">
-                                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.acciones' | translate }}</th>
+                                  <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.acciones' | translate }}</th>
                                   <td mat-cell *matCellDef="let row">
                                     <button mat-icon-button color="accent" [matMenuTriggerFor]="menuAdm1" [matTooltip]="'GLOBAL.acciones' | translate">
                                       <mat-icon>more_vert</mat-icon>
@@ -177,8 +177,8 @@
                                         mat-menu-item
                                         [disabled]="!row.PuedeEditar"
                                         [matTooltip]="!row.PuedeEditar ? row.MotivoNoEditable : ''">
-                                        <mat-icon [color]="row.Activo ? 'warn' : 'accent'" [fontIcon]="row.Activo ? 'lock' : 'lock_open'"></mat-icon>
-                                        <span>{{ 'calendario.tooltip_estado_actividad' | translate }}</span>
+                                        <mat-icon [ngClass]="row.Activo ? 'icono-desactivar' : 'icono-activar'" [fontIcon]="row.Activo ? 'unpublished' : 'check_circle'"></mat-icon>
+                                        <span>{{ (row.Activo ? "calendario.tooltip_desactivar_actividad" : "calendario.tooltip_activar_actividad") | translate }}</span>
                                       </button>
                                     </mat-menu>
                                   </td>

@@ -57,8 +57,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   ActivityEditor!: FormGroup;
   ActividadEditable: boolean = false;
   programasAsociados: number = 0;
-  filtroProgramasAsociados: string = '';
-  filtroProgramasDisponibles: string = '';
+  filtroProgramas: string = '';
   programasOriginales: number[] = [];
 
   constructor(
@@ -132,7 +131,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       let tablaFechas: any[] = [];
       deps.fechas.forEach((fdep: { Id: any; Inicio: moment.MomentInput; Fin: moment.MomentInput; Modificacion: moment.MomentInput; }) => {
         tablaFechas.push({
-          ProyectoCurricular: this.data.projects.find((p: { Id: any; }) => p.Id == fdep.Id).Nombre,
+          ProyectoCurricular: this.data.projects?.find((p: { Id: any; }) => p.Id == fdep.Id)?.Nombre || fdep.Id,
           FechaInicio:  this.parseDisplayDate(fdep.Inicio).format('DD/MM/YYYY HH:mm'),
           FechaFin: this.parseDisplayDate(fdep.Fin).format('DD/MM/YYYY HH:mm'),
           FechaEdicion: this.parseDisplayDate(fdep.Modificacion).format('DD/MM/YYYY'),
@@ -204,9 +203,17 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     return this.translate.instant('calendario.edicion_actividades');
   }
 
+  filtrarDetalle(event: Event) {
+    const valor = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = valor.trim().toLowerCase();
+  }
+
   dialogSubtitle(): string {
     if (this.editar_actividad) {
       return [this.nombre_proceso, this.periodo].filter(Boolean).join(' - ');
+    }
+    if (this.select_proyectos_act) {
+      return this.data?.activity?.Nombre || '';
     }
     return this.actividad_detalle_proyectos ? this.descripcion_actividad : '';
   }
@@ -349,12 +356,12 @@ export class EdicionActividadesProgramasComponent implements OnInit {
 
   programasAsociadosFiltrados() {
     const seleccionados = this.programasSeleccionados();
-    return this.projectsFiltrados(this.filtroProgramasAsociados).filter((project) => seleccionados.includes(Number(project.Id)));
+    return this.projectsFiltrados(this.filtroProgramas).filter((project) => seleccionados.includes(Number(project.Id)));
   }
 
   programasDisponiblesFiltrados() {
     const seleccionados = this.programasSeleccionados();
-    return this.projectsFiltrados(this.filtroProgramasDisponibles).filter((project) => !seleccionados.includes(Number(project.Id)));
+    return this.projectsFiltrados(this.filtroProgramas).filter((project) => !seleccionados.includes(Number(project.Id)));
   }
 
   projectsFiltrados(filtro: string) {
@@ -390,6 +397,57 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       ? Array.from(new Set([...seleccionados, Number(programaId)]))
       : seleccionados.filter((id) => id !== Number(programaId));
     this.SelectorDeps.controls['Dependencias'].setValue(nextValue);
+  }
+
+  agregarProgramasFiltrados() {
+    const seleccionados = this.programasSeleccionados();
+    const nuevos = this.programasDisponiblesFiltrados().map((project: any) => Number(project.Id)).filter((id: number) => id > 0);
+    this.SelectorDeps.controls['Dependencias'].setValue(Array.from(new Set([...seleccionados, ...nuevos])));
+  }
+
+  quitarProgramasFiltrados() {
+    const quitables = new Set(
+      this.programasAsociadosFiltrados()
+        .map((project: any) => Number(project.Id))
+        .filter((id: number) => !this.programaNoDesasociable(id))
+    );
+    this.SelectorDeps.controls['Dependencias'].setValue(this.programasSeleccionados().filter((id: number) => !quitables.has(id)));
+  }
+
+  hayProgramasQuitables(): boolean {
+    return this.programasAsociadosFiltrados().some((project: any) => !this.programaNoDesasociable(project.Id));
+  }
+
+  hayProgramasBloqueados(): boolean {
+    return this.programasSeleccionados().some((id: number) => this.programaNoDesasociable(id));
+  }
+
+  esProgramaNuevo(programaId: any): boolean {
+    const id = Number(programaId);
+    return !this.programasOriginales.includes(id) && this.programasSeleccionados().includes(id);
+  }
+
+  programaSeRetirara(programaId: any): boolean {
+    const id = Number(programaId);
+    return this.programasOriginales.includes(id) && !this.programasSeleccionados().includes(id);
+  }
+
+  totalProgramasNuevos(): number {
+    return this.programasSeleccionados().filter((id: number) => !this.programasOriginales.includes(id)).length;
+  }
+
+  totalProgramasRetirados(): number {
+    const seleccionados = this.programasSeleccionados();
+    return this.programasOriginales.filter((id: number) => !seleccionados.includes(id)).length;
+  }
+
+  hayCambiosProgramas(): boolean {
+    return this.totalProgramasNuevos() > 0 || this.totalProgramasRetirados() > 0;
+  }
+
+  nombreFacultadPrograma(project: any): string {
+    const facultadId = this.filtrosAlcanceService.facultadIdPrograma(project);
+    return this.facultades.find((facultad: any) => Number(facultad.Id) === facultadId)?.Nombre || '';
   }
 
   programaNoDesasociable(programaId: number) {

@@ -19,151 +19,199 @@
   </header>
 
   <mat-dialog-content class="sga-modal-content activity-program-dialog-content">
-    @if (select_proyectos_act) {
-      <mat-card class="program-manager-card sga-modal-flat-card">
-        <mat-card-content>
-          <form novalidate [formGroup]="SelectorDeps">
-            <p class="alert info">
-              {{ "calendario.seleccion_proyectos_info" | translate }}
-            </p>
-            <p>
-              <strong>{{ "calendario.programas_asociados" | translate:{ total: programasAsociados } }}</strong>
-            </p>
-            <mat-form-field appearance="outline" class="program-search">
-              <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
-              <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
-                <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
-                @for (facultad of facultades; track facultad) {
-                  <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <div class="program-manager">
-              <section class="program-panel associated">
-                <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
-                <mat-form-field appearance="outline" class="program-search">
-                  <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
-                  <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
-                </mat-form-field>
-                <div class="program-list">
-                  @for (project of programasAsociadosFiltrados(); track project) {
-                    <div class="program-item" [class.locked]="programaNoDesasociable(project.Id)">
-                      <mat-checkbox
-                        [checked]="true"
-                        [disabled]="programaNoDesasociable(project.Id)"
-                        (change)="togglePrograma(project.Id, $event.checked)">
-                        {{ project.Nombre }}
-                      </mat-checkbox>
-                      @if (programaNoDesasociable(project.Id)) {
-                        <small>{{ motivoBloqueoPrograma(project.Id) }}</small>
-                      }
-                    </div>
-                  }
-                  @if (programasAsociadosFiltrados().length === 0) {
-                    <p class="empty-list">
-                      {{ "calendario.sin_programas_asociados" | translate }}
-                    </p>
-                  }
-                </div>
-              </section>
-              <section class="program-panel available">
-                <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
-                <mat-form-field appearance="outline" class="program-search">
-                  <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
-                  <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />
-                </mat-form-field>
-                <div class="program-list">
-                  @for (project of programasDisponiblesFiltrados(); track project) {
-                    <div class="program-item">
-                      <mat-checkbox
-                        [checked]="false"
-                        (change)="togglePrograma(project.Id, $event.checked)">
-                        {{ project.Nombre }}
-                      </mat-checkbox>
-                    </div>
-                  }
-                  @if (programasDisponiblesFiltrados().length === 0) {
-                    <p class="empty-list">
-                      {{ "calendario.sin_programas_disponibles" | translate }}
-                    </p>
-                  }
-                </div>
-              </section>
+    @if (select_proyectos_act && projects.length === 0) {
+      <section class="aviso-sin-programas">
+        <mat-icon>school</mat-icon>
+        <h3>{{ "calendario.masivo_sin_programas_titulo" | translate }}</h3>
+        <p>{{ "calendario.masivo_sin_programas_detalle" | translate }}</p>
+      </section>
+    }
+    @if (select_proyectos_act && projects.length > 0) {
+      <form novalidate [formGroup]="SelectorDeps" class="programas-actividad">
+        <p class="descripcion-ventana">
+          {{ "calendario.descripcion_programas_actividad" | translate }}
+        </p>
+
+        <div class="barra-filtros">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+            <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+              <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+              @for (facultad of facultades; track facultad.Id) {
+                <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ "calendario.buscar_programa" | translate }}</mat-label>
+            <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+            <input matInput [(ngModel)]="filtroProgramas" [ngModelOptions]="{standalone: true}" />
+          </mat-form-field>
+        </div>
+
+        <div class="listas-programas">
+          <section class="panel-programas">
+            <header class="cabecera-lista">
+              <span class="titulo-lista">
+                {{ "calendario.programas_disponibles" | translate }}
+                <span class="contador-lista">{{ programasDisponiblesFiltrados().length }}</span>
+              </span>
+              <button
+                mat-button
+                type="button"
+                class="boton-agregar-todos"
+                (click)="agregarProgramasFiltrados()"
+                [disabled]="programasDisponiblesFiltrados().length === 0"
+                >
+                <mat-icon>playlist_add</mat-icon>
+                {{ "calendario.agregar_todos" | translate }}
+              </button>
+            </header>
+            <div class="lista-programas">
+              @for (project of programasDisponiblesFiltrados(); track project.Id) {
+                <button
+                  type="button"
+                  class="fila-programa"
+                  [class.retirado]="programaSeRetirara(project.Id)"
+                  (click)="togglePrograma(project.Id, true)"
+                  [attr.aria-label]="(programaSeRetirara(project.Id) ? 'calendario.deshacer' : 'calendario.agregar_programa') | translate"
+                  >
+                  <span class="texto-programa">
+                    <span class="nombre-programa">{{ project.Nombre }}</span>
+                    @if (programaSeRetirara(project.Id)) {
+                      <span class="etiqueta-cambio retiro">{{ "calendario.etiqueta_se_retirara" | translate }}</span>
+                    } @else if (nombreFacultadPrograma(project)) {
+                      <small class="facultad-programa">{{ nombreFacultadPrograma(project) }}</small>
+                    }
+                  </span>
+                  <mat-icon class="icono-accion agregar" [matTooltip]="(programaSeRetirara(project.Id) ? 'calendario.deshacer' : 'calendario.agregar_programa') | translate">
+                    {{ programaSeRetirara(project.Id) ? "undo" : "add_circle_outline" }}
+                  </mat-icon>
+                </button>
+              }
+              @if (programasDisponiblesFiltrados().length === 0) {
+                <p class="lista-vacia">
+                  <mat-icon>search_off</mat-icon>
+                  {{ "calendario.sin_programas_disponibles" | translate }}
+                </p>
+              }
             </div>
-            <p class="alert warning">
-              {{ "calendario.programas_bloqueados_info" | translate }}
-            </p>
-          </form>
-        </mat-card-content>
-      </mat-card>
+          </section>
+
+          <section class="panel-programas asociados">
+            <header class="cabecera-lista">
+              <span class="titulo-lista">
+                {{ "calendario.programas_asociados_titulo" | translate }}
+                <span class="contador-lista activo">{{ programasAsociadosFiltrados().length }}</span>
+              </span>
+              <button
+                mat-button
+                type="button"
+                class="boton-quitar-todos"
+                (click)="quitarProgramasFiltrados()"
+                [disabled]="!hayProgramasQuitables()"
+                >
+                <mat-icon>playlist_remove</mat-icon>
+                {{ "calendario.quitar_todos" | translate }}
+              </button>
+            </header>
+            <div class="lista-programas">
+              @for (project of programasAsociadosFiltrados(); track project.Id) {
+                @if (programaNoDesasociable(project.Id)) {
+                  <div class="fila-programa bloqueada">
+                    <span class="texto-programa">
+                      <span class="nombre-programa">{{ project.Nombre }}</span>
+                      <span class="etiqueta-cambio bloqueo">{{ motivoBloqueoPrograma(project.Id) }}</span>
+                    </span>
+                    <mat-icon class="icono-accion bloqueo" [matTooltip]="'calendario.programa_no_desasociable' | translate">lock</mat-icon>
+                  </div>
+                } @else {
+                  <button
+                    type="button"
+                    class="fila-programa"
+                    (click)="togglePrograma(project.Id, false)"
+                    [attr.aria-label]="'calendario.quitar_programa' | translate"
+                    >
+                    <span class="texto-programa">
+                      <span class="nombre-programa">{{ project.Nombre }}</span>
+                      @if (esProgramaNuevo(project.Id)) {
+                        <span class="etiqueta-cambio nuevo">{{ "calendario.etiqueta_nuevo" | translate }}</span>
+                      } @else if (nombreFacultadPrograma(project)) {
+                        <small class="facultad-programa">{{ nombreFacultadPrograma(project) }}</small>
+                      }
+                    </span>
+                    <mat-icon class="icono-accion quitar" [matTooltip]="'calendario.quitar_programa' | translate">
+                      remove_circle_outline
+                    </mat-icon>
+                  </button>
+                }
+              }
+              @if (programasAsociadosFiltrados().length === 0) {
+                <p class="lista-vacia">
+                  <mat-icon>playlist_add</mat-icon>
+                  {{ "calendario.sin_programas_asociados" | translate }}
+                </p>
+              }
+            </div>
+          </section>
+        </div>
+
+        @if (hayProgramasBloqueados()) {
+          <div class="aviso-bloqueados">
+            <mat-icon>lock</mat-icon>
+            <span>{{ "calendario.programas_bloqueados_info" | translate }}</span>
+          </div>
+        }
+        @if (programasSeleccionados().length === 0) {
+          <div class="aviso-sin-seleccion">
+            <mat-icon>warning_amber</mat-icon>
+            <span>{{ "calendario.actividad_sin_programas_seleccionados" | translate }}</span>
+          </div>
+        }
+      </form>
     }
 
     @if (actividad_detalle_proyectos) {
-      <mat-card class="sga-modal-flat-card">
-        <mat-card-content>
-          <h5>{{ "calendario.descripcion_actividad" | translate }}</h5>
-          <p>{{ descripcion_actividad }}</p>
-          <br />
-          <div class="table">
-            <table mat-table [dataSource]="dataSource" matSort>
-              <!-- ID Column -->
-              <ng-container matColumnDef="ProyectoCurricular">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 40%"
-                  >
-                  {{ "calendario.proyecto_curricular" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.ProyectoCurricular }}</td>
-              </ng-container>
-              <!-- Progress Column -->
-              <ng-container matColumnDef="FechaInicio">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 20%"
-                  >
-                  {{ "calendario.fecha_inicio" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.FechaInicio }}</td>
-              </ng-container>
-              <ng-container matColumnDef="FechaFin">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 20%"
-                  >
-                  {{ "calendario.fecha_fin" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.FechaFin }}</td>
-              </ng-container>
-              <ng-container matColumnDef="FechaEdicion">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  style="width: 20%"
-                  >
-                  {{ "calendario.fecha_edicion" | translate }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.FechaEdicion }}</td>
-              </ng-container>
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-              <!-- Row shown when there is no matching data. -->
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="4">
-                  "{{ "calendario.sin_proyectos_actividades" | translate }}"
-                </td>
-              </tr>
-            </table>
+      <section class="detalle-programas">
+        <div class="barra-detalle">
+          <span class="conteo-detalle">
+            <mat-icon>school</mat-icon>
+            {{ "calendario.programas_fechas_particulares" | translate:{ total: dataSource?.data?.length || 0 } }}
+          </span>
+          @if ((dataSource?.data?.length || 0) > 0) {
+            <mat-form-field appearance="outline" class="buscador-detalle">
+              <mat-label>{{ "calendario.buscar_programa" | translate }}</mat-label>
+              <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+              <input matInput type="text" (keyup)="filtrarDetalle($event)" />
+            </mat-form-field>
+          }
+        </div>
+
+        @if (dataSource?.filteredData?.length) {
+          <ul class="lista-detalle">
+            @for (row of dataSource.filteredData; track $index) {
+              <li class="fila-detalle">
+                <div class="texto-detalle">
+                  <span class="nombre-detalle">{{ row.ProyectoCurricular }}</span>
+                  <span class="fechas-detalle">
+                    <mat-icon>event</mat-icon>
+                    {{ row.FechaInicio }} → {{ row.FechaFin }}
+                  </span>
+                </div>
+                <span class="edicion-detalle" [matTooltip]="'calendario.fecha_edicion' | translate">
+                  <mat-icon>edit_calendar</mat-icon>
+                  {{ row.FechaEdicion }}
+                </span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="vacio-detalle">
+            <mat-icon>{{ (dataSource?.data?.length || 0) > 0 ? "search_off" : "event_busy" }}</mat-icon>
+            {{ ((dataSource?.data?.length || 0) > 0 ? "GLOBAL.table_no_data_found" : "calendario.sin_proyectos_actividades") | translate }}
           </div>
-        </mat-card-content>
-      </mat-card>
+        }
+      </section>
     }
 
     @if (proceso_detalle) {
@@ -394,9 +442,9 @@
                       "calendario.dirigido" | translate
                     }}</mat-card-subtitle>
                     <div class="table">
-                      <table mat-table [dataSource]="dataSource2" matSort>
+                      <table mat-table [dataSource]="dataSource2">
                         <ng-container matColumnDef="Nombre">
-                          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          <th mat-header-cell *matHeaderCellDef>
                             {{ "calendario.nombre" | translate }}
                           </th>
                           <td mat-cell *matCellDef="let element">
@@ -418,18 +466,23 @@
       </mat-dialog-content>
 
       <mat-dialog-actions align="end" class="sga-modal-actions">
-        <button mat-button type="button" (click)="closeDialog()">
-          {{ (select_proyectos_act || (editar_actividad && ActividadEditable) ? "GLOBAL.cancelar" : "GLOBAL.cerrar") | translate }}
+        @if (select_proyectos_act && projects.length > 0) {
+          <span class="resumen-cambios">
+            {{ "calendario.resumen_programas" | translate:{ asociados: programasSeleccionados().length, nuevos: totalProgramasNuevos(), retirados: totalProgramasRetirados() } }}
+          </span>
+        }
+        <button mat-flat-button type="button" class="boton-cancelar" (click)="closeDialog()">
+          {{ ((select_proyectos_act && projects.length > 0) || (editar_actividad && ActividadEditable) ? "GLOBAL.cancelar" : "GLOBAL.cerrar") | translate }}
         </button>
-        @if (select_proyectos_act || (editar_actividad && ActividadEditable)) {
+        @if ((select_proyectos_act && projects.length > 0) || (editar_actividad && ActividadEditable)) {
           <button
             mat-flat-button
-            color="accent"
+            class="boton-guardar"
             type="button"
-            [disabled]="(select_proyectos_act && SelectorDeps.invalid) || (editar_actividad && ActivityEditor.invalid)"
+            [disabled]="(select_proyectos_act && (SelectorDeps.invalid || !hayCambiosProgramas())) || (editar_actividad && ActivityEditor.invalid)"
             (click)="guardar()"
             >
-            {{ "GLOBAL.guardar" | translate }}
+            {{ (select_proyectos_act ? "calendario.guardar_cambios" : "GLOBAL.guardar") | translate }}
           </button>
         }
       </mat-dialog-actions>

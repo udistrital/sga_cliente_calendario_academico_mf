@@ -2,9 +2,18 @@
   <header class="sga-modal-header">
     <div class="sga-modal-heading">
       <h2 id="assign-programs-dialog-title" mat-dialog-title>
-        {{ "calendario.para" | translate }} {{ dat.data.NivelNombre }}
+        {{ "calendario.titulo_programas_calendario" | translate }}
       </h2>
-      <p>{{ "calendario.periodo" | translate }}: {{ dat.data.Periodo }}</p>
+      <div class="contexto-calendario">
+        <span class="pastilla-contexto">
+          <mat-icon>school</mat-icon>
+          {{ dat.data.NivelNombre || "-" }}
+        </span>
+        <span class="pastilla-contexto">
+          <mat-icon>event</mat-icon>
+          {{ dat.data.Periodo || "-" }}
+        </span>
+      </div>
     </div>
     <button
       mat-icon-button
@@ -20,87 +29,148 @@
 
   <mat-dialog-content class="sga-modal-content">
     <form novalidate (ngSubmit)="register()" class="program-form">
-      <p class="alert info">
-        {{ "calendario.seleccion_proyectos_calendario_info" | translate }}
-      </p>
-      @if ((selectedProjects.value?.length || 0) === 0) {
-        <p class="alert warning">
-          {{ "calendario.calendario_sin_programas_alerta" | translate }}
-        </p>
-      }
-      <mat-form-field appearance="outline" class="program-search">
-        <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
-        <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
-          <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
-          @for (facultad of facultades; track facultad) {
-            <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <p>
-        <strong>{{ "calendario.programas_asociados" | translate:{ total: selectedProjects.value?.length || 0 } }}</strong>
+      <p class="descripcion-ventana">
+        {{ "calendario.descripcion_programas_calendario" | translate }}
       </p>
 
-      <div class="program-manager">
-        <section class="program-panel associated">
-          <div class="program-panel-header">
-            <h4>{{ "calendario.programas_asociados_titulo" | translate }}</h4>
-            <button mat-button color="warn" type="button" (click)="deseleccionarProgramasAsociadosFiltrados()" [disabled]="programasAsociadosFiltrados().length === 0">
-              {{ "calendario.masivo_deseleccionar_todos_programas" | translate }}
-            </button>
-          </div>
-          <mat-form-field appearance="outline" class="program-search">
-            <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
-            <input matInput [(ngModel)]="filtroProgramasAsociados" [ngModelOptions]="{standalone: true}" />
-          </mat-form-field>
-          <div class="program-list">
-            @for (project of programasAsociadosFiltrados(); track project) {
-              <div class="program-item">
-                <mat-checkbox [checked]="true" (change)="togglePrograma(project.Id, $event.checked)">
-                  {{ project.Nombre }}
-                </mat-checkbox>
-              </div>
+      <div class="barra-filtros">
+        <mat-form-field appearance="outline" class="campo-facultad">
+          <mat-label>{{ "calendario.facultad" | translate }}</mat-label>
+          <mat-select [(ngModel)]="facultadSeleccionada" [ngModelOptions]="{standalone: true}">
+            <mat-option [value]="null">{{ "calendario.todas_facultades" | translate }}</mat-option>
+            @for (facultad of facultades; track facultad) {
+              <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
             }
-            @if (programasAsociadosFiltrados().length === 0) {
-              <p class="empty-list">
-                {{ "calendario.sin_programas_asociados" | translate }}
-              </p>
-            }
-          </div>
-        </section>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="campo-busqueda">
+          <mat-label>{{ "calendario.buscar_programa" | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+          <input matInput [(ngModel)]="filtroProgramas" [ngModelOptions]="{standalone: true}" />
+        </mat-form-field>
+      </div>
 
-        <section class="program-panel available">
-          <div class="program-panel-header">
-            <h4>{{ "calendario.programas_disponibles" | translate }}</h4>
-            <button mat-button color="accent" type="button" (click)="seleccionarProgramasDisponiblesFiltrados()" [disabled]="programasDisponiblesFiltrados().length === 0">
-              {{ "calendario.masivo_seleccionar_todos_programas" | translate }}
+      <div class="listas-programas">
+        <section class="panel-programas">
+          <header class="cabecera-lista">
+            <span class="titulo-lista">
+              {{ "calendario.programas_disponibles" | translate }}
+              <span class="contador-lista">{{ programasDisponiblesFiltrados().length }}</span>
+            </span>
+            <button
+              mat-button
+              type="button"
+              class="boton-agregar-todos"
+              (click)="seleccionarProgramasDisponiblesFiltrados()"
+              [disabled]="programasDisponiblesFiltrados().length === 0"
+              >
+              <mat-icon>playlist_add</mat-icon>
+              {{ "calendario.agregar_todos" | translate }}
             </button>
-          </div>
-          <mat-form-field appearance="outline" class="program-search">
-            <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
-            <input matInput [(ngModel)]="filtroProgramasDisponibles" [ngModelOptions]="{standalone: true}" />
-          </mat-form-field>
-          <div class="program-list">
-            @for (project of programasDisponiblesFiltrados(); track project) {
-              <div class="program-item">
-                <mat-checkbox [checked]="false" (change)="togglePrograma(project.Id, $event.checked)">
-                  {{ project.Nombre }}
-                </mat-checkbox>
-              </div>
+          </header>
+          <div class="lista-programas">
+            @for (project of programasDisponiblesFiltrados(); track project.Id) {
+              <button
+                type="button"
+                class="fila-programa"
+                [class.retirado]="seRetirara(project.Id)"
+                (click)="togglePrograma(project.Id, true)"
+                [attr.aria-label]="(seRetirara(project.Id) ? 'calendario.deshacer' : 'calendario.agregar_programa') | translate"
+                >
+                <span class="texto-programa">
+                  <span class="nombre-programa">{{ project.Nombre }}</span>
+                  @if (seRetirara(project.Id)) {
+                    <span class="etiqueta-cambio retiro">{{ "calendario.etiqueta_se_retirara" | translate }}</span>
+                  } @else if (nombreFacultad(project)) {
+                    <small class="facultad-programa">{{ nombreFacultad(project) }}</small>
+                  }
+                </span>
+                <mat-icon class="icono-accion agregar" [matTooltip]="(seRetirara(project.Id) ? 'calendario.deshacer' : 'calendario.agregar_programa') | translate">
+                  {{ seRetirara(project.Id) ? "undo" : "add_circle_outline" }}
+                </mat-icon>
+              </button>
             }
             @if (programasDisponiblesFiltrados().length === 0) {
-              <p class="empty-list">
+              <p class="lista-vacia">
+                <mat-icon>search_off</mat-icon>
                 {{ "calendario.sin_programas_disponibles" | translate }}
               </p>
             }
           </div>
         </section>
+
+        <section class="panel-programas asociados">
+          <header class="cabecera-lista">
+            <span class="titulo-lista">
+              {{ "calendario.programas_asociados_titulo" | translate }}
+              <span class="contador-lista activo">{{ programasAsociadosFiltrados().length }}</span>
+            </span>
+            <button
+              mat-button
+              type="button"
+              class="boton-quitar-todos"
+              (click)="deseleccionarProgramasAsociadosFiltrados()"
+              [disabled]="programasAsociadosFiltrados().length === 0"
+              >
+              <mat-icon>playlist_remove</mat-icon>
+              {{ "calendario.quitar_todos" | translate }}
+            </button>
+          </header>
+          <div class="lista-programas">
+            @for (project of programasAsociadosFiltrados(); track project.Id) {
+              <button
+                type="button"
+                class="fila-programa"
+                (click)="togglePrograma(project.Id, false)"
+                [attr.aria-label]="'calendario.quitar_programa' | translate"
+                >
+                <span class="texto-programa">
+                  <span class="nombre-programa">{{ project.Nombre }}</span>
+                  @if (esNuevo(project.Id)) {
+                    <span class="etiqueta-cambio nuevo">{{ "calendario.etiqueta_nuevo" | translate }}</span>
+                  } @else if (nombreFacultad(project)) {
+                    <small class="facultad-programa">{{ nombreFacultad(project) }}</small>
+                  }
+                </span>
+                <mat-icon class="icono-accion quitar" [matTooltip]="'calendario.quitar_programa' | translate">
+                  remove_circle_outline
+                </mat-icon>
+              </button>
+            }
+            @if (programasAsociadosFiltrados().length === 0) {
+              <p class="lista-vacia">
+                <mat-icon>playlist_add</mat-icon>
+                {{ "calendario.sin_programas_asociados" | translate }}
+              </p>
+            }
+          </div>
+        </section>
       </div>
+
+      @if (totalRetirados() > 0) {
+        <div class="aviso-retiro">
+          <mat-icon>warning_amber</mat-icon>
+          <span>
+            @if (idsSeleccionados().length === 0) {
+              {{ "calendario.calendario_sin_programas_alerta" | translate }}
+            } @else {
+              {{ "calendario.aviso_retiro_programas" | translate:{ total: totalRetirados() } }}
+            }
+          </span>
+        </div>
+      }
     </form>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="sga-modal-actions">
-    <button mat-button type="button" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
-    <button mat-flat-button color="accent" type="button" (click)="register()">{{ "GLOBAL.guardar" | translate }}</button>
+  <mat-dialog-actions class="sga-modal-actions acciones-programas">
+    <span class="resumen-cambios">
+      {{ "calendario.resumen_programas" | translate:{ asociados: idsSeleccionados().length, nuevos: totalNuevos(), retirados: totalRetirados() } }}
+    </span>
+    <div class="botones-programas">
+      <button mat-flat-button type="button" class="boton-cancelar" (click)="closeDialog()">{{ "GLOBAL.cancelar" | translate }}</button>
+      <button mat-flat-button type="button" class="boton-guardar" [disabled]="!hayCambios()" (click)="register()">
+        {{ "calendario.guardar_cambios" | translate }}
+      </button>
+    </div>
   </mat-dialog-actions>
 </section>

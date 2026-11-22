@@ -32,6 +32,8 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
   bloqueadasDesasociacion: any[] = [];
   validacionesPorActividad = new Map<number, any>();
   operacionTabIndex = 0;
+  mostrarDetalle = false;
+  mostrarBloqueadas = false;
   validando = false;
   actualizando = false;
   actualizado = false;
@@ -267,6 +269,24 @@ export class GestionMasivaActividadesProgramasComponent implements OnInit {
 
   totalAsociacionesExistentes(): number {
     return this.totalAsociaciones;
+  }
+
+  operacionActual(): 'asociar' | 'desasociar' {
+    return this.operacionTabIndex === 0 ? 'asociar' : 'desasociar';
+  }
+
+  procesosOperacion(): any[] {
+    return this.operacionActual() === 'asociar' ? this.procesosCandidatosAsociar : this.procesosCandidatosDesasociar;
+  }
+
+  seleccionadasEnProceso(proceso: any): number {
+    const operacion = this.operacionActual();
+    return (proceso?.actividadesCandidatas || []).filter((actividad: any) => this.actividadSeleccionada(actividad, operacion)).length;
+  }
+
+  alternarActividad(actividad: any) {
+    const operacion = this.operacionActual();
+    this.toggleActividad(actividad, !this.actividadSeleccionada(actividad, operacion), operacion);
   }
 
   onOperacionTabChange(index: number) {

@@ -51,8 +51,8 @@
         </div>
         @if (!readOnly) {
           <button
-            mat-flat-button
-            color="accent"
+            mat-stroked-button
+            class="boton-secundario"
             type="button"
             data-testid="manage-activity-programs"
             (click)="managePrograms()"
@@ -76,8 +76,7 @@
         @if (!readOnly && dependencias.length > 0 && !showEditor) {
           <button
             mat-flat-button
-            class="create-extension-button"
-            color="accent"
+            class="create-extension-button boton-primario"
             type="button"
             data-testid="create-extension"
             (click)="openCreateExtension()"
@@ -103,11 +102,13 @@
             </h3>
           </div>
           <button
-            mat-button
+            mat-stroked-button
+            class="boton-cancelar-edicion"
             type="button"
             [disabled]="saving"
             (click)="cancelEditExtension()"
             >
+            <mat-icon fontIcon="close"></mat-icon>
             {{ "GLOBAL.cancelar" | translate }}
           </button>
         </header>
@@ -123,10 +124,12 @@
                   </div>
                   @if (extensionMode === 'create') {
                     <div class="selection-actions">
-                      <button mat-button color="primary" type="button" (click)="selectAllPrograms()">
+                      <button mat-button class="boton-texto-azul" type="button" (click)="selectAllPrograms()">
+                        <mat-icon fontIcon="done_all"></mat-icon>
                         {{ "calendario.seleccionar_todos" | translate }}
                       </button>
-                      <button mat-button type="button" (click)="clearPrograms()">
+                      <button mat-button class="boton-texto-rojo" type="button" (click)="clearPrograms()">
+                        <mat-icon fontIcon="clear_all"></mat-icon>
                         {{ "GLOBAL.Limpiar" | translate }}
                       </button>
                     </div>
@@ -301,7 +304,7 @@
                     <div class="upload-field">
                       <span>{{ "calendario.documento_soporte_opcional" | translate }}</span>
                       <div class="upload-actions">
-                        <button mat-stroked-button color="primary" type="button" (click)="extensionFileInput.click()">
+                        <button mat-stroked-button class="boton-subir" type="button" (click)="extensionFileInput.click()">
                           <mat-icon fontIcon="attach_file"></mat-icon>
                           {{ extensionFile ? ("calendario.cambiar_documento_soporte" | translate) : ("calendario.subir_documento_soporte" | translate) }}
                         </button>
@@ -356,7 +359,7 @@
                     </div>
                     <button
                       mat-flat-button
-                      color="accent"
+                      class="boton-confirmar"
                       type="submit"
                       data-testid="save-extension"
                       [disabled]="!canReviewExtension() || saving"
@@ -407,71 +410,87 @@
               class="extension-record"
               [class.current]="extensionHasCurrentPrograms(extension)"
               >
-              <div class="record-number">
-                <span>#{{ extension.NumeroExtension || extensionId(extension) }}</span>
-                <small>{{ "calendario.extension" | translate }}</small>
-              </div>
-              <div class="record-main">
-                <div class="record-heading">
-                  <strong>{{ formatExtensionDate(extension.FechaFin) }}</strong>
-                  <span
-                    class="status-pill"
-                    [class.current]="extensionIsFullyCurrent(extension)"
-                    [class.partial]="extensionIsPartiallyCurrent(extension)"
-                    >
-                    {{
-                    extensionIsFullyCurrent(extension)
-                    ? ("calendario.extension_vigente" | translate)
-                    : extensionIsPartiallyCurrent(extension)
-                    ? ("calendario.extension_vigente_parcial" | translate)
-                    : ("calendario.extension_no_vigente" | translate)
-                    }}
-                  </span>
+              <header class="record-top">
+                <span class="record-badge">
+                  <mat-icon>more_time</mat-icon>
+                  {{ "calendario.extension" | translate }} #{{ extension.NumeroExtension || extensionId(extension) }}
+                </span>
+                <span
+                  class="status-pill"
+                  [class.current]="extensionIsFullyCurrent(extension)"
+                  [class.partial]="extensionIsPartiallyCurrent(extension)"
+                  >
+                  {{
+                  extensionIsFullyCurrent(extension)
+                  ? ("calendario.extension_vigente" | translate)
+                  : extensionIsPartiallyCurrent(extension)
+                  ? ("calendario.extension_vigente_parcial" | translate)
+                  : ("calendario.extension_no_vigente" | translate)
+                  }}
+                </span>
+                <div class="record-actions">
+                  @if (extension.DocumentoId) {
+                    <button
+                      mat-icon-button
+                      class="icono-descargar"
+                      type="button"
+                      [disabled]="downloadingDocumentId === extension.DocumentoId"
+                      (click)="downloadExtensionFile(extension.DocumentoId)"
+                      [attr.aria-label]="'calendario.descargar_documento_soporte' | translate"
+                      [matTooltip]="'calendario.descargar_documento_soporte' | translate"
+                      >
+                      <mat-icon fontIcon="cloud_download"></mat-icon>
+                    </button>
+                  }
+                  @if (!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)) {
+                    <button
+                      mat-icon-button
+                      class="icono-editar"
+                      type="button"
+                      [disabled]="saving"
+                      (click)="startEditExtension(extension)"
+                      [attr.aria-label]="'GLOBAL.editar' | translate"
+                      [matTooltip]="'GLOBAL.editar' | translate"
+                      >
+                      <mat-icon fontIcon="edit"></mat-icon>
+                    </button>
+                  }
+                  @if (!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)) {
+                    <button
+                      mat-icon-button
+                      class="icono-anular"
+                      type="button"
+                      [disabled]="saving"
+                      (click)="deleteExtension(extension)"
+                      [attr.aria-label]="'calendario.anular_extension' | translate"
+                      [matTooltip]="'calendario.anular_extension' | translate"
+                      >
+                      <mat-icon fontIcon="block"></mat-icon>
+                    </button>
+                  }
                 </div>
-                <p>{{ extensionDependencyNames(extension) }}</p>
-                <small>{{ extension.Descripcion || ("calendario.sin_descripcion" | translate) }}</small>
+              </header>
+              <div class="record-body">
+                <div class="record-date">
+                  <span class="record-label">{{ "calendario.fecha_fin_extension" | translate }}</span>
+                  <strong>
+                    <mat-icon>event</mat-icon>
+                    {{ formatExtensionDate(extension.FechaFin) }}
+                  </strong>
+                </div>
+                <div class="record-programs">
+                  <span class="record-label">{{ "calendario.programas_academicos" | translate }}</span>
+                  <div class="record-program-list">
+                    @for (nombre of extensionDependencyList(extension); track $index) {
+                      <span class="record-program">{{ nombre }}</span>
+                    }
+                  </div>
+                </div>
               </div>
-              <div class="record-actions">
-                @if (extension.DocumentoId) {
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    [disabled]="downloadingDocumentId === extension.DocumentoId"
-                    (click)="downloadExtensionFile(extension.DocumentoId)"
-                    [attr.aria-label]="'calendario.descargar_documento_soporte' | translate"
-                    [matTooltip]="'calendario.descargar_documento_soporte' | translate"
-                    >
-                    <mat-icon fontIcon="cloud_download"></mat-icon>
-                  </button>
-                }
-                @if (!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)) {
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    [disabled]="saving"
-                    (click)="startEditExtension(extension)"
-                    [attr.aria-label]="'GLOBAL.editar' | translate"
-                    [matTooltip]="'GLOBAL.editar' | translate"
-                    >
-                    <mat-icon fontIcon="edit"></mat-icon>
-                  </button>
-                }
-                @if (!readOnly && extensionId(extension) && extensionIsFullyCurrent(extension)) {
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    type="button"
-                    [disabled]="saving"
-                    (click)="deleteExtension(extension)"
-                    [attr.aria-label]="'calendario.anular_extension' | translate"
-                    [matTooltip]="'calendario.anular_extension' | translate"
-                    >
-                    <mat-icon fontIcon="block"></mat-icon>
-                  </button>
-                }
-              </div>
+              <p class="record-description" [class.empty]="!extension.Descripcion">
+                <mat-icon>notes</mat-icon>
+                {{ extension.Descripcion || ("calendario.sin_descripcion" | translate) }}
+              </p>
             </article>
           }
         </div>
@@ -480,7 +499,7 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="dialog-actions sga-modal-actions">
-    <button mat-button type="button" [disabled]="saving" (click)="closeDialog()">
+    <button mat-flat-button type="button" class="boton-cerrar-dialogo" [disabled]="saving" (click)="closeDialog()">
       {{ "GLOBAL.cerrar" | translate }}
     </button>
   </mat-dialog-actions>

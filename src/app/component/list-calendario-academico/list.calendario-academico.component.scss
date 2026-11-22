@@ -10,12 +10,104 @@
   padding: 0.5rem;
   border-radius: 0.25rem;
   margin-bottom: 0.3rem;
+  text-align: center;
 }
+
 .status-indicator.active {
   color: white;
   background-color: var(--success-accent);
 }
+
 .status-indicator.inactive {
   color: white;
   background-color: var(--danger-base);
+}
+
+th {
+  font-weight: bold;
+}
+
+.encabezado-centrado ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+mat-toolbar {
+  align-items: center;
+  justify-content: center;
+}
+
+.icono-agregar {
+  color: white;
+}
+
+.filtro {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.contenedor-tabla {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.full-width-table {
+  width: 100%;
+}
+
+.contenedor-acciones {
+  text-align: center;
+}
+
+.boton-acciones {
+  border: 0;
+  cursor: pointer;
+}
+
+.paginador {
+  margin-top: 30px;
+}
+
+.icono-ver {
+  color: #03678f !important;
+}
+
+.icono-programas {
+  color: #6a4c93 !important;
+}
+
+.icono-clonar {
+  color: #c0a318 !important;
+}
+
+.icono-editar {
+  color: var(--others-accent) !important;
+}
+
+.icono-activar {
+  color: var(--success-accent) !important;
+}
+
+.icono-desactivar {
+  color: var(--danger-accent) !important;
+}
+
+th.encabezado-centrado {
+  text-align: center;
+}
+
+.full-width-table ::ng-deep .mat-sort-header-arrow {
+  opacity: 0.3 !important;
+  color: #02547c;
+}
+
+.full-width-table ::ng-deep .mat-sort-header:hover .mat-sort-header-arrow {
+  opacity: 0.6 !important;
+}
+
+.full-width-table ::ng-deep .mat-sort-header-sorted .mat-sort-header-arrow {
+  opacity: 1 !important;
+}
+
+.full-width-table ::ng-deep .mat-sort-header-sorted .mat-sort-header-content {
+  color: #03678f;
 }

@@ -1,15 +1,5 @@
 @import 'assets/styles/sga-sweetalert2/sga-sweetalert2.scss';
 
-// Above CDK dialogs (1000) and below SweetAlert (1060).
-spinner-util .overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
-  z-index: 1050 !important;
-}
-
 .sga-modal-panel {
   --mat-dialog-container-shape: 12px;
   --color100: #e1edf2;
@@ -35,17 +25,16 @@ spinner-util .overlay {
   height: 100%;
   min-height: 0;
   color: #1f2937;
-  background: #f8fafb;
+  background: #fff;
 }
 
 .sga-modal-header {
   display: flex;
   flex: 0 0 auto;
-  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 2px solid var(--primary, #03678f);
+  align-items: center;
+  padding: 1rem 1.5rem 0.5rem;
   background: #fff;
 }
 
@@ -89,7 +78,7 @@ spinner-util .overlay {
   padding: 1.25rem 1.5rem !important;
   overflow-x: hidden;
   overflow-y: auto;
-  background: #f8fafb;
+  background: #fff;
 }
 
 .sga-modal-actions {
@@ -99,8 +88,7 @@ spinner-util .overlay {
   gap: 0.5rem;
   min-height: 3.75rem;
   margin: 0;
-  padding: 0.6rem 1.5rem !important;
-  border-top: 1px solid var(--color200, #e2e8f0);
+  padding: 0.6rem 1.5rem 1rem !important;
   background: #fff;
 }
 
@@ -164,4 +152,68 @@ spinner-util .overlay {
 
 .activity-edit-dialog .mat-mdc-dialog-content {
   max-height: 86vh;
+}
+
+.pestanas-destacadas {
+  --mat-tab-divider-color: #d6e5ec;
+  --mat-tab-divider-height: 1px;
+  --mat-tab-active-indicator-color: #03678f;
+  --mat-tab-active-hover-indicator-color: #03678f;
+  --mat-tab-active-focus-indicator-color: #03678f;
+  --mat-tab-active-indicator-height: 3px;
+  --mat-tab-active-indicator-shape: 3px 3px 0 0;
+  --mat-tab-label-text-weight: 600;
+  --mat-tab-inactive-label-text-color: #5f7d8c;
+  --mat-tab-inactive-hover-label-text-color: #02547c;
+  --mat-tab-inactive-focus-label-text-color: #02547c;
+  --mat-tab-active-label-text-color: #02547c;
+  --mat-tab-active-hover-label-text-color: #02547c;
+  --mat-tab-active-focus-label-text-color: #02547c;
+}
+
+.pestanas-destacadas > .mat-mdc-tab-header .mdc-tab {
+  border-radius: 8px 8px 0 0;
+  transition: background-color 0.2s;
+}
+
+.pestanas-destacadas > .mat-mdc-tab-header .mdc-tab:not(.mdc-tab--active):hover {
+  background-color: #f0f6f9;
+}
+
+.pestanas-destacadas > .mat-mdc-tab-header .mdc-tab--active {
+  background-color: #f0f6f9;
+}
+
+.aviso-sin-programas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 560px;
+  margin: 48px auto;
+  padding: 32px 24px;
+  border: 2px dashed #b3d1dd;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.aviso-sin-programas mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #03678f;
+}
+
+.aviso-sin-programas h3 {
+  margin: 0;
+  color: #02547c;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.aviso-sin-programas p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }

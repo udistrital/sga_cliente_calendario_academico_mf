@@ -1,0 +1,8 @@
+@if (cargando$ | async) {
+  <div class="fondo-cargando" role="status" aria-live="polite">
+    <div class="tarjeta-cargando">
+      <div class="rueda"></div>
+      <span class="texto-cargando">{{ 'GLOBAL.cargando' | translate }}</span>
+    </div>
+  </div>
+}

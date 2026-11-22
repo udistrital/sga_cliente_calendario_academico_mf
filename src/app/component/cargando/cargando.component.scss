@@ -1,0 +1,41 @@
+.fondo-cargando {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.tarjeta-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 180px;
+  padding: 28px 36px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.rueda {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #e1edf2;
+  border-top-color: #03678f;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+.texto-cargando {
+  font-weight: 500;
+  color: #02547c;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

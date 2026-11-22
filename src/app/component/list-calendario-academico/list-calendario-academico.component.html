@@ -14,7 +14,19 @@
           <mat-card>
             <mat-card-content>
               <!-- BUSCADOR Y BOTON -->
-              <mat-form-field class="form-field">
+              <mat-toolbar>
+                <button
+                  mat-mini-fab
+                  color="accent"
+                  (click)="onCreate($event)"
+                  [matTooltip]="
+                    'calendario.tooltip_crear' | translate
+                  "
+                >
+                  <mat-icon class="icono-agregar">add</mat-icon>
+                </button>
+              </mat-toolbar>
+              <mat-form-field class="filtro">
                 <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
                 <input
                   matInput
@@ -24,19 +36,7 @@
                 />
               </mat-form-field>
               <!-- TABLA -->
-              <div class="table">
-                <mat-toolbar>
-                  <button
-                    mat-icon-button
-                    color="accent"
-                    (click)="onCreate($event)"
-                    [matTooltip]="
-                      'calendario.tooltip_crear' | translate
-                    "
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </mat-toolbar>
+              <div class="contenedor-tabla">
                 <table
                   mat-table
                   [dataSource]="dataSource"
@@ -67,7 +67,7 @@
                   </ng-container>
 
                   <ng-container matColumnDef="Estado">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="encabezado-centrado">
                       {{ "calendario.estado" | translate }}
                     </th>
                     <td mat-cell *matCellDef="let row">
@@ -78,20 +78,21 @@
                           inactive: !row.Activo
                         }"
                       >
-                        {{ row.Activo ? "Activo" : "Inactivo" }}
+                        {{ (row.Activo ? "GLOBAL.activo" : "GLOBAL.inactivo") | translate }}
                       </div>
+                    </td>
                   </ng-container>
 
                   <ng-container matColumnDef="Acciones">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <th mat-header-cell *matHeaderCellDef class="encabezado-centrado">
                       {{ "GLOBAL.acciones" | translate }}
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td mat-cell *matCellDef="let row" class="contenedor-acciones">
                       <button
                         mat-icon-button
+                        class="boton-acciones"
                         [matMenuTriggerFor]="menu"
                         [matTooltip]="'GLOBAL.acciones' | translate"
-                        color="accent"
                       >
                         <mat-icon>more_vert</mat-icon>
                       </button>
@@ -106,10 +107,7 @@
                             })
                           "
                         >
-                          <mat-icon
-                            fontIcon="visibility"
-                            color="accent"
-                          ></mat-icon>
+                          <mat-icon class="icono-ver" fontIcon="visibility"></mat-icon>
                           <span>{{
                             "calendario.tooltip_detalle" | translate
                           }}</span>
@@ -118,10 +116,7 @@
                           mat-menu-item
                           (click)="onAction({ action: 'assign', data: row })"
                         >
-                          <mat-icon
-                            fontIcon="extension"
-                            color="accent"
-                          ></mat-icon>
+                          <mat-icon class="icono-programas" fontIcon="extension"></mat-icon>
                           <span>{{
                             "calendario.tooltip_asignar_proyecto" | translate
                           }}</span>
@@ -130,10 +125,7 @@
                           mat-menu-item
                           (click)="onAction({ action: 'clone', data: row })"
                         >
-                          <mat-icon
-                            fontIcon="content_copy"
-                            color="accent"
-                          ></mat-icon>
+                          <mat-icon class="icono-clonar" fontIcon="content_copy"></mat-icon>
                           <span>{{
                             "calendario.tooltip_clonar" | translate
                           }}</span>
@@ -148,7 +140,7 @@
                             })
                           "
                         >
-                          <mat-icon fontIcon="edit" color="accent"></mat-icon>
+                          <mat-icon class="icono-editar" fontIcon="edit"></mat-icon>
                           <span>{{
                             "calendario.tooltip_editar" | translate
                           }}</span>
@@ -158,11 +150,14 @@
                           (click)="onAction({ action: 'delete', data: row })"
                         >
                           <mat-icon
-                            [fontIcon]="row.Activo ? 'unpublished' : 'restore'"
-                            [color]="row.Activo ? 'warn' : 'accent'"
+                            [ngClass]="row.Activo ? 'icono-desactivar' : 'icono-activar'"
+                            [fontIcon]="row.Activo ? 'unpublished' : 'check_circle'"
                           ></mat-icon>
                           <span>{{
-                            "calendario.tooltip_estado_calendario" | translate
+                            (row.Activo
+                              ? "calendario.tooltip_desactivar_calendario"
+                              : "calendario.tooltip_activar_calendario"
+                            ) | translate
                           }}</span>
                         </button>
                       </mat-menu>
@@ -177,13 +172,14 @@
 
                   <!-- Row shown when there is no matching data. -->
                   <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" colspan="4">
+                    <td class="mat-cell" colspan="5">
                       {{ "calendario.sin_procesos" | translate }}
                     </td>
                   </tr>
                 </table>
                 <mat-paginator
                   #paginator
+                  class="paginador"
                   [pageSize]="6"
                   [showFirstLastButtons]="true"
                 ></mat-paginator>
@@ -200,14 +196,9 @@
                 [calendarForNew]="calendarForNew"
                 (newCalendar)="actualizarListadoCalendarios()"
                 (calendarCloneOut)="recargarDespuesClon($event)"
+                (regresar)="activateTab()"
               ></def-calendario-academico>
             </mat-card-content>
-            <mat-card-actions>
-              <button mat-flat-button color="primary" (click)="activateTab()">
-                <mat-icon>arrow_back</mat-icon>
-                {{ "GLOBAL.regresar" | translate }}
-              </button>
-            </mat-card-actions>
           </mat-card>
         </mat-tab>
       </mat-tab-group>

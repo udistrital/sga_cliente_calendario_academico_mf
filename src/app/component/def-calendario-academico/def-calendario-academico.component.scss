@@ -10,23 +10,279 @@
 
 /* Estilos para el indicador de estado */
 .badge {
+  flex-shrink: 0;
   margin: 0.4em;
   width: 0.5em;
   height: 0.5em;
   border-radius: 100%;
+  background-color: var(--danger-base);
+}
+
+.badge.activo {
+  background-color: var(--success-accent);
+}
+
+.opcion-periodo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.vigencia-periodo {
+  margin-left: 5px;
+  font-size: 0.8em;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 8px 8px;
+}
+
+.titulo {
+  margin: 0 0 20px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #02547c;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.campos mat-form-field {
+  width: 100%;
+}
+
+.subtitulo {
+  margin: 8px 0 12px;
+  padding-left: 8px;
+  border-left: 4px solid #03678f;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #02547c;
+}
+
+.zona-archivo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  background-color: #fafafa;
+  text-align: center;
+}
+
+.zona-archivo.con-archivo {
+  border-color: #03678f;
+  background-color: #f0f6f9;
+}
+
+.icono-subir {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.con-archivo .icono-subir {
+  color: #03678f;
+}
+
+.sin-archivo {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.archivo-seleccionado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 12px;
+  border: 1px solid #03678f;
+  border-radius: 20px;
+  background-color: white;
+}
+
+.archivo-seleccionado:has(.boton-quitar) {
+  padding-right: 4px;
+}
+
+.icono-archivo {
+  flex-shrink: 0;
+  color: #03678f;
+}
+
+.nombre-archivo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #02547c;
+  font-weight: 500;
+}
+
+.boton-quitar {
+  flex-shrink: 0;
+  color: var(--danger-accent);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.boton-regresar {
+  --mat-button-outlined-label-text-color: #145a95;
+  --mat-button-outlined-outline-color: #145a95;
+  --mat-button-outlined-state-layer-color: #145a95;
+  --mat-button-outlined-ripple-color: rgba(20, 90, 149, 0.12);
+  background-color: #e3ebf2;
+}
+
+.boton-guardar {
+  --mat-button-filled-container-color: #03678f;
+  --mat-button-filled-label-text-color: white;
+  --mat-button-filled-state-layer-color: white;
+  --mat-button-filled-ripple-color: rgba(255, 255, 255, 0.2);
+  --mat-button-filled-disabled-container-color: rgba(3, 103, 143, 0.35);
+  --mat-button-filled-disabled-label-text-color: white;
+}
+
+.titulo-procesos {
+  margin: 24px 0 8px;
+  padding: 0 8px;
+}
+
+.descripcion {
+  margin: 0 0 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.opciones-modo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0 8px;
+}
+
+.opcion-modo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background-color: white;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.opcion-modo:hover,
+.opcion-modo:focus-visible {
+  border-color: #03678f;
+  box-shadow: 0 2px 8px rgba(3, 103, 143, 0.15);
+  outline: none;
+}
+
+.opcion-modo.seleccionada {
+  border-color: #03678f;
+  background-color: #f0f6f9;
+}
+
+.icono-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #e1edf2;
+  color: #03678f;
+}
+
+.texto-opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.texto-opcion b {
+  color: #02547c;
+  font-weight: 600;
+}
+
+.texto-opcion small {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.8125rem;
+}
+
+.panel-clonar {
+  margin: 16px 8px 0;
+  padding: 16px 16px 8px;
+  border: 1px solid #b3d1dd;
+  border-radius: 12px;
+  background-color: #f0f6f9;
+}
+
+.panel-clonar .subtitulo {
+  margin-top: 0;
+}
+
+.pie-clonar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.nota-clonar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #02547c;
+  font-size: 0.8125rem;
+}
+
+.nota-clonar mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 768px) {
+  .campos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .opciones-modo {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .activity-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 5.5rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 999px;
+  display: inline-block;
+  min-width: 72px;
+  padding: 2px 10px;
+  border-radius: 12px;
   color: white;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .activity-status.active {
@@ -68,4 +324,526 @@
 .extension-count-badge.empty {
   color: #4f5965;
   background: #edf2f7;
+}
+
+$fondo-claro: #f0f6f9;
+
+.table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table .mat-mdc-table {
+  width: 100%;
+}
+
+th.mat-mdc-header-cell {
+  background-color: $fondo-claro;
+  color: #02547c;
+  font-weight: 600;
+}
+
+.encabezado-centrado ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+.celda-estado {
+  text-align: center;
+}
+
+.icono-activar {
+  color: var(--success-accent) !important;
+}
+
+.icono-desactivar {
+  color: var(--danger-accent) !important;
+}
+
+.barra-procesos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.buscador-procesos {
+  flex: 1 1 280px;
+}
+
+.barra-procesos .boton-guardar {
+  height: 48px;
+  margin-top: 4px;
+}
+
+.icono-buscar {
+  margin: 0 4px 0 12px;
+  color: #03678f;
+}
+
+.lista-procesos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.tarjeta-proceso {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #d6e5ec;
+  border-radius: 12px;
+  background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tarjeta-proceso:hover {
+  border-color: #81b3c7;
+  box-shadow: 0 4px 12px rgba(3, 103, 143, 0.12);
+}
+
+.tarjeta-proceso.inactivo {
+  background-color: #fafafa;
+}
+
+.tarjeta-proceso.inactivo .icono-proceso {
+  background-color: #eeeeee;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.tarjeta-proceso.inactivo .nombre-proceso,
+.tarjeta-proceso.inactivo .descripcion-proceso {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.cabecera-proceso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icono-proceso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e1edf2;
+  color: #03678f;
+}
+
+.icono-proceso mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.nombre-proceso {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #02547c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.descripcion-proceso {
+  display: -webkit-box;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.pie-proceso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #edf3f6;
+}
+
+.conteo-actividades {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #5f7d8c;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.conteo-actividades mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.boton-acciones-proceso {
+  color: #03678f;
+}
+
+.sin-procesos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px;
+  border: 2px dashed #b3d1dd;
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.9rem;
+}
+
+.sin-procesos mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #03678f;
+}
+
+.barra-masivo {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+
+.boton-masivo {
+  --mat-button-outlined-label-text-color: #145a95;
+  --mat-button-outlined-outline-color: #145a95;
+  --mat-button-outlined-state-layer-color: #145a95;
+}
+
+.sin-procesos-actividades {
+  margin-top: 20px;
+}
+
+.vista-actividades {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 0 8px;
+}
+
+.columna-procesos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.titulo-columna {
+  margin-bottom: 2px;
+  color: #5f7d8c;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.opcion-proceso {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d6e5ec;
+  border-radius: 10px;
+  background-color: white;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.opcion-proceso:hover,
+.opcion-proceso:focus-visible {
+  border-color: #81b3c7;
+  background-color: #f7fafc;
+  outline: none;
+}
+
+.opcion-proceso.seleccionado {
+  border-color: #03678f;
+  background-color: #e1edf2;
+}
+
+.fila-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nombre-opcion {
+  overflow: hidden;
+  color: #02547c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.opcion-proceso.inactivo .nombre-opcion {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.conteo-opcion {
+  color: #5f7d8c;
+  font-size: 0.75rem;
+}
+
+.panel-actividades {
+  min-width: 0;
+  padding: 16px 20px;
+  border: 1px solid #d6e5ec;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.cabecera-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.info-panel {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.info-panel h4 {
+  margin: 0;
+  color: #02547c;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.info-panel p {
+  margin: 2px 0 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.8125rem;
+}
+
+.aviso-inactivo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid #f3c5cf;
+  border-radius: 10px;
+  background-color: #fdf1f3;
+  color: #8a2b3d;
+  font-size: 0.8125rem;
+}
+
+.aviso-inactivo span {
+  flex: 1 1 200px;
+}
+
+.boton-activar {
+  --mat-button-outlined-label-text-color: var(--success-accent);
+  --mat-button-outlined-outline-color: var(--success-accent);
+  --mat-button-outlined-state-layer-color: var(--success-accent);
+  background-color: white;
+}
+
+.buscador-actividades {
+  width: 100%;
+}
+
+.lista-actividades {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila-actividad {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e3edf2;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fila-actividad:hover {
+  border-color: #b3d1dd;
+  box-shadow: 0 2px 8px rgba(3, 103, 143, 0.08);
+}
+
+.fila-actividad.inactiva {
+  background-color: #fafafa;
+}
+
+.fila-actividad.inactiva .nombre-actividad,
+.fila-actividad.inactiva .descripcion-actividad,
+.fila-actividad.inactiva .fechas-actividad {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.titulo-actividad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.nombre-actividad {
+  color: #02547c;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.estado-temporal {
+  padding: 1px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.estado-temporal.proxima {
+  background-color: #e1edf2;
+  color: #02547c;
+}
+
+.estado-temporal.en_curso {
+  background-color: #e6f2dc;
+  color: #3b6d11;
+}
+
+.estado-temporal.finalizada {
+  background-color: #eeeeee;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.descripcion-actividad {
+  margin: 4px 0 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.fechas-actividad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  color: #5f7d8c;
+  font-size: 0.8rem;
+}
+
+.fechas-actividad mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.barra-avance {
+  height: 4px;
+  max-width: 320px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background-color: #e3edf2;
+  overflow: hidden;
+}
+
+.barra-avance span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background-color: #03678f;
+}
+
+.acciones-actividad {
+  display: flex;
+  align-items: center;
+  color: #03678f;
+}
+
+.acciones-actividad button {
+  color: #03678f;
+}
+
+.boton-extensiones {
+  position: relative;
+}
+
+.contador-extensiones {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: #03678f;
+  color: white;
+  font-size: 0.65rem;
+  line-height: 16px;
+}
+
+.sin-actividades {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px;
+  border: 2px dashed #d6e5ec;
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.875rem;
+}
+
+.sin-actividades mat-icon {
+  font-size: 30px;
+  width: 30px;
+  height: 30px;
+  color: #81b3c7;
+}
+
+@media (max-width: 900px) {
+  .vista-actividades {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .columna-procesos {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .titulo-columna {
+    display: none;
+  }
+
+  .opcion-proceso {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 160px;
+  }
+
+  .fila-actividad {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

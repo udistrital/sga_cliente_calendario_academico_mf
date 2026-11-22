@@ -691,6 +691,10 @@ export class GestionExtensionesActividadComponent implements OnInit {
     return dependencia?.Nombre || `${this.t('calendario.programa_academico')} ${id}`;
   }
 
+  extensionDependencyList(extension: any): string[] {
+    return this.extensionDependencyIds(extension).map((id) => this.dependencyName(id));
+  }
+
   extensionDependencyNames(extension: any): string {
     const names = this.extensionDependencyIds(extension).map((id) => this.dependencyName(id));
     return names.join(', ') || '-';

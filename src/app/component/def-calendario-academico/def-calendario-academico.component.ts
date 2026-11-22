@@ -86,6 +86,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   calendarClone!: CalendarioClone;
   calendarioEvento: CalendarioEvento;
   activetabs: boolean = false;
+  indiceProceso = 0;
   activebutton: boolean = false;
   activetabsClone: boolean = false;
   //calendarForm!: FormGroup;
@@ -133,6 +134,8 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   calendarCloneOut = new EventEmitter<number>();
   @Output()
   newCalendar = new EventEmitter<void>();
+  @Output()
+  regresar = new EventEmitter<void>();
   private readonly destroy$ = new Subject<void>();
   private loadCalendarVersion = 0;
 
@@ -375,6 +378,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
                 this.dataSource = new MatTableDataSource(this.processes);
                 this.datasourceActivity = new MatTableDataSource<Actividad>();
               }
+              this.agregarProcesosSinActividades(loadVersion);
               this.calendarForm.patchValue({
                 resolucion: this.calendar.resolucion,
                 anno: this.calendar.anno,
@@ -421,13 +425,104 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
     }
   }
 
+  agregarProcesosSinActividades(loadVersion: number) {
+    const calendarioId = this.calendar.calendarioId;
+    this.eventoService.get('proceso?query=CalendarioID__Id:' + calendarioId + '&limit=0').subscribe(
+      (procesos: any) => {
+        if (loadVersion !== this.loadCalendarVersion || !Array.isArray(procesos)) {
+          return;
+        }
+        const idsCargados = new Set(this.processes.map((proceso: Proceso) => Number(proceso.procesoId)));
+        const faltantes = procesos.filter((proceso: any) => proceso && proceso.Id && !idsCargados.has(Number(proceso.Id)));
+        if (faltantes.length === 0) {
+          return;
+        }
+        faltantes.forEach((proceso: any) => {
+          const procesoSinActividades = new Proceso();
+          const tipoRecurrenciaId = proceso.TipoRecurrenciaId?.Id ?? proceso.TipoRecurrenciaId;
+          procesoSinActividades.procesoId = proceso.Id;
+          procesoSinActividades.Nombre = proceso.Nombre || proceso.ProcesoCatalogoId?.Nombre || '';
+          procesoSinActividades.Descripcion = proceso.Descripcion || proceso.ProcesoCatalogoId?.Descripcion || '';
+          procesoSinActividades.ProcesoCatalogoId = proceso.ProcesoCatalogoId;
+          procesoSinActividades.TipoRecurrenciaId = { Id: tipoRecurrenciaId };
+          procesoSinActividades.CalendarioId = { Id: calendarioId };
+          procesoSinActividades.Activo = proceso.Activo;
+          procesoSinActividades.actividades = new MatTableDataSource<Actividad>();
+          this.processes.push(procesoSinActividades);
+        });
+        this.dataSource = new MatTableDataSource(this.processes);
+      },
+      () => {},
+    );
+  }
+
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+    if (this.datasourceExtension) {
+      this.datasourceExtension.filter = filterValue.trim().toLowerCase();
+    }
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  indiceProcesoSeleccionado(): number {
+    return Math.min(this.indiceProceso, Math.max(this.processes.length - 1, 0));
+  }
+
+  procesoSeleccionado(): Proceso {
+    return this.processes[this.indiceProcesoSeleccionado()];
+  }
+
+  seleccionarProceso(indice: number) {
+    this.indiceProceso = indice;
+  }
+
+  actividadesOrdenadas(proceso: Proceso): Actividad[] {
+    return [...proceso.actividades.filteredData].sort(
+      (a: Actividad, b: Actividad) => this.fechaActividad(a.FechaInicio) - this.fechaActividad(b.FechaInicio)
+    );
+  }
+
+  fechaActividad(valor: any): number {
+    const fecha = moment(valor, ['DD/MM/YYYY HH:mm', moment.ISO_8601]);
+    return fecha.isValid() ? fecha.valueOf() : 0;
+  }
+
+  estadoTemporal(actividad: Actividad): string | null {
+    const inicio = this.fechaActividad(actividad.FechaInicio);
+    const fin = this.fechaActividad(actividad.FechaFin);
+    if (!inicio || !fin) {
+      return null;
+    }
+    const ahora = Date.now();
+    if (ahora < inicio) {
+      return 'proxima';
+    }
+    if (ahora > fin) {
+      return 'finalizada';
+    }
+    return 'en_curso';
+  }
+
+  avanceActividad(actividad: Actividad): number {
+    const inicio = this.fechaActividad(actividad.FechaInicio);
+    const fin = this.fechaActividad(actividad.FechaFin);
+    if (!inicio || !fin || fin <= inicio) {
+      return 0;
+    }
+    return Math.min(100, Math.max(0, Math.round(((Date.now() - inicio) * 100) / (fin - inicio))));
+  }
+
+  duracionDias(actividad: Actividad): number {
+    const inicio = this.fechaActividad(actividad.FechaInicio);
+    const fin = this.fechaActividad(actividad.FechaFin);
+    if (!inicio || !fin || fin < inicio) {
+      return 0;
+    }
+    return Math.max(1, Math.round((fin - inicio) / 86400000));
   }
 
   applyFilterActividades(event: Event, data: any, i: number) {
@@ -1032,7 +1127,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   addProcess(event: any) {
     const processConfig = new MatDialogConfig();
     processConfig.width = '800px';
-    processConfig.height = '400px';
     processConfig.maxWidth = '94vw';
     processConfig.maxHeight = '90vh';
     processConfig.panelClass = 'sga-modal-panel';
@@ -1058,6 +1152,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
             process.Activo = response.Data['Activo'];
             process.actividades = new MatTableDataSource<Actividad>();
             this.processes.push(process);
+            this.indiceProceso = this.processes.length - 1;
             this.addActivity(null, process);
             //this.processTable.load(this.processes);
 
@@ -1082,7 +1177,6 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   editProcess(event: any) {
     const processConfig = new MatDialogConfig();
     processConfig.width = '800px';
-    processConfig.height = '400px';
     processConfig.maxWidth = '94vw';
     processConfig.maxHeight = '90vh';
     processConfig.panelClass = 'sga-modal-panel';
@@ -1153,6 +1247,10 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   }
 
   addActivity(event: any, process: Proceso) {
+    if (process?.Activo === false) {
+      this.popUpManager.showErrorToast(this.translate.instant('calendario.proceso_inactivo_sin_actividades'));
+      return;
+    }
     const activityConfig = new MatDialogConfig();
     activityConfig.width = '1040px';
     activityConfig.maxWidth = '95vw';
@@ -1319,6 +1417,14 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
 
   cleanURL(oldURL: string): SafeResourceUrl {
     return this.sanitization.bypassSecurityTrustUrl(oldURL);
+  }
+
+  quitarResolucion(fileInput: HTMLInputElement) {
+    this.fileResolucion = null;
+    fileInput.value = '';
+    this.calendarForm.patchValue({
+      fileResolucion: '',
+    });
   }
 
   onInputFileResolucion(event: any) {
