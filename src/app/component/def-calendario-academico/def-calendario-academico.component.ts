@@ -53,9 +53,10 @@ import {
 } from '../gestion-extensiones-actividad/gestion-extensiones-actividad.component';
 
 @Component({
-  selector: 'def-calendario-academico',
-  templateUrl: './def-calendario-academico.component.html',
-  styleUrls: ['./def-calendario-academico.component.scss'],
+    selector: 'def-calendario-academico',
+    templateUrl: './def-calendario-academico.component.html',
+    styleUrls: ['./def-calendario-academico.component.scss'],
+    standalone: false
 })
 export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   fileResolucion: any;

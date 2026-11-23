@@ -8,9 +8,10 @@ import { PopUpManager } from 'src/app/managers/popUpManager';
 import { EventoService } from 'src/app/services/evento.service';
 
 @Component({
-  selector: 'proceso-calendario-academico',
-  templateUrl: './proceso-calendario-academico.component.html',
-  styleUrls: ['./proceso-calendario-academico.component.scss'],
+    selector: 'proceso-calendario-academico',
+    templateUrl: './proceso-calendario-academico.component.html',
+    styleUrls: ['./proceso-calendario-academico.component.scss'],
+    standalone: false
 })
 export class ProcesoCalendarioAcademicoComponent {
 

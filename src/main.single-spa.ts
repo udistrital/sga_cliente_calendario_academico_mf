@@ -1,9 +1,9 @@
-import { enableProdMode, NgZone } from '@angular/core';
+import { enableProdMode, NgZone, provideZoneChangeDetection } from '@angular/core';
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Router, NavigationStart } from '@angular/router';
 
-import { singleSpaAngular, getSingleSpaExtraProviders } from 'single-spa-angular';
+import { singleSpaAngular, provideSingleSpaPlatform } from 'single-spa-angular';
 
 
 
@@ -18,7 +18,7 @@ if (environment.production) {
 const lifecycles = singleSpaAngular({
   bootstrapFunction: singleSpaProps => {
     singleSpaPropsSubject.next(singleSpaProps);
-    return platformBrowserDynamic(getSingleSpaExtraProviders()).bootstrapModule(AppModule);
+    return platformBrowserDynamic(provideSingleSpaPlatform()).bootstrapModule(AppModule, { applicationProviders: [provideZoneChangeDetection()], });
   },
   template: '<sga-calendarioacademico-mf/>',
   Router,

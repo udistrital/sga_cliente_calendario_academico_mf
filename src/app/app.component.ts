@@ -9,7 +9,7 @@ import { getCookie } from 'src/utils/cookie';
     selector: 'sga-calendarioacademico-mf',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-
+    standalone: false
 })
 export class AppComponent implements OnInit {
   whatLang$ = fromEvent(window, 'lang');

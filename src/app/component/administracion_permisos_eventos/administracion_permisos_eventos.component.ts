@@ -28,9 +28,10 @@ interface RolGestionEventoCatalogo {
 }
 
 @Component({
-  selector: 'app-administracion-permisos-eventos',
-  templateUrl: './administracion_permisos_eventos.component.html',
-  styleUrls: ['./administracion_permisos_eventos.component.scss'],
+    selector: 'app-administracion-permisos-eventos',
+    templateUrl: './administracion_permisos_eventos.component.html',
+    styleUrls: ['./administracion_permisos_eventos.component.scss'],
+    standalone: false
 })
 export class AdministracionPermisosEventosComponent implements OnInit {
   eventoCatalogos: EventoCatalogoGestion[] = [];

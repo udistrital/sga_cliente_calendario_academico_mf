@@ -7,9 +7,10 @@ import { CalendarioActualizacionService } from 'src/app/services/calendario-actu
 import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService } from 'src/app/services/calendario-filtros-alcance.service';
 
 @Component({
-  selector: 'gestion-masiva-actividades-programas',
-  templateUrl: './gestion-masiva-actividades-programas.component.html',
-  styleUrls: ['./gestion-masiva-actividades-programas.component.scss'],
+    selector: 'gestion-masiva-actividades-programas',
+    templateUrl: './gestion-masiva-actividades-programas.component.html',
+    styleUrls: ['./gestion-masiva-actividades-programas.component.scss'],
+    standalone: false
 })
 export class GestionMasivaActividadesProgramasComponent implements OnInit {
   calendar: any;

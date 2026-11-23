@@ -8,9 +8,10 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { DialogPreviewFileComponent } from '../dialog-preview-file/dialog-preview-file.component';
 
 @Component({
-  selector: 'ngx-dinamicform',
-  templateUrl: './dinamicform.component.html',
-  styleUrls: ['./dinamicform.component.scss'],
+    selector: 'ngx-dinamicform',
+    templateUrl: './dinamicform.component.html',
+    styleUrls: ['./dinamicform.component.scss'],
+    standalone: false
 })
 
 export class DinamicformComponent implements OnInit, OnChanges {

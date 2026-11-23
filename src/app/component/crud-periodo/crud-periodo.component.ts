@@ -10,9 +10,10 @@ import { DinamicformComponent } from '../dinamicform/dinamicform.component';
 
 
 @Component({
-  selector: 'ngx-crud-periodo',
-  templateUrl: './crud-periodo.component.html',
-  styleUrls: ['./crud-periodo.component.scss'],
+    selector: 'ngx-crud-periodo',
+    templateUrl: './crud-periodo.component.html',
+    styleUrls: ['./crud-periodo.component.scss'],
+    standalone: false
 })
 export class CrudPeriodoComponent implements OnInit {
   @ViewChild(DinamicformComponent) dynamicForm!: DinamicformComponent;

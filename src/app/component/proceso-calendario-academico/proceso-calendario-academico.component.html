@@ -10,7 +10,7 @@
       (click)="closeDialog()"
       [attr.aria-label]="'GLOBAL.cerrar' | translate"
       [matTooltip]="'GLOBAL.cerrar' | translate"
-    >
+      >
       <mat-icon fontIcon="close"></mat-icon>
     </button>
   </header>
@@ -20,13 +20,17 @@
       <mat-form-field appearance="outline" floatLabel="always">
         <mat-label>*{{ "calendario.proceso" | translate }}</mat-label>
         <mat-select formControlName="ProcesoCatalogoId" required>
-          <mat-option *ngFor="let proceso of procesosCatalogo" [value]="proceso.Id">
-            {{ proceso.Nombre }}
-          </mat-option>
+          @for (proceso of procesosCatalogo; track proceso) {
+            <mat-option [value]="proceso.Id">
+              {{ proceso.Nombre }}
+            </mat-option>
+          }
         </mat-select>
-        <mat-error *ngIf="processForm.get('ProcesoCatalogoId')?.hasError('required') && processForm.get('ProcesoCatalogoId')?.touched">
-          {{ "calendario.error_nombre_proceso" | translate }}
-        </mat-error>
+        @if (processForm.get('ProcesoCatalogoId')?.hasError('required') && processForm.get('ProcesoCatalogoId')?.touched) {
+          <mat-error>
+            {{ "calendario.error_nombre_proceso" | translate }}
+          </mat-error>
+        }
       </mat-form-field>
 
       <div class="process-description">
@@ -37,13 +41,17 @@
       <mat-form-field appearance="outline" floatLabel="always">
         <mat-label>*{{ "calendario.periodicidad" | translate }}</mat-label>
         <mat-select formControlName="TipoRecurrenciaId" required>
-          <mat-option *ngFor="let period of periodicidad" [value]="period.Id">
-            {{ period.Nombre }}
-          </mat-option>
+          @for (period of periodicidad; track period) {
+            <mat-option [value]="period.Id">
+              {{ period.Nombre }}
+            </mat-option>
+          }
         </mat-select>
-        <mat-error *ngIf="processForm.get('TipoRecurrenciaId')?.hasError('required') && processForm.get('TipoRecurrenciaId')?.touched">
-          {{ "calendario.error_period_proceso" | translate }}
-        </mat-error>
+        @if (processForm.get('TipoRecurrenciaId')?.hasError('required') && processForm.get('TipoRecurrenciaId')?.touched) {
+          <mat-error>
+            {{ "calendario.error_period_proceso" | translate }}
+          </mat-error>
+        }
       </mat-form-field>
     </form>
   </mat-dialog-content>

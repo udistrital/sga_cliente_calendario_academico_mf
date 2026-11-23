@@ -14,9 +14,10 @@ import { forkJoin } from 'rxjs';
 // import { LocalDataSource } from 'ng2-smart-table';
 
 @Component({
-  selector: 'ngx-actividad-calendario-academico',
-  templateUrl: './actividad-calendario-academico.component.html',
-  styleUrls: ['./actividad-calendario-academico.component.scss'],
+    selector: 'ngx-actividad-calendario-academico',
+    templateUrl: './actividad-calendario-academico.component.html',
+    styleUrls: ['./actividad-calendario-academico.component.scss'],
+    standalone: false
 })
 export class ActividadCalendarioAcademicoComponent implements OnInit {
 
