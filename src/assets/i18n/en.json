@@ -68,6 +68,7 @@
         }
     },
     "GLOBAL": {
+        "limpiar": "Clear",
         "admitir": "Admit",
         "aspirantes_inscritos": "Enrolled Applicants",
         "click_aqui": "Click here",
@@ -1077,6 +1078,11 @@
         "fechas_particulares_fuera_rango": "Specific dates must be within the allowed range for the academic program.",
         "error_consultar_rango_programa": "Could not query the allowed range for the academic program. The global event range will be used.",
         "administracion_calendario_proyecto": "Academic calendar administration by curricular project",
+        "consulta_filtros_descripcion": "Choose the period, faculty, level and program to view its academic calendar.",
+        "consulta_sin_seleccion": "Select an academic program to see the processes and activities of its calendar.",
+        "consulta_sin_actividades": "This program has no activities assigned in the calendar.",
+        "resolucion_numero_anno": "Resolution {{numero}} of {{anno}}",
+        "sin_fechas_particulares_programa": "This program has no specific dates for this activity, so the global dates apply.",
         "hora_inicio": "Start time",
         "hora_fin": "End time",
         "extensiones": "Extensions",

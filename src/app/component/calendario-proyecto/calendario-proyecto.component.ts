@@ -87,6 +87,10 @@ export class CalendarioProyectoComponent {
     );
   }
 
+  nombrePrograma(): string {
+    return this.projects.find((project) => Number(project.Id) === this.projectId)?.Nombre || '';
+  }
+
   resetControl(control: FormControl, disabled: boolean): void {
     control.setValue('');
     if (disabled) {

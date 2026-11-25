@@ -324,7 +324,7 @@
                         </button>
                       }
                     </div>
-                    @if (dataSource?.filteredData?.length) {
+                    @if (dataSource.filteredData.length) {
                       <div class="lista-procesos">
                         @for (row of dataSource.filteredData; track $index) {
                           <article class="tarjeta-proceso" [class.inactivo]="!row.Activo">
@@ -339,8 +339,8 @@
                             <footer class="pie-proceso">
                               <span class="conteo-actividades">
                                 <mat-icon>event_note</mat-icon>
-                                {{ row.actividades?.data?.length || 0 }}
-                                {{ (row.actividades?.data?.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+                                {{ row.actividades.data.length || 0 }}
+                                {{ (row.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
                               </span>
                               @if (!view) {
                                 <button
@@ -662,7 +662,7 @@
                                   </button>
                                 }
                               </div>
-                              @if (dataSource?.filteredData?.length) {
+                              @if (dataSource.filteredData.length) {
                                 <div class="lista-procesos">
                                   @for (row of dataSource.filteredData; track $index) {
                                     <article class="tarjeta-proceso" [class.inactivo]="!row.Activo">
@@ -677,8 +677,8 @@
                                       <footer class="pie-proceso">
                                         <span class="conteo-actividades">
                                           <mat-icon>event_note</mat-icon>
-                                          {{ row.actividades?.data?.length || 0 }}
-                                          {{ (row.actividades?.data?.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+                                          {{ row.actividades.data.length || 0 }}
+                                          {{ (row.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
                                         </span>
                                         @if (!view) {
                                           <button
@@ -745,7 +745,7 @@
                                   </button>
                                 }
                               </div>
-                              @if (datasourceExtension?.filteredData?.length) {
+                              @if (datasourceExtension.filteredData.length) {
                                 <div class="lista-procesos">
                                   @for (row of datasourceExtension.filteredData; track $index) {
                                     <article class="tarjeta-proceso" [class.inactivo]="!row.Activo">
@@ -760,8 +760,8 @@
                                       <footer class="pie-proceso">
                                         <span class="conteo-actividades">
                                           <mat-icon>event_note</mat-icon>
-                                          {{ row.actividades?.data?.length || 0 }}
-                                          {{ (row.actividades?.data?.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+                                          {{ row.actividades.data.length || 0 }}
+                                          {{ (row.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
                                         </span>
                                         @if (!view) {
                                           <button
@@ -884,8 +884,8 @@
               }
             </span>
             <small class="conteo-opcion">
-              {{ item.actividades?.data?.length || 0 }}
-              {{ (item.actividades?.data?.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+              {{ item.actividades.data.length || 0 }}
+              {{ (item.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
             </small>
           </button>
         }

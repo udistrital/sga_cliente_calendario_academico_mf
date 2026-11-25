@@ -6,7 +6,6 @@ import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { PopUpManager } from '../../managers/popUpManager';
 import * as moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SgaCalendarioMidService } from '../../services/sga_calendario_mid.service';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
@@ -30,11 +29,8 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   facultadSeleccionada: number | null = null;
   actividad: string = "";
   descripcion_actividad: string = "";
-  proceso_detalle: boolean = false;
   editar_actividad: boolean = false;
   nombre_proceso: string = "";
-  descripcion_proceso: string = "";
-  periodicidad_proceso: string = "";
   periodo: string = "";
   fecha_inicio_org: string = "";
   fecha_fin_org: string = "";
@@ -44,7 +40,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   responsableDisplayedColumns: string[] = ['Nombre'];
   dataSource!: MatTableDataSource<any>;
   dataSource2!: MatTableDataSource<any>
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   settings!: Object;
@@ -74,25 +69,16 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     if(this.vista == "select"){
       this.select_proyectos_act = true;
       this.actividad_detalle_proyectos = false;
-      this.proceso_detalle = false;
       this.editar_actividad = false;
     }
     if(this.vista == "view"){
       this.select_proyectos_act = false;
       this.actividad_detalle_proyectos = true;
-      this.proceso_detalle = false;
-      this.editar_actividad = false;
-    }
-    if(this.vista == "process"){
-      this.select_proyectos_act = false;
-      this.actividad_detalle_proyectos = false;
-      this.proceso_detalle = true;
       this.editar_actividad = false;
     }
     if(this.vista == "edit_act"){
       this.select_proyectos_act = false;
       this.actividad_detalle_proyectos = false;
-      this.proceso_detalle = false;
       this.editar_actividad = true;
     }
     this.dialogRef.backdropClick().subscribe(() => this.closeDialog());
@@ -139,11 +125,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
       })
       this.dataSource = new MatTableDataSource(tablaFechas);
     
-    }
-    if(this.proceso_detalle){
-      this.nombre_proceso = this.data.process.Nombre;
-      this.descripcion_proceso = this.data.process.Descripcion;
-      this.periodicidad_proceso = this.data.process.TipoRecurrenciaId.Nombre;
     }
     if(this.editar_actividad){
       this.data.activity.DependenciaId = this.normalizarDependenciaId(this.data.activity.DependenciaId);
@@ -197,10 +178,7 @@ export class EdicionActividadesProgramasComponent implements OnInit {
     if (this.actividad_detalle_proyectos) {
       return `${this.translate.instant('calendario.actividad')}: ${this.actividad || ''}`;
     }
-    if (this.proceso_detalle) {
-      return this.translate.instant('calendario.proceso');
-    }
-    return this.translate.instant('calendario.edicion_actividades');
+    return this.actividad || this.translate.instant('calendario.edicion_actividades');
   }
 
   filtrarDetalle(event: Event) {
@@ -209,9 +187,6 @@ export class EdicionActividadesProgramasComponent implements OnInit {
   }
 
   dialogSubtitle(): string {
-    if (this.editar_actividad) {
-      return [this.nombre_proceso, this.periodo].filter(Boolean).join(' - ');
-    }
     if (this.select_proyectos_act) {
       return this.data?.activity?.Nombre || '';
     }

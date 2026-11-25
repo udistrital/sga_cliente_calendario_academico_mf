@@ -51,6 +51,7 @@ import {
   GestionExtensionesActividadComponent,
   GestionExtensionesActividadResult,
 } from '../gestion-extensiones-actividad/gestion-extensiones-actividad.component';
+import { avanceActividad, duracionDias, estadoTemporal, ordenarPorInicio } from 'src/app/utils/tiempo-actividad';
 
 @Component({
     selector: 'def-calendario-academico',
@@ -73,9 +74,9 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
     'Acciones',
   ];
   displayedColumnsExtension: string[] = ['Nombre', 'Descripcion', 'Activo', 'Acciones'];
-  dataSource!: MatTableDataSource<Proceso>;
+  dataSource = new MatTableDataSource<Proceso>([]);
   datasourceActivity!: MatTableDataSource<Actividad>;
-  datasourceExtension!: MatTableDataSource<Proceso>;
+  datasourceExtension = new MatTableDataSource<Proceso>([]);
 
   //processTable!: LocalDataSource;
   activities!: Actividad[];
@@ -459,9 +460,7 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   applyFilterProces(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.datasourceExtension) {
-      this.datasourceExtension.filter = filterValue.trim().toLowerCase();
-    }
+    this.datasourceExtension.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
@@ -481,48 +480,19 @@ export class DefCalendarioAcademicoComponent implements OnChanges, OnDestroy {
   }
 
   actividadesOrdenadas(proceso: Proceso): Actividad[] {
-    return [...proceso.actividades.filteredData].sort(
-      (a: Actividad, b: Actividad) => this.fechaActividad(a.FechaInicio) - this.fechaActividad(b.FechaInicio)
-    );
-  }
-
-  fechaActividad(valor: any): number {
-    const fecha = moment(valor, ['DD/MM/YYYY HH:mm', moment.ISO_8601]);
-    return fecha.isValid() ? fecha.valueOf() : 0;
+    return ordenarPorInicio(proceso.actividades.filteredData);
   }
 
   estadoTemporal(actividad: Actividad): string | null {
-    const inicio = this.fechaActividad(actividad.FechaInicio);
-    const fin = this.fechaActividad(actividad.FechaFin);
-    if (!inicio || !fin) {
-      return null;
-    }
-    const ahora = Date.now();
-    if (ahora < inicio) {
-      return 'proxima';
-    }
-    if (ahora > fin) {
-      return 'finalizada';
-    }
-    return 'en_curso';
+    return estadoTemporal(actividad);
   }
 
   avanceActividad(actividad: Actividad): number {
-    const inicio = this.fechaActividad(actividad.FechaInicio);
-    const fin = this.fechaActividad(actividad.FechaFin);
-    if (!inicio || !fin || fin <= inicio) {
-      return 0;
-    }
-    return Math.min(100, Math.max(0, Math.round(((Date.now() - inicio) * 100) / (fin - inicio))));
+    return avanceActividad(actividad);
   }
 
   duracionDias(actividad: Actividad): number {
-    const inicio = this.fechaActividad(actividad.FechaInicio);
-    const fin = this.fechaActividad(actividad.FechaFin);
-    if (!inicio || !fin || fin < inicio) {
-      return 0;
-    }
-    return Math.max(1, Math.round((fin - inicio) / 86400000));
+    return duracionDias(actividad);
   }
 
   applyFilterActividades(event: Event, data: any, i: number) {

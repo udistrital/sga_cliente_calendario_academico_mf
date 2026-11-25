@@ -155,10 +155,23 @@ export class AdministracionPermisosEventosComponent implements OnInit {
   }
 
   get perfilesAsignados(): PerfilGestion[] {
-    const idsActivos = new Set(this.relaciones.filter((relacion) => relacion.Activo).map((relacion) => relacion.PerfilId));
+    const idsActivos = this.idsPerfilesAsignados();
     return this.perfiles
       .filter((perfil) => idsActivos.has(perfil.Id))
       .filter((perfil) => this.coincideFiltro(perfil, this.filtroAsignados));
+  }
+
+  get totalAsignados(): number {
+    const idsActivos = this.idsPerfilesAsignados();
+    return this.perfiles.filter((perfil) => idsActivos.has(perfil.Id)).length;
+  }
+
+  get totalDisponibles(): number {
+    return this.perfiles.length - this.totalAsignados;
+  }
+
+  private idsPerfilesAsignados(): Set<number> {
+    return new Set(this.relaciones.filter((relacion) => relacion.Activo).map((relacion) => relacion.PerfilId));
   }
 
   get eventoCatalogosFiltrados(): EventoCatalogoGestion[] {
@@ -174,7 +187,7 @@ export class AdministracionPermisosEventosComponent implements OnInit {
   }
 
   get perfilesDisponibles(): PerfilGestion[] {
-    const idsActivos = new Set(this.relaciones.filter((relacion) => relacion.Activo).map((relacion) => relacion.PerfilId));
+    const idsActivos = this.idsPerfilesAsignados();
     return this.perfiles
       .filter((perfil) => !idsActivos.has(perfil.Id))
       .filter((perfil) => this.coincideFiltro(perfil, this.filtroDisponibles));

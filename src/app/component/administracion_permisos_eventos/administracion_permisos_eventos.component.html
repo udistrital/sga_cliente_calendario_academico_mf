@@ -5,121 +5,158 @@
   </mat-card-header>
 
   <mat-card-content>
-    <mat-form-field class="full-width">
-      <mat-label>{{ 'calendario.evento_catalogo' | translate }}</mat-label>
-      <input
-        matInput
-        [(ngModel)]="eventoCatalogoTexto"
-        [matAutocomplete]="eventosAutocomplete"
-        [placeholder]="'calendario.buscar_evento_catalogo' | translate"
-        autocomplete="off"
-        (ngModelChange)="onBuscarEventoCatalogo()" />
-      <mat-icon matPrefix>search</mat-icon>
-      @if (displayEventoCatalogo(eventoCatalogoTexto)) {
-        <button mat-icon-button matSuffix type="button" (click)="eventoCatalogoTexto = ''; onBuscarEventoCatalogo()">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-      <mat-autocomplete #eventosAutocomplete="matAutocomplete" [displayWith]="displayEventoCatalogo" (optionSelected)="onSeleccionarEventoCatalogo($event.option.value)">
-        @for (evento of eventoCatalogosFiltrados; track evento) {
-          <mat-option [value]="evento">
-            <span>{{ evento.Nombre }}</span>
-            <small class="autocomplete-option-detail">ID {{ evento.Id }}</small>
-          </mat-option>
+    <section class="panel-filtros">
+      <header class="cabecera-seccion">
+        <span class="icono-seccion"><mat-icon>event</mat-icon></span>
+        <div>
+          <h3>{{ 'calendario.evento_catalogo' | translate }}</h3>
+          <p>{{ 'calendario.buscar_evento_catalogo' | translate }}</p>
+        </div>
+      </header>
+
+      <mat-form-field appearance="outline" class="campo-evento">
+        <mat-label>{{ 'calendario.evento_catalogo' | translate }}</mat-label>
+        <mat-icon matPrefix class="icono-campo">search</mat-icon>
+        <input
+          matInput
+          [(ngModel)]="eventoCatalogoTexto"
+          [matAutocomplete]="eventosAutocomplete"
+          autocomplete="off"
+          (ngModelChange)="onBuscarEventoCatalogo()" />
+        @if (displayEventoCatalogo(eventoCatalogoTexto)) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="'GLOBAL.limpiar' | translate"
+            (click)="eventoCatalogoTexto = ''; onBuscarEventoCatalogo()">
+            <mat-icon>close</mat-icon>
+          </button>
         }
-        @if (eventoCatalogosFiltrados.length === 0) {
-          <mat-option disabled>
-            {{ 'calendario.sin_eventos_catalogo_filtro' | translate }}
-          </mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
+        <mat-autocomplete #eventosAutocomplete="matAutocomplete" [displayWith]="displayEventoCatalogo" (optionSelected)="onSeleccionarEventoCatalogo($event.option.value)">
+          @for (evento of eventoCatalogosFiltrados; track evento) {
+            <mat-option [value]="evento">
+              <span>{{ evento.Nombre }}</span>
+              <small class="autocomplete-option-detail">ID {{ evento.Id }}</small>
+            </mat-option>
+          }
+          @if (eventoCatalogosFiltrados.length === 0) {
+            <mat-option disabled>
+              {{ 'calendario.sin_eventos_catalogo_filtro' | translate }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </section>
 
     @if (eventoCatalogoSeleccionado) {
-      <div class="evento-resumen">
-        <h3>{{ eventoCatalogoSeleccionado.Nombre }}</h3>
-        <p>{{ eventoCatalogoSeleccionado.Descripcion || ('GLOBAL.NA' | translate) }}</p>
-        <span>{{ 'calendario.perfiles_gestores_asignados' | translate:{ total: perfilesAsignados.length } }}</span>
-      </div>
-    }
-
-    @if (cargando) {
-      <div class="loading-state">
-        <span>{{ 'GLOBAL.cargando' | translate }}</span>
-      </div>
-    }
-
-    @if (eventoCatalogoSeleccionado && !cargando) {
-      <section class="roles-grid">
-        <mat-card class="roles-list-card">
-          <mat-card-header>
-            <mat-card-title>{{ 'calendario.perfiles_disponibles_gestion' | translate }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <mat-form-field class="full-width">
-              <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
-              <input matInput [(ngModel)]="filtroDisponibles" [placeholder]="'GLOBAL.buscar' | translate" />
-              <mat-icon matPrefix>search</mat-icon>
-            </mat-form-field>
-            <div class="profile-list">
-              @for (perfil of perfilesDisponibles; track perfil) {
-                <article class="profile-row">
-                  <div>
-                    <strong>{{ perfil.Nombre }}</strong>
-                    <small>ID {{ perfil.Id }}</small>
-                  </div>
-                  <button mat-stroked-button color="accent" (click)="agregarPerfil(perfil)" [disabled]="guardandoPerfilId !== null">
-                    <mat-icon>add</mat-icon>
-                    {{ 'GLOBAL.asignar' | translate }}
-                  </button>
-                </article>
-              }
-              @if (perfilesDisponibles.length === 0) {
-                <p class="empty-state">
-                  {{ 'calendario.sin_perfiles_disponibles_gestion' | translate }}
-                </p>
-              }
-            </div>
-          </mat-card-content>
-        </mat-card>
-        <mat-card class="roles-list-card assigned">
-          <mat-card-header>
-            <mat-card-title>{{ 'calendario.perfiles_asignados_gestion' | translate }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <mat-form-field class="full-width">
-              <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
-              <input matInput [(ngModel)]="filtroAsignados" [placeholder]="'GLOBAL.buscar' | translate" />
-              <mat-icon matPrefix>search</mat-icon>
-            </mat-form-field>
-            <div class="profile-list">
-              @for (perfil of perfilesAsignados; track perfil) {
-                <article class="profile-row active">
-                  <div>
-                    <strong>{{ perfil.Nombre }}</strong>
-                    <small>ID {{ perfil.Id }}</small>
-                  </div>
-                  <button mat-stroked-button color="warn" (click)="retirarPerfil(perfil)" [disabled]="guardandoPerfilId !== null">
-                    <mat-icon>remove</mat-icon>
-                    {{ 'GLOBAL.eliminar' | translate }}
-                  </button>
-                </article>
-              }
-              @if (perfilesAsignados.length === 0) {
-                <p class="empty-state">
-                  {{ 'calendario.sin_perfiles_asignados_gestion' | translate }}
-                </p>
-              }
-            </div>
-          </mat-card-content>
-        </mat-card>
+      <section class="resumen-calendario">
+        <span class="icono-resumen"><mat-icon>admin_panel_settings</mat-icon></span>
+        <div class="texto-resumen">
+          <h3>{{ eventoCatalogoSeleccionado.Nombre }}</h3>
+          <p>{{ eventoCatalogoSeleccionado.Descripcion || ('GLOBAL.NA' | translate) }}</p>
+        </div>
+        <div class="datos-resumen">
+          <span class="dato-resumen">
+            <mat-icon>tag</mat-icon>
+            ID {{ eventoCatalogoSeleccionado.Id }}
+          </span>
+          <span class="dato-resumen">
+            <mat-icon>verified_user</mat-icon>
+            {{ 'calendario.perfiles_gestores_asignados' | translate:{ total: totalAsignados } }}
+          </span>
+        </div>
       </section>
     }
 
-    @if (!eventoCatalogoSeleccionado && !cargando) {
-      <p class="empty-state initial">
+    @if (cargando) {
+      <div class="estado-cargando" role="status">
+        <mat-icon>hourglass_empty</mat-icon>
+        {{ 'GLOBAL.cargando' | translate }}
+      </div>
+    } @else if (eventoCatalogoSeleccionado) {
+      <section class="roles-grid">
+        <div class="columna-perfiles">
+          <header class="cabecera-columna">
+            <mat-icon>group_add</mat-icon>
+            <h4>{{ 'calendario.perfiles_disponibles_gestion' | translate }}</h4>
+            <span class="contador">{{ totalDisponibles }}</span>
+          </header>
+          <mat-form-field appearance="outline" class="buscador-perfiles">
+            <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
+            <mat-icon matPrefix class="icono-campo">search</mat-icon>
+            <input matInput [(ngModel)]="filtroDisponibles" />
+          </mat-form-field>
+          <div class="profile-list">
+            @for (perfil of perfilesDisponibles; track perfil.Id) {
+              <article class="profile-row">
+                <span class="avatar-perfil"><mat-icon>badge</mat-icon></span>
+                <div class="texto-perfil">
+                  <strong>{{ perfil.Nombre }}</strong>
+                  <small>ID {{ perfil.Id }}</small>
+                </div>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="boton-asignar"
+                  (click)="agregarPerfil(perfil)"
+                  [disabled]="guardandoPerfilId !== null">
+                  <mat-icon>add</mat-icon>
+                  {{ 'GLOBAL.asignar' | translate }}
+                </button>
+              </article>
+            } @empty {
+              <div class="lista-vacia">
+                <mat-icon>person_search</mat-icon>
+                {{ (filtroDisponibles ? 'GLOBAL.table_no_data_found' : 'calendario.sin_perfiles_disponibles_gestion') | translate }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="columna-perfiles asignados">
+          <header class="cabecera-columna">
+            <mat-icon>verified_user</mat-icon>
+            <h4>{{ 'calendario.perfiles_asignados_gestion' | translate }}</h4>
+            <span class="contador">{{ totalAsignados }}</span>
+          </header>
+          <mat-form-field appearance="outline" class="buscador-perfiles">
+            <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
+            <mat-icon matPrefix class="icono-campo">search</mat-icon>
+            <input matInput [(ngModel)]="filtroAsignados" />
+          </mat-form-field>
+          <div class="profile-list">
+            @for (perfil of perfilesAsignados; track perfil.Id) {
+              <article class="profile-row active">
+                <span class="avatar-perfil"><mat-icon>verified_user</mat-icon></span>
+                <div class="texto-perfil">
+                  <strong>{{ perfil.Nombre }}</strong>
+                  <small>ID {{ perfil.Id }}</small>
+                </div>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="boton-retirar"
+                  (click)="retirarPerfil(perfil)"
+                  [disabled]="guardandoPerfilId !== null">
+                  <mat-icon>remove</mat-icon>
+                  {{ 'GLOBAL.eliminar' | translate }}
+                </button>
+              </article>
+            } @empty {
+              <div class="lista-vacia">
+                <mat-icon>person_off</mat-icon>
+                {{ (filtroAsignados ? 'GLOBAL.table_no_data_found' : 'calendario.sin_perfiles_asignados_gestion') | translate }}
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    } @else {
+      <div class="sin-seleccion">
+        <mat-icon>manage_search</mat-icon>
         {{ 'calendario.seleccione_evento_catalogo_roles' | translate }}
-      </p>
+      </div>
     }
   </mat-card-content>
 </mat-card>

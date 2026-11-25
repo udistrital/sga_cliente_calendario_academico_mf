@@ -28,6 +28,7 @@ import { CalendarioFiltroOption, CalendarioFiltrosAlcanceService, CalendarioProg
 import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
 import { firstValueFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { avanceActividad, duracionDias, estadoTemporal, ordenarPorInicio } from 'src/app/utils/tiempo-actividad';
 
 @Component({
     selector: 'administracion-calendario',
@@ -90,16 +91,8 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
   periodo_calendario: string = '';
   idCalendario: number = 0;
 
-  displayedColumns: string[] = ['Nombre', 'Descripcion', 'Acciones'];
-  displayedColumnsActividades: string[] = [
-    'Nombre',
-    'Descripcion',
-    'FechaInicio',
-    'FechaFin',
-    'Activo',
-    'Acciones',
-  ];
-  dataSource!: MatTableDataSource<Proceso>;
+  dataSource = new MatTableDataSource<Proceso>([]);
+  indiceProceso = 0;
   datasourceActivity!: MatTableDataSource<Actividad>;
   private readonly destroy$ = new Subject<void>();
 
@@ -277,6 +270,38 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
     }
   }
 
+  indiceProcesoSeleccionado(): number {
+    return Math.min(this.indiceProceso, Math.max(this.processes.length - 1, 0));
+  }
+
+  procesoSeleccionado(): Proceso {
+    return this.processes[this.indiceProcesoSeleccionado()];
+  }
+
+  seleccionarProceso(indice: number) {
+    this.indiceProceso = indice;
+  }
+
+  totalActividades(): number {
+    return this.processes.reduce((total, proceso) => total + proceso.actividades.data.length, 0);
+  }
+
+  actividadesOrdenadas(proceso: Proceso): Actividad[] {
+    return ordenarPorInicio(proceso.actividades.filteredData);
+  }
+
+  estadoTemporal(actividad: Actividad): string | null {
+    return estadoTemporal(actividad);
+  }
+
+  avanceActividad(actividad: Actividad): number {
+    return avanceActividad(actividad);
+  }
+
+  duracionDias(actividad: Actividad): number {
+    return duracionDias(actividad);
+  }
+
   applyFilterActividades(event: Event, data: any) {
     const filterValue = (event.target as HTMLInputElement).value;
     data.filter = filterValue.trim().toLowerCase();
@@ -343,6 +368,7 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
 
   async onSelectPrograma() {
     this.Calendario_academico = '';
+    this.indiceProceso = 0;
     this.processes = [];
     this.dataSource = new MatTableDataSource<Proceso>();
     if (!this.periodoSelected?.Id || !this.proyectoSelected?.Id) {
@@ -782,9 +808,6 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
       return;
     }
     switch (event.action) {
-      case 'view':
-        this.viewProcess(event, process);
-        break;
       case 'edit':
         this.editActivity(event, process);
         break;
@@ -795,21 +818,6 @@ export class AdministracionCalendarioComponent implements OnInit, OnDestroy {
         this.calendarioActividad(event, process);
         break;
     }
-  }
-
-  viewProcess(event: any, process: any) {
-    const activityConfig = new MatDialogConfig();
-    activityConfig.width = '600px';
-    activityConfig.height = '370px';
-    activityConfig.maxWidth = '94vw';
-    activityConfig.maxHeight = '90vh';
-    activityConfig.panelClass = 'sga-modal-panel';
-    activityConfig.data = { process: event.data, vista: 'process' };
-    const newActivity = this.dialog.open(
-      EdicionActividadesProgramasComponent,
-      activityConfig
-    );
-    newActivity.afterClosed().subscribe({ next: () => {} });
   }
 
   calendarioActividad(event: any, process: any) {

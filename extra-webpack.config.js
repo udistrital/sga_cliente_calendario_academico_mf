@@ -10,6 +10,11 @@ module.exports = (config, options) => {
     singleSpaWebpackConfig.devtool = false;
   }
 
+  singleSpaWebpackConfig.ignoreWarnings = [
+    ...(singleSpaWebpackConfig.ignoreWarnings || []),
+    /style-loader[\\/]dist[\\/]runtime/,
+  ];
+
   singleSpaWebpackConfig.devServer = singleSpaWebpackConfig.devServer || {};
   singleSpaWebpackConfig.devServer.headers = {
     ...singleSpaWebpackConfig.devServer.headers,

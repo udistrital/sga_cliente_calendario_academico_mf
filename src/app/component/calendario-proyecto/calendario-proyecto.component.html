@@ -5,72 +5,80 @@
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <mat-form-field class="full-width">
-      <mat-label>{{ 'calendario.seleccione_periodo_filtro' | translate }}</mat-label>
-      <mat-select
-        [formControl]="selectedPeriod"
-        (selectionChange)="onSelectPeriod()"
-        >
-        @for (periodo of periodos; track periodo) {
-          <mat-option [value]="periodo.Id">{{ periodo.Nombre }}</mat-option>
-        }
-        @if (!periodos.length) {
-          <mat-option disabled>{{ 'calendario.sin_periodos_disponibles' | translate }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <section class="panel-filtros">
+      <header class="cabecera-seccion">
+        <span class="icono-seccion"><mat-icon>tune</mat-icon></span>
+        <div>
+          <h3>{{ "calendario.informacion_general" | translate }}</h3>
+          <p>{{ "calendario.consulta_filtros_descripcion" | translate }}</p>
+        </div>
+      </header>
 
-    <mat-form-field class="full-width">
-      <mat-label>{{ 'calendario.seleccione_facultad_filtro' | translate }}</mat-label>
-      <mat-select
-        [formControl]="selectedFaculty"
-        (selectionChange)="onSelectFaculty()"
-        >
-        @for (facultad of facultades; track facultad) {
-          <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
-        }
-        @if (!facultades.length) {
-          <mat-option disabled>{{ 'calendario.sin_facultades_disponibles' | translate }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+      <div class="campos-filtros">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'calendario.seleccione_periodo_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">date_range</mat-icon>
+          <mat-select [formControl]="selectedPeriod" (selectionChange)="onSelectPeriod()">
+            @for (periodo of periodos; track periodo) {
+              <mat-option [value]="periodo.Id">{{ periodo.Nombre }}</mat-option>
+            }
+            @if (!periodos.length) {
+              <mat-option disabled>{{ 'calendario.sin_periodos_disponibles' | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-    <mat-form-field class="full-width">
-      <mat-label>{{ 'calendario.seleccione_nivel_filtro' | translate }}</mat-label>
-      <mat-select
-        [formControl]="selectedLevel"
-        (selectionChange)="onSelectLevel()"
-        >
-        @for (nivel of niveles; track nivel) {
-          <mat-option [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
-        }
-        @if (!niveles.length) {
-          <mat-option disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'calendario.seleccione_facultad_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">account_balance</mat-icon>
+          <mat-select [formControl]="selectedFaculty" (selectionChange)="onSelectFaculty()">
+            @for (facultad of facultades; track facultad) {
+              <mat-option [value]="facultad.Id">{{ facultad.Nombre }}</mat-option>
+            }
+            @if (!facultades.length) {
+              <mat-option disabled>{{ 'calendario.sin_facultades_disponibles' | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-    <mat-form-field class="full-width">
-      <mat-label>{{ 'calendario.seleccione_programa_filtro' | translate }}</mat-label>
-      <mat-select
-        [formControl]="selectedProject"
-        (selectionChange)="onSelectProject()"
-        >
-        @for (project of projects; track project) {
-          <mat-option [value]="project.Id">{{ project.Nombre }}</mat-option>
-        }
-        @if (!projects.length) {
-          <mat-option disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'calendario.seleccione_nivel_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">workspace_premium</mat-icon>
+          <mat-select [formControl]="selectedLevel" (selectionChange)="onSelectLevel()">
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel.Id">{{ nivel.Nombre }}</mat-option>
+            }
+            @if (!niveles.length) {
+              <mat-option disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'calendario.seleccione_programa_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">school</mat-icon>
+          <mat-select [formControl]="selectedProject" (selectionChange)="onSelectProject()">
+            @for (project of projects; track project) {
+              <mat-option [value]="project.Id">{{ project.Nombre }}</mat-option>
+            }
+            @if (!projects.length) {
+              <mat-option disabled>{{ 'calendario.sin_programas_disponibles' | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </section>
 
     @if (showCalendar) {
-      <div class="margin-y">
-        <detalle-calendario
-          [calendarForProject]="calendarioId"
-          [projectId]="projectId"
-        ></detalle-calendario>
+      <detalle-calendario
+        [calendarForProject]="calendarioId"
+        [projectId]="projectId"
+        [programaNombre]="nombrePrograma()"
+      ></detalle-calendario>
+    } @else {
+      <div class="sin-seleccion">
+        <mat-icon>manage_search</mat-icon>
+        {{ "calendario.consulta_sin_seleccion" | translate }}
       </div>
     }
   </mat-card-content>

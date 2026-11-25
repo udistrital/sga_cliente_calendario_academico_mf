@@ -1,140 +1,179 @@
 @if (calendar !== undefined) {
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        {{ "calendario.calendario_academico" | translate }}
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ calendar.Nombre }}
-      </mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div>
-        <form novalidate class="form-horizontal">
-          @if (calendar.ListaCalendario != undefined) {
-            <div class="form-grid2">
-              <div class="form-col1">
-                {{ "calendario.calendario_resolucion" | translate }} :
-                {{ calendar.resolucion }} del año {{ calendar.anno }}
-                <button
-                  mat-button
-                  type="button"
-                  (click)="downloadFile(calendar.DocumentoId)"
-                  title="{{ 'calendario.descargar_resolucion' | translate }}"
-                  class="float-center boton-primary"
-                  mat-button
-                  type="button"
-                  >
-                  <mat-icon fontIcon="cloud_download"></mat-icon>
-                </button>
-              </div>
-              <div class="form-col1">
-                <mat-form-field style="width: 100%" floatLabel="always">
-                  <mat-select placeholder="Seleccione la versión del calendario">
-                    <mat-option>--Seleccionar--</mat-option>
-                    @for (listCal of calendar.ListaCalendario; track listCal) {
-                      <mat-option
-                        (click)="cambiarCalendario(listCal.Id)"
-                        [value]="listCal.Id"
-                        >
-                        {{ listCal.Nombre }}
-                      </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-          }
-          <div class="margin-y">
-            <h3>{{ "calendario.actividades" | translate }}</h3>
-            @for (proceso of processes; track proceso; let i = $index) {
-              <mat-expansion-panel>
-                <mat-expansion-panel-header class="mat-expansion-panel-gradient">
-                  <mat-panel-title>
-                    {{ i + 1 }}. {{ proceso.Nombre }}
-                  </mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="table margin-y">
-                  <table mat-table [dataSource]="proceso.actividades">
-                    <!-- ID Column -->
-                    <ng-container matColumnDef="Nombre">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="width: 20%"
-                        >
-                        {{ "calendario.nombre" | translate }}
-                      </th>
-                      <td mat-cell *matCellDef="let row">
-                        {{ row.Nombre }}
-                      </td>
-                    </ng-container>
-                    <!-- Progress Column -->
-                    <ng-container matColumnDef="Descripcion">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="width: 20%"
-                        >
-                        {{ "GLOBAL.descripcion" | translate }}
-                      </th>
-                      <td mat-cell *matCellDef="let row">
-                        {{ row.Descripcion }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="FechaInicio">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="width: 20%"
-                        >
-                        {{ "calendario.fecha_inicio" | translate }}
-                      </th>
-                      <td mat-cell *matCellDef="let row">
-                        {{ row.FechaInicio }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="FechaFin">
-                      <th
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="width: 20%"
-                        >
-                        {{ "calendario.fecha_fin" | translate }}
-                      </th>
-                      <td mat-cell *matCellDef="let row">
-                        {{ row.FechaFin }}
-                      </td>
-                    </ng-container>
-                    <ng-container matColumnDef="Activo">
-                      <th class="encabezado-centrado"
-                        mat-header-cell
-                        *matHeaderCellDef
-                        style="width: 20%"
-                        >
-                        {{ "calendario.estado" | translate }}
-                      </th>
-                      <td mat-cell *matCellDef="let row" class="celda-estado">
-                        <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
-                          {{ (row.Activo ? 'GLOBAL.activo' : 'GLOBAL.inactivo') | translate }}
-                        </span>
-                      </td>
-                    </ng-container>
-                    <tr
-                      mat-header-row
-                      *matHeaderRowDef="displayedColumnsActividades"
-                    ></tr>
-                    <tr
-                      mat-row
-                      *matRowDef="let row; columns: displayedColumnsActividades"
-                    ></tr>
-                  </table>
-                </div>
-              </mat-expansion-panel>
+  <section class="resumen-calendario">
+    <span class="icono-resumen"><mat-icon>event_available</mat-icon></span>
+    <div class="texto-resumen">
+      <h3>{{ calendar.Nombre }}</h3>
+      @if (programaNombre) {
+        <p>{{ programaNombre }}</p>
+      }
+    </div>
+    <div class="datos-resumen">
+      <span class="dato-resumen">
+        <mat-icon>gavel</mat-icon>
+        {{ "calendario.resolucion_numero_anno" | translate: { numero: calendar.resolucion, anno: calendar.anno } }}
+      </span>
+      <span class="dato-resumen">
+        <mat-icon>account_tree</mat-icon>
+        {{ processes.length }}
+        {{ "calendario.procesos" | translate | lowercase }}
+      </span>
+      <span class="dato-resumen">
+        <mat-icon>event_note</mat-icon>
+        {{ totalActividades() }}
+        {{ (totalActividades() === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+      </span>
+    </div>
+    <div class="acciones-resumen">
+      @if (calendar.ListaCalendario) {
+        <mat-form-field appearance="outline" class="selector-version" subscriptSizing="dynamic">
+          <mat-label>{{ "calendario.seleccione_version_calendario" | translate }}</mat-label>
+          <mat-select>
+            <mat-option>{{ "GLOBAL.seleccionar" | translate }}</mat-option>
+            @for (listCal of calendar.ListaCalendario; track listCal) {
+              <mat-option (click)="cambiarCalendario(listCal.Id)" [value]="listCal.Id">
+                {{ listCal.Nombre }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+      <button mat-stroked-button type="button" class="boton-resolucion" (click)="downloadFile(calendar.DocumentoId)">
+        <mat-icon>cloud_download</mat-icon>
+        {{ "calendario.descargar_resolucion" | translate }}
+      </button>
+    </div>
+  </section>
+
+  <section class="panel-procesos-actividades">
+    <h3 class="titulo-seccion">{{ "calendario.procesos_actividades" | translate }}</h3>
+    <mat-tab-group class="pestanas-destacadas">
+      <mat-tab label="{{ 'calendario.procesos' | translate }}">
+        <div class="barra-procesos">
+          <mat-form-field appearance="outline" class="buscador-procesos">
+            <mat-label>{{ "GLOBAL.buscar" | translate }}</mat-label>
+            <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+            <input matInput type="text" [value]="filtroProcesos" (keyup)="applyFilterProcesos($event)" />
+          </mat-form-field>
+        </div>
+        @if (procesosFiltrados().length) {
+          <div class="lista-procesos">
+            @for (row of procesosFiltrados(); track $index) {
+              <article class="tarjeta-proceso">
+                <header class="cabecera-proceso">
+                  <span class="icono-proceso"><mat-icon>account_tree</mat-icon></span>
+                  <h4 class="nombre-proceso">{{ row.Nombre }}</h4>
+                </header>
+                <p class="descripcion-proceso">{{ row.Descripcion || "-" }}</p>
+                <footer class="pie-proceso">
+                  <span class="conteo-actividades">
+                    <mat-icon>event_note</mat-icon>
+                    {{ row.actividades.data.length || 0 }}
+                    {{ (row.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+                  </span>
+                </footer>
+              </article>
             }
           </div>
-        </form>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        } @else {
+          <div class="sin-procesos">
+            <mat-icon>account_tree</mat-icon>
+            {{ (filtroProcesos ? "GLOBAL.table_no_data_found" : "calendario.sin_procesos") | translate }}
+          </div>
+        }
+      </mat-tab>
+
+      <mat-tab label="{{ 'calendario.actividades' | translate }}">
+        @if (processes.length === 0) {
+          <div class="sin-procesos sin-procesos-actividades">
+            <mat-icon>event_busy</mat-icon>
+            {{ "calendario.consulta_sin_actividades" | translate }}
+          </div>
+        } @else {
+          @let proceso = procesoSeleccionado();
+          <div class="vista-actividades">
+            <nav class="columna-procesos" [attr.aria-label]="'calendario.procesos' | translate">
+              <span class="titulo-columna">{{ "calendario.procesos" | translate }}</span>
+              @for (item of processes; track $index; let i = $index) {
+                <button
+                  type="button"
+                  class="opcion-proceso"
+                  [class.seleccionado]="item === proceso"
+                  [attr.aria-current]="item === proceso"
+                  (click)="seleccionarProceso(i)"
+                  >
+                  <span class="fila-opcion">
+                    <span class="nombre-opcion">{{ item.Nombre }}</span>
+                  </span>
+                  <small class="conteo-opcion">
+                    {{ item.actividades.data.length || 0 }}
+                    {{ (item.actividades.data.length === 1 ? "calendario.actividad" : "calendario.actividades") | translate | lowercase }}
+                  </small>
+                </button>
+              }
+            </nav>
+
+            <section class="panel-actividades">
+              <header class="cabecera-panel">
+                <div class="info-panel">
+                  <h4>{{ proceso.Nombre }}</h4>
+                  <p>{{ proceso.Descripcion || "-" }}</p>
+                </div>
+              </header>
+
+              <mat-form-field appearance="outline" class="buscador-actividades">
+                <mat-label>{{ "calendario.buscar_actividad" | translate }}</mat-label>
+                <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+                <input
+                  matInput
+                  type="text"
+                  [value]="proceso.actividades.filter"
+                  (keyup)="applyFilterActividades($event, proceso)"
+                  />
+              </mat-form-field>
+
+              @if (proceso.actividades.filteredData.length) {
+                <ul class="lista-actividades">
+                  @for (row of actividadesOrdenadas(proceso); track $index) {
+                    @let estado = estadoTemporal(row);
+                    <li class="fila-actividad" [class.inactiva]="!row.Activo">
+                      <div class="contenido-actividad">
+                        <div class="titulo-actividad">
+                          <span class="nombre-actividad">{{ row.Nombre }}</span>
+                          @if (!row.Activo) {
+                            <span class="activity-status inactive">{{ "GLOBAL.inactivo" | translate }}</span>
+                          } @else if (estado) {
+                            <span class="estado-temporal" [ngClass]="estado">{{ ("calendario.estado_" + estado) | translate }}</span>
+                          }
+                        </div>
+                        @if (row.Descripcion) {
+                          <p class="descripcion-actividad">{{ row.Descripcion }}</p>
+                        }
+                        <div class="fechas-actividad">
+                          <mat-icon>event</mat-icon>
+                          <span>{{ row.FechaInicio }} → {{ row.FechaFin }}</span>
+                          @if (duracionDias(row); as dias) {
+                            <span class="duracion">· {{ dias }} {{ (dias === 1 ? "calendario.dia" : "calendario.dias") | translate }}</span>
+                          }
+                        </div>
+                        @if (row.Activo && estado === "en_curso") {
+                          <div class="barra-avance">
+                            <span [style.width.%]="avanceActividad(row)"></span>
+                          </div>
+                        }
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="sin-actividades">
+                  <mat-icon>event_busy</mat-icon>
+                  {{ (proceso.actividades.filter ? "GLOBAL.table_no_data_found" : "calendario.sin_actividades_proceso") | translate }}
+                </div>
+              }
+            </section>
+          </div>
+        }
+      </mat-tab>
+    </mat-tab-group>
+  </section>
 }

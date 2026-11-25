@@ -1,0 +1,194 @@
+$azul: #03678f;
+$azul-oscuro: #02547c;
+$fondo-claro: #f0f6f9;
+$borde: #d6e5ec;
+
+.panel-filtros {
+  margin-top: 8px;
+  padding: 20px 20px 4px;
+  border: 1px solid $borde;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.cabecera-seccion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cabecera-seccion h3 {
+  margin: 0;
+  color: $azul-oscuro;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.cabecera-seccion p {
+  margin: 2px 0 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.8125rem;
+}
+
+.icono-seccion,
+.icono-resumen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e1edf2;
+  color: $azul;
+}
+
+.campos-filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.campos-filtros mat-form-field {
+  width: 100%;
+}
+
+.icono-campo {
+  margin: 0 4px 0 12px;
+  color: $azul;
+}
+
+.mat-mdc-form-field-disabled .icono-campo {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.resumen-calendario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border: 1px solid #b3d1dd;
+  border-radius: 12px;
+  background-color: $fondo-claro;
+}
+
+.icono-resumen {
+  background-color: $azul;
+  color: white;
+}
+
+.texto-resumen {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.texto-resumen h3 {
+  margin: 0;
+  color: $azul-oscuro;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.texto-resumen p {
+  margin: 2px 0 0;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 0.8125rem;
+}
+
+.datos-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dato-resumen {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: 1px solid #b3d1dd;
+  border-radius: 999px;
+  background-color: white;
+  color: $azul-oscuro;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dato-resumen mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: $azul;
+}
+
+.panel-procesos-actividades {
+  margin-top: 16px;
+  padding: 20px 20px 12px;
+  border: 1px solid $borde;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.titulo-seccion {
+  margin: 0 0 12px;
+  color: $azul-oscuro;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.sin-seleccion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 32px 16px;
+  border: 2px dashed $borde;
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.sin-seleccion mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #81b3c7;
+}
+
+.activity-status {
+  display: inline-block;
+  min-width: 72px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.activity-status.active {
+  background-color: var(--success-accent);
+}
+
+.activity-status.inactive {
+  background-color: var(--danger-base);
+}
+
+.icono-activar {
+  color: var(--success-accent) !important;
+}
+
+.icono-desactivar {
+  color: var(--danger-accent) !important;
+}
+
+@media (max-width: 768px) {
+  .campos-filtros {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

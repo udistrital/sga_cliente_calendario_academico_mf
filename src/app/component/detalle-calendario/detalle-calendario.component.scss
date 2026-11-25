@@ -1,53 +1,27 @@
-//HOVER SOBRE LAS FILAS
-.mat-mdc-row:hover .mat-mdc-cell {
-  background-color: var(--color100);
+@use "sass:meta";
+
+@include meta.load-css("../../../assets/styles/consulta-calendario");
+@include meta.load-css("../../../assets/styles/procesos-actividades");
+
+.acciones-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
-// COLOR EN LOS MAT-EXPANSION-PANEL
-.mat-expansion-panel-gradient {
-  background: var(--color100);
+.selector-version {
+  min-width: 240px;
 }
 
-.activity-status {
-  display: inline-block;
-  min-width: 72px;
-  padding: 2px 10px;
-  border-radius: 12px;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
+.boton-resolucion {
+  --mat-button-outlined-label-text-color: #145a95;
+  --mat-button-outlined-outline-color: #145a95;
+  --mat-button-outlined-state-layer-color: #145a95;
+  background-color: white;
 }
 
-.activity-status.active {
-  background-color: var(--success-accent);
-}
-
-.activity-status.inactive {
-  background-color: var(--danger-base);
-}
-
-$fondo-claro: #f0f6f9;
-
-.table {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.table .mat-mdc-table {
-  width: 100%;
-}
-
-th.mat-mdc-header-cell {
-  background-color: $fondo-claro;
-  color: #02547c;
-  font-weight: 600;
-}
-
-.encabezado-centrado ::ng-deep .mat-sort-header-container {
-  justify-content: center;
-}
-
-.celda-estado {
-  text-align: center;
+.pie-proceso {
+  min-height: 40px;
 }

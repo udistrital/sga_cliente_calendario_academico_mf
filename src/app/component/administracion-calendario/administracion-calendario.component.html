@@ -4,16 +4,19 @@
   </mat-card-header>
 
   <mat-card-content>
-    <br />
+    <section class="panel-filtros">
+      <header class="cabecera-seccion">
+        <span class="icono-seccion"><mat-icon>tune</mat-icon></span>
+        <div>
+          <h3>{{ 'calendario.informacion_general' | translate }}</h3>
+          <p>{{ 'calendario.consulta_filtros_descripcion' | translate }}</p>
+        </div>
+      </header>
 
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>{{ 'calendario.informacion_general' | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <br />
-        <mat-form-field class="full-width">
+      <div class="campos-filtros">
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'calendario.seleccione_periodo_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">date_range</mat-icon>
           <mat-select [(ngModel)]="periodoSelected" (selectionChange)="onSelectPeriodo()">
             @for (periodo of periodos; track periodo) {
               <mat-option [value]="periodo">{{ periodo.Nombre }}</mat-option>
@@ -24,8 +27,9 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'calendario.seleccione_facultad_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">account_balance</mat-icon>
           <mat-select [(ngModel)]="facultadSelected" (selectionChange)="onSelectFacultad()" [disabled]="!periodoSelected">
             @for (facultad of facultades; track facultad) {
               <mat-option [value]="facultad">{{ facultad.Nombre }}</mat-option>
@@ -36,22 +40,22 @@
           </mat-select>
         </mat-form-field>
 
-        <div>
-          <mat-form-field class="full-width">
-            <mat-label>{{ 'calendario.seleccione_nivel_filtro' | translate }}</mat-label>
-            <mat-select [(ngModel)]="nivelesSelected" (selectionChange)="onSelectLevel()" [disabled]="!facultadSelected">
-              @for (nivel of niveles; track nivel) {
-                <mat-option [value]="nivel">{{ nivel.Nombre }}</mat-option>
-              }
-              @if (!niveles.length) {
-                <mat-option disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'calendario.seleccione_nivel_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">workspace_premium</mat-icon>
+          <mat-select [(ngModel)]="nivelesSelected" (selectionChange)="onSelectLevel()" [disabled]="!facultadSelected">
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel.Nombre }}</mat-option>
+            }
+            @if (!niveles.length) {
+              <mat-option disabled>{{ 'calendario.sin_niveles_disponibles' | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-        <mat-form-field class="full-width">
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'calendario.seleccione_programa_filtro' | translate }}</mat-label>
+          <mat-icon matPrefix class="icono-campo">school</mat-icon>
           <mat-select [(ngModel)]="proyectoSelected" (selectionChange)="onSelectPrograma()" [disabled]="!nivelesSelected">
             @for (proyecto of Proyectos; track proyecto) {
               <mat-option [value]="proyecto">{{ proyecto.Nombre }}</mat-option>
@@ -61,148 +65,202 @@
             }
           </mat-select>
         </mat-form-field>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </section>
 
-    <br />
     @if (Calendario_academico) {
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>{{ 'calendario.procesos_actividades' | translate }}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-tab-group class="pestanas-destacadas">
-            <mat-tab label="{{ 'calendario.procesos' | translate }}">
-              <br />
-              <mat-card>
-                <mat-card-content>
-                  <mat-form-field class="full-width">
-                    <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
-                    <input matInput (keyup)="applyFilterProces($event)" placeholder="{{ 'GLOBAL.buscar' | translate }}" #input />
-                    <mat-icon class="icon-search" matPrefix>search</mat-icon>
-                  </mat-form-field>
-                  <div class="table" (custom)="onAction($event, null)">
-                    <table mat-table [dataSource]="dataSource" matSort>
-                      <!-- ID Column -->
-                      <ng-container matColumnDef="Nombre">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'calendario.nombre' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">{{ row.Nombre }}</td>
-                      </ng-container>
-                      <!-- Progress Column -->
-                      <ng-container matColumnDef="Descripcion">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'GLOBAL.descripcion' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">{{ row.Descripcion }}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="Acciones">
-                        <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.acciones' | translate }}</th>
-                        <td mat-cell *matCellDef="let row">
-                          <button mat-icon-button color="accent" (click)="onAction({ action: 'view', data: row }, null)">
-                            <mat-icon aria-hidden="false" title="{{ 'calendario.tooltip_detalle_proceso' | translate }}" fontIcon="search"></mat-icon>
-                          </button>
-                        </td>
-                      </ng-container>
-                      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                      <!-- Row shown when there is no matching data. -->
-                      <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="4">{{ 'calendario.sin_procesos' | translate }}</td>
-                      </tr>
-                    </table>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-tab>
-            <mat-tab label="{{ 'calendario.actividades' | translate }}">
-              <mat-card>
-                <mat-card-content>
-                  <mat-accordion>
-                    @for (process of processes; track process; let i = $index) {
-                      <mat-expansion-panel>
-                        <mat-expansion-panel-header class="mat-expansion-panel-gradient">
-                          <mat-panel-title>{{i+1}}. {{ process.Nombre }}</mat-panel-title>
-                        </mat-expansion-panel-header>
-                        <br/>
-                        <mat-card>
-                          <mat-card-content>
-                            <mat-form-field class="full-width">
-                              <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
-                              <input matInput (keyup)="applyFilterActividades($event, process.actividades)" placeholder="{{ 'GLOBAL.buscar' | translate }}" #inputActividades />
-                              <mat-icon class="icon-search" matPrefix>search</mat-icon>
-                            </mat-form-field>
-                            <div class="table">
-                              <table mat-table [dataSource]="process.actividades">
-                                <!-- ID Column -->
-                                <ng-container matColumnDef="Nombre">
-                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.nombre' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">{{ row.Nombre }}</td>
-                                </ng-container>
-                                <!-- Progress Column -->
-                                <ng-container matColumnDef="Descripcion">
-                                  <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.descripcion' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">{{ row.Descripcion }}</td>
-                                </ng-container>
-                                <ng-container matColumnDef="FechaInicio">
-                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.fecha_inicio' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">{{ row.FechaInicio }}</td>
-                                </ng-container>
-                                <ng-container matColumnDef="FechaFin">
-                                  <th mat-header-cell *matHeaderCellDef>{{ 'calendario.fecha_fin' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">{{ row.FechaFin }}</td>
-                                </ng-container>
-                                <ng-container matColumnDef="Activo">
-                                  <th class="encabezado-centrado" mat-header-cell *matHeaderCellDef>{{ 'calendario.estado' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row" class="celda-estado">
-                                    <span class="activity-status" [ngClass]="row.Activo ? 'active' : 'inactive'">
-                                      {{ (row.Activo ? 'GLOBAL.activo' : 'GLOBAL.inactivo') | translate }}
-                                    </span>
-                                  </td>
-                                </ng-container>
-                                <ng-container matColumnDef="Acciones">
-                                  <th mat-header-cell *matHeaderCellDef>{{ 'GLOBAL.acciones' | translate }}</th>
-                                  <td mat-cell *matCellDef="let row">
-                                    <button mat-icon-button color="accent" [matMenuTriggerFor]="menuAdm1" [matTooltip]="'GLOBAL.acciones' | translate">
-                                      <mat-icon>more_vert</mat-icon>
-                                    </button>
-                                    <mat-menu #menuAdm1="matMenu">
-                                      <button
-                                        (click)="onAction({ action: 'edit', data: row }, process)"
-                                        mat-menu-item
-                                        [disabled]="!row.PuedeEditar"
-                                        [matTooltip]="!row.PuedeEditar ? row.MotivoNoEditable : ''">
-                                        <mat-icon color="accent" fontIcon="edit_outline"></mat-icon>
-                                        <span>{{ 'calendario.tooltip_editar_actividad' | translate }}</span>
-                                      </button>
-                                      <button
-                                        (click)="onAction({ action: 'disable', data: row }, process)"
-                                        mat-menu-item
-                                        [disabled]="!row.PuedeEditar"
-                                        [matTooltip]="!row.PuedeEditar ? row.MotivoNoEditable : ''">
-                                        <mat-icon [ngClass]="row.Activo ? 'icono-desactivar' : 'icono-activar'" [fontIcon]="row.Activo ? 'unpublished' : 'check_circle'"></mat-icon>
-                                        <span>{{ (row.Activo ? "calendario.tooltip_desactivar_actividad" : "calendario.tooltip_activar_actividad") | translate }}</span>
-                                      </button>
-                                    </mat-menu>
-                                  </td>
-                                </ng-container>
-                                <tr mat-header-row *matHeaderRowDef="displayedColumnsActividades"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumnsActividades"></tr>
-                                <!-- Row shown when there is no matching data. -->
-                                <tr class="mat-row" *matNoDataRow>
-                                  <td class="mat-cell" colspan="4">{{ 'calendario.sin_actividades' | translate }}</td>
-                                </tr>
-                              </table>
-                            </div>
-                          </mat-card-content>
-                        </mat-card>
-                      </mat-expansion-panel>
-                    }
-                  </mat-accordion>
-                </mat-card-content>
-              </mat-card>
-            </mat-tab>
-          </mat-tab-group>
-        </mat-card-content>
-      </mat-card>
-    }
+      <section class="resumen-calendario">
+        <span class="icono-resumen"><mat-icon>event_available</mat-icon></span>
+        <div class="texto-resumen">
+          <h3>{{ Calendario_academico }}</h3>
+          <p>{{ Proyecto_nombre }}</p>
+        </div>
+        <div class="datos-resumen">
+          <span class="dato-resumen">
+            <mat-icon>date_range</mat-icon>
+            {{ periodo_calendario }}
+          </span>
+          <span class="dato-resumen">
+            <mat-icon>account_tree</mat-icon>
+            {{ processes.length }}
+            {{ 'calendario.procesos' | translate | lowercase }}
+          </span>
+          <span class="dato-resumen">
+            <mat-icon>event_note</mat-icon>
+            {{ totalActividades() }}
+            {{ (totalActividades() === 1 ? 'calendario.actividad' : 'calendario.actividades') | translate | lowercase }}
+          </span>
+        </div>
+      </section>
 
+      <section class="panel-procesos-actividades">
+        <h3 class="titulo-seccion">{{ 'calendario.procesos_actividades' | translate }}</h3>
+        <mat-tab-group class="pestanas-destacadas">
+          <mat-tab label="{{ 'calendario.procesos' | translate }}">
+            <div class="barra-procesos">
+              <mat-form-field appearance="outline" class="buscador-procesos">
+                <mat-label>{{ 'GLOBAL.buscar' | translate }}</mat-label>
+                <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+                <input matInput type="text" (keyup)="applyFilterProces($event)" />
+              </mat-form-field>
+            </div>
+            @if (dataSource.filteredData.length) {
+              <div class="lista-procesos">
+                @for (row of dataSource.filteredData; track $index) {
+                  <article class="tarjeta-proceso">
+                    <header class="cabecera-proceso">
+                      <span class="icono-proceso"><mat-icon>account_tree</mat-icon></span>
+                      <h4 class="nombre-proceso">{{ row.Nombre }}</h4>
+                    </header>
+                    <p class="descripcion-proceso">{{ row.Descripcion || '-' }}</p>
+                    <footer class="pie-proceso">
+                      <span class="conteo-actividades">
+                        <mat-icon>event_note</mat-icon>
+                        {{ row.actividades.data.length || 0 }}
+                        {{ (row.actividades.data.length === 1 ? 'calendario.actividad' : 'calendario.actividades') | translate | lowercase }}
+                      </span>
+                      @if (row.TipoRecurrenciaId.Nombre) {
+                        <span class="periodicidad-proceso" [matTooltip]="'calendario.periodicidad_campo' | translate">
+                          <mat-icon>autorenew</mat-icon>
+                          {{ row.TipoRecurrenciaId.Nombre }}
+                        </span>
+                      }
+                    </footer>
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="sin-procesos">
+                <mat-icon>account_tree</mat-icon>
+                {{ (dataSource.filter ? 'GLOBAL.table_no_data_found' : 'calendario.sin_procesos') | translate }}
+              </div>
+            }
+          </mat-tab>
+
+          <mat-tab label="{{ 'calendario.actividades' | translate }}">
+            @if (processes.length === 0) {
+              <div class="sin-procesos sin-procesos-actividades">
+                <mat-icon>event_busy</mat-icon>
+                {{ 'calendario.consulta_sin_actividades' | translate }}
+              </div>
+            } @else {
+              @let proceso = procesoSeleccionado();
+              <div class="vista-actividades">
+                <nav class="columna-procesos" [attr.aria-label]="'calendario.procesos' | translate">
+                  <span class="titulo-columna">{{ 'calendario.procesos' | translate }}</span>
+                  @for (item of processes; track $index; let i = $index) {
+                    <button
+                      type="button"
+                      class="opcion-proceso"
+                      [class.seleccionado]="item === proceso"
+                      [attr.aria-current]="item === proceso"
+                      (click)="seleccionarProceso(i)"
+                      >
+                      <span class="fila-opcion">
+                        <span class="nombre-opcion">{{ item.Nombre }}</span>
+                      </span>
+                      <small class="conteo-opcion">
+                        {{ item.actividades.data.length || 0 }}
+                        {{ (item.actividades.data.length === 1 ? 'calendario.actividad' : 'calendario.actividades') | translate | lowercase }}
+                      </small>
+                    </button>
+                  }
+                </nav>
+
+                <section class="panel-actividades">
+                  <header class="cabecera-panel">
+                    <div class="info-panel">
+                      <h4>{{ proceso.Nombre }}</h4>
+                      <p>{{ proceso.Descripcion || '-' }}</p>
+                    </div>
+                  </header>
+
+                  <mat-form-field appearance="outline" class="buscador-actividades">
+                    <mat-label>{{ 'calendario.buscar_actividad' | translate }}</mat-label>
+                    <mat-icon matPrefix class="icono-buscar">search</mat-icon>
+                    <input
+                      matInput
+                      type="text"
+                      [value]="proceso.actividades.filter"
+                      (keyup)="applyFilterActividades($event, proceso.actividades)"
+                      />
+                  </mat-form-field>
+
+                  @if (proceso.actividades.filteredData.length) {
+                    <ul class="lista-actividades">
+                      @for (row of actividadesOrdenadas(proceso); track $index) {
+                        @let estado = estadoTemporal(row);
+                        <li class="fila-actividad" [class.inactiva]="!row.Activo">
+                          <div class="contenido-actividad">
+                            <div class="titulo-actividad">
+                              <span class="nombre-actividad">{{ row.Nombre }}</span>
+                              @if (!row.Activo) {
+                                <span class="activity-status inactive">{{ 'GLOBAL.inactivo' | translate }}</span>
+                              } @else if (estado) {
+                                <span class="estado-temporal" [ngClass]="estado">{{ ('calendario.estado_' + estado) | translate }}</span>
+                              }
+                            </div>
+                            @if (row.Descripcion) {
+                              <p class="descripcion-actividad">{{ row.Descripcion }}</p>
+                            }
+                            <div class="fechas-actividad">
+                              <mat-icon>event</mat-icon>
+                              <span>{{ row.FechaInicio }} → {{ row.FechaFin }}</span>
+                              @if (duracionDias(row); as dias) {
+                                <span class="duracion">· {{ dias }} {{ (dias === 1 ? 'calendario.dia' : 'calendario.dias') | translate }}</span>
+                              }
+                            </div>
+                            @if (row.Activo && estado === 'en_curso') {
+                              <div class="barra-avance">
+                                <span [style.width.%]="avanceActividad(row)"></span>
+                              </div>
+                            }
+                          </div>
+                          <div class="acciones-actividad">
+                            <span [matTooltip]="row.PuedeEditar ? ('calendario.tooltip_editar_actividad' | translate) : row.MotivoNoEditable">
+                              <button
+                                mat-icon-button
+                                type="button"
+                                [disabled]="!row.PuedeEditar"
+                                (click)="onAction({ action: 'edit', data: row }, proceso)"
+                                [attr.aria-label]="'calendario.tooltip_editar_actividad' | translate"
+                                >
+                                <mat-icon>edit_outline</mat-icon>
+                              </button>
+                            </span>
+                            <span [matTooltip]="row.PuedeEditar ? ((row.Activo ? 'calendario.tooltip_desactivar_actividad' : 'calendario.tooltip_activar_actividad') | translate) : row.MotivoNoEditable">
+                              <button
+                                mat-icon-button
+                                type="button"
+                                [disabled]="!row.PuedeEditar"
+                                [ngClass]="row.Activo ? 'icono-desactivar' : 'icono-activar'"
+                                (click)="onAction({ action: 'disable', data: row }, proceso)"
+                                [attr.aria-label]="(row.Activo ? 'calendario.tooltip_desactivar_actividad' : 'calendario.tooltip_activar_actividad') | translate"
+                                >
+                                <mat-icon>{{ row.Activo ? 'unpublished' : 'check_circle' }}</mat-icon>
+                              </button>
+                            </span>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <div class="sin-actividades">
+                      <mat-icon>event_busy</mat-icon>
+                      {{ (proceso.actividades.filter ? 'GLOBAL.table_no_data_found' : 'calendario.sin_actividades_proceso') | translate }}
+                    </div>
+                  }
+                </section>
+              </div>
+            }
+          </mat-tab>
+        </mat-tab-group>
+      </section>
+    } @else {
+      <div class="sin-seleccion">
+        <mat-icon>manage_search</mat-icon>
+        {{ 'calendario.consulta_sin_seleccion' | translate }}
+      </div>
+    }
   </mat-card-content>
 </mat-card>

@@ -18,6 +18,7 @@ import { SgaCalendarioMidService } from 'src/app/services/sga_calendario_mid.ser
 import { CalendarioActualizacionService } from 'src/app/services/calendario-actualizacion.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { avanceActividad, duracionDias, estadoTemporal, ordenarPorInicio } from 'src/app/utils/tiempo-actividad';
 
 @Component({
     selector: 'detalle-calendario',
@@ -34,10 +35,11 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy 
   processSettings: any;
   activitiesSettings: any;
   idDetalle: any
-  processes!: Proceso[];
+  processes: Proceso[] = [];
   calendar!: Calendario;
   //processTable!: LocalDataSource;
-  displayedColumnsActividades: string[] = ["Nombre", "Descripcion", "FechaInicio", "FechaFin", "Activo"]
+  indiceProceso = 0;
+  filtroProcesos = '';
   fileResolucion: any;
   calendarForm!: FormGroup;
   responsable!: string;
@@ -47,6 +49,8 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy 
   calendarForProject: string = '0';
   @Input()
   projectId: number = 0;
+  @Input()
+  programaNombre: string = '';
 
   constructor(
     private sgaCalendarioMidService: SgaCalendarioMidService,
@@ -94,16 +98,17 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy 
                 const loadedProcess: Proceso = new Proceso();
                 loadedProcess.Nombre = element['Proceso'];
                 loadedProcess.CalendarioId = { Id: this.calendar.calendarioId };
-                loadedProcess.actividades = new MatTableDataSource<Actividad>;
                 const activities: any[] = element['Actividades']
                 if (activities !== null) {
+                  const activityList: Actividad[] = [];
                   activities.forEach(element => {
                     const loadedActivity = this.buildActivityForProject(element, loadedProcess);
                     if (loadedActivity !== null) {
-                      loadedProcess.actividades.data.push(loadedActivity);
+                      activityList.push(loadedActivity);
                     }
                   });
-                  if (loadedProcess.actividades.data.length > 0) {
+                  loadedProcess.actividades = new MatTableDataSource<Actividad>(activityList);
+                  if (activityList.length > 0) {
                     this.processes.push(loadedProcess);
                   }
                 }
@@ -131,6 +136,8 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   ngOnChanges() {
+    this.indiceProceso = 0;
+    this.filtroProcesos = '';
     if (this.calendarForProject != '0') {
       this.loadSelects(this.calendarForProject);
     }
@@ -139,6 +146,55 @@ export class DetalleCalendarioComponent implements OnInit, OnChanges, OnDestroy 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  indiceProcesoSeleccionado(): number {
+    return Math.min(this.indiceProceso, Math.max(this.processes.length - 1, 0));
+  }
+
+  procesoSeleccionado(): Proceso {
+    return this.processes[this.indiceProcesoSeleccionado()];
+  }
+
+  seleccionarProceso(indice: number) {
+    this.indiceProceso = indice;
+  }
+
+  totalActividades(): number {
+    return this.processes.reduce((total, proceso) => total + proceso.actividades.data.length, 0);
+  }
+
+  procesosFiltrados(): Proceso[] {
+    if (!this.filtroProcesos) {
+      return this.processes;
+    }
+    return this.processes.filter((proceso) =>
+      `${proceso.Nombre} ${proceso.Descripcion || ''}`.toLowerCase().includes(this.filtroProcesos)
+    );
+  }
+
+  applyFilterProcesos(event: Event) {
+    this.filtroProcesos = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
+
+  applyFilterActividades(event: Event, proceso: Proceso) {
+    proceso.actividades.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
+
+  actividadesOrdenadas(proceso: Proceso): Actividad[] {
+    return ordenarPorInicio(proceso.actividades.filteredData);
+  }
+
+  estadoTemporal(actividad: Actividad): string | null {
+    return estadoTemporal(actividad);
+  }
+
+  avanceActividad(actividad: Actividad): number {
+    return avanceActividad(actividad);
+  }
+
+  duracionDias(actividad: Actividad): number {
+    return duracionDias(actividad);
   }
 
   cambiarCalendario(id: any) {
